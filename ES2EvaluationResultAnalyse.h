@@ -38,8 +38,8 @@ signals:
     void dataOperate();
 
 public slots:
-    //void countThreadSlot(int, int);
     void OnButtonLoadDataFile();
+    void OnButtonLoadEvaluationData();
     void finishLoadDataFile();
     void uploadCountProgress(int, int);
 
@@ -52,6 +52,7 @@ private:
     LoadDataFile* loadDataFile;
 
     DlgWait* _waitOperate;
+    QList<MResult*>* McurrentResults = nullptr;
 
     
 

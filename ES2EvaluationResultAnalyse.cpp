@@ -60,9 +60,37 @@ void ES2EvaluationResultAnalyse::startLoadThread()
 
 void ES2EvaluationResultAnalyse::OnButtonLoadDataFile()
 {
+    QString fileName = QFileDialog::getOpenFileName(this, (u8"添加数据文件"), QString(), "Data Files(*.evaluationinfo)");
+    if (fileName.isEmpty())
+	{
+		return;
+	}
+	QFile file(fileName);
+
     SetWait(true);
-    loadDataFile->readData();
-    //dataOperate();
+    loadDataFile->readData(McurrentResults, fileName);
+    dataOperate();
+}
+
+void ES2EvaluationResultAnalyse::OnButtonLoadEvaluationData()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, (u8"添加测评参数"), QString(), "Data Files(*.evaluationinfo)");
+    if (fileName.isEmpty())
+	{
+		return;
+	}
+	QFile file(fileName);
+	QString uid;
+	if (file.exists())
+	{
+		file.open(QIODevice::ReadOnly);
+		QDataStream input(&file);
+		input >> uid;
+		file.close();
+	}
+    SetWait(true);
+    loadDataFile->readData(McurrentResults, fileName);
+    dataOperate();
 }
 
 void ES2EvaluationResultAnalyse::uploadCountProgress(int rec, int sum)

@@ -17,9 +17,12 @@
 #include <QList>
 #include <QThread>
 
+#include "mresult.h"
+
 #include "dlgwait.h"
 
 using namespace Cm3::CommonUtils;
+using namespace Cm3::FormResult;
 
 class LoadDataFile : public QObject
 {
@@ -29,7 +32,7 @@ public:
     LoadDataFile(QObject *parent = nullptr);
     ~LoadDataFile();
 
-    void readData();
+    void readData(QList<MResult*>*, QString);
 
 signals:
     void countStep(int, int);
@@ -42,6 +45,10 @@ public slots:
 
 private:
     QStringList _fileNames;
+    MResult* _result = nullptr;
+    QList<MResult*>* _results = nullptr;
+    QString _filePath;
+    QString _dataOperateType;
 
 };
 

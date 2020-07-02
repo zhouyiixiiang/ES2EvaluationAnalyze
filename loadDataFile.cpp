@@ -11,20 +11,11 @@ LoadDataFile::~LoadDataFile()
 
 }
 
-void LoadDataFile::readData()
+void LoadDataFile::readData(QList<MResult*>* results, QString filePath)
 {
-    int sum;
-    //sum = file.len
-    //countFile();
-    sum = 10;
-
-    for(int i = 0; i < sum; i ++){
-
-    
-        Sleep(1000);
-        getCount(i, sum);
-    }
-    emit finish();
+	_results = results;
+	_filePath = filePath;
+	_dataOperateType = "readResultData";
 }
 
 
@@ -35,5 +26,25 @@ void LoadDataFile::getCount(int rec, int sum)
 
 void LoadDataFile::doDataOperate()
 {
+    if(_dataOperateType == "readResultData")
+    {
 
+        int sum;
+        //sum = file.len
+        //countFile();
+        sum = 10;
+
+        for(int i = 0; i < sum; i ++)
+        {
+
+        
+            Sleep(1000);
+            getCount(i, sum);
+        }
+        emit finish();
+    }
+    else
+    {
+
+    }
 }
