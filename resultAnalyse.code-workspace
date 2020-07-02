@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "D:\\workshop\\ES2Evaluation\\ES.Evaluation2.0Solution\\Cm3FormImageAnalyzer"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.php": "php",
+			"fstream": "cpp"
+		}
+	}
+}

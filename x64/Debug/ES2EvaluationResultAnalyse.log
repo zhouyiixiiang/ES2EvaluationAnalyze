@@ -1,0 +1,9 @@
+﻿  ES2EvaluationResultAnalyse.cpp
+D:\workshop\ES2Evaluation\ES.Evaluation2.0Solution\Cm3CommonUtils\dlgwait.h(1,1): warning C4828: 文件包含在偏移 0x159 处开始的字符，该字符在当前源字符集中无效(代码页 65001)。
+D:\workshop\ES2Evaluation\ES.Evaluation2.0Solution\Cm3CommonUtils\dlgwait.h(1,1): warning C4828: 文件包含在偏移 0x15a 处开始的字符，该字符在当前源字符集中无效(代码页 65001)。
+D:\workshop\ES2Evaluation\ES.Evaluation2.0Solution\Cm3CommonUtils\dlgwait.h(1,1): warning C4828: 文件包含在偏移 0x15b 处开始的字符，该字符在当前源字符集中无效(代码页 65001)。
+D:\workshop\ES2Evaluation\ES.Evaluation2.0Solution\Cm3CommonUtils\dlgwait.h(1,1): warning C4828: 文件包含在偏移 0x15c 处开始的字符，该字符在当前源字符集中无效(代码页 65001)。
+D:\workshop\ES2Evaluation\ES.Evaluation2.0Solution\Cm3CommonUtils\dlgwait.h(1,1): warning C4828: 文件包含在偏移 0x17e 处开始的字符，该字符在当前源字符集中无效(代码页 65001)。
+D:\workshop\ES2Evaluation\ES.Evaluation2.0Solution\Cm3CommonUtils\dlgwait.h(1,1): warning C4828: 文件包含在偏移 0x181 处开始的字符，该字符在当前源字符集中无效(代码页 65001)。
+D:\workshop\ES2Evaluation\ES.Evaluation2.0Solution\Cm3CommonUtils\dlgwait.h(1,1): warning C4828: 文件包含在偏移 0x184 处开始的字符，该字符在当前源字符集中无效(代码页 65001)。
+  ES2EvaluationResultAnalyse.vcxproj -> D:\workshop\ES2Evaluation\ES.Evaluation2.0Solution\x64\Debug\ES2EvaluationResultAnalyse.exe
