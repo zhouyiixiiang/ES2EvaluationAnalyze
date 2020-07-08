@@ -44,11 +44,15 @@ public slots:
     void getCount(int, int);
 
 private:
-    QStringList _fileNames;
-    MResult* _result = nullptr;
+    void readResultsFromFile();
+
+    QString _uid;
     QList<MResult*>* _results = nullptr;
+    MResult* _result = nullptr;
+    QStringList _fileNames;
     QString _filePath;
     QString _dataOperateType;
+    QString _path;
 
 };
 

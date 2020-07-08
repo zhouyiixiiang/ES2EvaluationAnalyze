@@ -60,7 +60,7 @@ void ES2EvaluationResultAnalyse::startLoadThread()
 
 void ES2EvaluationResultAnalyse::OnButtonLoadDataFile()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, (u8"添加数据文件"), QString(), "Data Files(*.evaluationinfo)");
+    QString fileName = QFileDialog::getOpenFileName(this, (u8"添加数据文件"), QString(), "Data Files(*.crst)");
     if (fileName.isEmpty())
 	{
 		return;
