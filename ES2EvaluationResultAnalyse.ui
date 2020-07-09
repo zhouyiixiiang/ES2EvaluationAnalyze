@@ -112,13 +112,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QTreeWidget" name="treeWidget">
-            <column>
-             <property name="text">
-              <string notr="true">1</string>
-             </property>
-            </column>
-           </widget>
+           <widget class="QTableView" name="tableView"/>
           </item>
          </layout>
         </widget>
@@ -136,18 +130,7 @@
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_6">
              <item>
-              <widget class="QTableWidget" name="tableWidget">
-               <column>
-                <property name="text">
-                 <string>名称</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>备注</string>
-                </property>
-               </column>
-              </widget>
+              <widget class="QTableView" name="tableView_2"/>
              </item>
             </layout>
            </widget>
@@ -159,65 +142,7 @@
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_5">
              <item>
-              <widget class="QTableWidget" name="tableWidget_2">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="horizontalScrollBarPolicy">
-                <enum>Qt::ScrollBarAsNeeded</enum>
-               </property>
-               <property name="sizeAdjustPolicy">
-                <enum>QAbstractScrollArea::AdjustIgnored</enum>
-               </property>
-               <property name="horizontalScrollMode">
-                <enum>QAbstractItemView::ScrollPerItem</enum>
-               </property>
-               <attribute name="horizontalHeaderDefaultSectionSize">
-                <number>120</number>
-               </attribute>
-               <attribute name="horizontalHeaderMinimumSectionSize">
-                <number>0</number>
-               </attribute>
-               <attribute name="verticalHeaderDefaultSectionSize">
-                <number>30</number>
-               </attribute>
-               <attribute name="verticalHeaderMinimumSectionSize">
-                <number>15</number>
-               </attribute>
-               <column>
-                <property name="text">
-                 <string>姓名</string>
-                </property>
-                <property name="font">
-                 <font>
-                  <kerning>false</kerning>
-                 </font>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>性别</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>职务</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>职务类别</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>编码</string>
-                </property>
-               </column>
-              </widget>
+              <widget class="QTableView" name="tableView_3"/>
              </item>
             </layout>
            </widget>

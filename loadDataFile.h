@@ -18,11 +18,15 @@
 #include <QThread>
 
 #include "mresult.h"
+#include "mpattern.h"
+#include "mformpattern.h"
+//#include "excelreader.h"
 
 #include "dlgwait.h"
 
 using namespace Cm3::CommonUtils;
 using namespace Cm3::FormResult;
+using namespace Cm3::FormPattern;
 
 class LoadDataFile : public QObject
 {
@@ -45,6 +49,7 @@ public slots:
 
 private:
     void readResultsFromFile();
+    //void generateExcelResult(MResult*, MPattern*, QString);
 
     QString _uid;
     QList<MResult*>* _results = nullptr;

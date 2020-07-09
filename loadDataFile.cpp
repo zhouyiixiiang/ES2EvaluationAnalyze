@@ -3,6 +3,7 @@
 
 LoadDataFile::LoadDataFile(QObject *parent) : QObject(parent)
 {
+
     //_filePath = "";
 }
 
@@ -28,8 +29,9 @@ void LoadDataFile::doDataOperate()
 {
     if(_dataOperateType == "readResultData")
     {
+		readResultsFromFile();
 
-        int sum;
+    /*    int sum;
         //sum = file.len
         //countFile();
         sum = 10;
@@ -40,7 +42,7 @@ void LoadDataFile::doDataOperate()
         
             Sleep(1000);
             getCount(i, sum);
-        }
+        }*/
         emit finish();
     }
     else
@@ -49,7 +51,7 @@ void LoadDataFile::doDataOperate()
     }
 }
 
-void loadDataFile::readResultsFromFile()
+void LoadDataFile::readResultsFromFile()
 {
 	QString appPath = QCoreApplication::applicationDirPath().toStdString().data();
 	QFile file(_filePath);
@@ -62,7 +64,10 @@ void loadDataFile::readResultsFromFile()
 		input >> _uid >> lenResults;
 		for (int ii = 0; ii < lenResults; ii++)
 		{
-			MResult* rst = _results->at(ii);
+			MResult* rst = new MResult;
+			_results->append(rst);
+			
+			//MResult* rst = _results->at(ii);
 			input >> rst->PatternGUID >> rst->_isInitialized >> rst->_validFormCount >> rst->FormResultsLen;
 			int len = rst->FormResultsLen;
 			for (int i = 0; i < len; i++)
