@@ -36,7 +36,8 @@ public:
     LoadDataFile(QObject *parent = nullptr);
     ~LoadDataFile();
 
-    void readData(QList<MResult*>*, QString);
+    void readDataFile(QList<MResult*>*, QString);
+    void readEvaluationData(QList<MResult*>*, QString);
 
 signals:
     void countStep(int, int);

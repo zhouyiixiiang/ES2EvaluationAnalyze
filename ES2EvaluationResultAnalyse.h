@@ -73,15 +73,22 @@ public:
 
 
 private:
+    template <typename T>
+    void ReleaseQList(QList<T*>* qlist);
     void initGender();
+    void readEvaluationInfoFromDatafile();
     MEvaluationInfo* _currentEvaluationInfo = nullptr; // 当前测评
-
+    QStringList fileNamesEndWith(QString name);
 
     int _formPatternIndex = 0;
     QList<QString> _gender;
     QList<MEvaluationInfo*>* _evaluationInfos = nullptr; // 已有测评
     MRecognizeFormPattern* _currentrecognizePattern = nullptr;
     MemberInfo* _currentEvaluationMemberInfo = nullptr;
+    ES2EvaluationSubjects* _evaluationSubjectInfo = nullptr;
+    QString _path;
+
+    QList<QMetaObject::Connection> _connections;
 
 
     QThread* dataOperateThread;
