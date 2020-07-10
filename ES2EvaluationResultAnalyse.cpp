@@ -12,11 +12,10 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 	_selectedMembersIndex.clear();
 	_connections.clear();
 
-    McurrentResults = new  QList<MResult*>;
+    McurrentResults = new QList<MResult*>;
 	_evaluationInfos = new QList<MEvaluationInfo*>; 
 	_currentrecognizePattern = new MRecognizeFormPattern();
 	_currentEvaluationInfo = new MEvaluationInfo();
-
 
 	if (_evaluationInfos->size() > 0)
 	{
@@ -29,8 +28,8 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 	{
 		//初始化并从本地读取测评主体与测评成员信息
 		_evaluationSubjectInfo = new ES2EvaluationSubjects();
-		_currentEvaluationMember = new ES2EvaluationMember();
 		_evaluationSubjectInfo->readFromBinaryFile();
+		_currentEvaluationMember = new ES2EvaluationMember();
 		_currentEvaluationMember->readFromBinaryFile();
 	}
 
@@ -42,7 +41,7 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 	getconnectUseMapFunc("tableEvaluationObject", ui.tableView_2, _tableEvaluationObject);
 	getconnectUseMapFunc("tableEvaluationMembers", ui.tableView_3, _tableEvaluationMembers);
 
-	updateAllTableviews();
+	//updateAllTableviews();
 
     _waitOperate = new DlgWait(this);
     _waitOperate->hide();
@@ -209,9 +208,7 @@ void ES2EvaluationResultAnalyse::selectionTableEvaluationChanged(const QItemSele
 			_formPatternIndex = 0;
 			//getMemberDutyClass();
 			// 更新tablePatternInfo表格
-			fillingTheTableView("tableEvaluationObject");
-			fillingTheTableView("tableEvaluationMembers");
-			fillingTheTableView("tableEvaluation");
+			updateAllTableviews();
 		}
 	}
 }
@@ -328,9 +325,9 @@ void ES2EvaluationResultAnalyse::disconnectUsingMapFunc(QString s, TableItem* ta
 
 void ES2EvaluationResultAnalyse::updateAllTableviews()
 {
+	fillingTheTableView("tableEvaluation");
 	fillingTheTableView("tableEvaluationMembers");
 	fillingTheTableView("tablePatternInfo");
-	fillingTheTableView("tableEvaluation");
 }
 
 

@@ -29,6 +29,7 @@
 
 using namespace Cm3::CommonUtils;
 using namespace Cm3::FormResult;
+using namespace Es2::EvaluationSubject;
 
 class ES2EvaluationResultAnalyse : public QMainWindow
 {
