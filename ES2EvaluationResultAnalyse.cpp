@@ -17,6 +17,7 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 	_currentrecognizePattern = new MRecognizeFormPattern();
 	_currentEvaluationInfo = new MEvaluationInfo();
 
+
 	if (_evaluationInfos->size() > 0)
 	{
 		_currentEvaluationInfo = _evaluationInfos->at(0);
@@ -28,7 +29,9 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 	{
 		//初始化并从本地读取测评主体与测评成员信息
 		_evaluationSubjectInfo = new ES2EvaluationSubjects();
+		_currentEvaluationMember = new ES2EvaluationMember();
 		_evaluationSubjectInfo->readFromBinaryFile();
+		_currentEvaluationMember->readFromBinaryFile();
 	}
 
 	_tableEvaluation = new TableItem();
@@ -39,7 +42,7 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 	getconnectUseMapFunc("tableEvaluationObject", ui.tableView_2, _tableEvaluationObject);
 	getconnectUseMapFunc("tableEvaluationMembers", ui.tableView_3, _tableEvaluationMembers);
 
-	//updateAllTableviews();
+	updateAllTableviews();
 
     _waitOperate = new DlgWait(this);
     _waitOperate->hide();
@@ -56,15 +59,26 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 ES2EvaluationResultAnalyse::~ES2EvaluationResultAnalyse()
 {
 	ReleaseQList(_evaluationInfos);
+	ReleaseQList(McurrentResults);
+
 	for (int i = 0; i < _connections.size(); i++)
 	{
 		disconnect(_connections.at(i));
 	}
-
 	if (_evaluationSubjectInfo != nullptr)
 	{
 		delete _evaluationSubjectInfo;
 		_evaluationSubjectInfo = nullptr;
+	}
+	if (_currentrecognizePattern != nullptr)
+	{
+		delete _currentrecognizePattern;
+		_currentrecognizePattern = nullptr;
+	}
+	if (_currentEvaluationInfo != nullptr)
+	{
+		delete _currentEvaluationInfo;
+		_currentEvaluationInfo = nullptr;
 	}
 
 	disconnectUsingMapFunc("tableEvaluation", _tableEvaluation);
@@ -175,9 +189,8 @@ void ES2EvaluationResultAnalyse::OnButtonLoadEvaluationData()
 	}
 	//readEvaluationInfoFromDatafile();
 	
-
 	_currentEvaluationInfo->readRecognizePatternsFromBinaryFile(fileName);
-	fillingTheTableView("tableEvaluation");
+	updateAllTableviews();
 
     //SetWait(true);
     //loadDataFile->readEvaluationData(McurrentResults, fileName);
@@ -247,9 +260,7 @@ void ES2EvaluationResultAnalyse::finishLoadDataFile()
 {
     SetWait(false);
 
-	fillingTheTableView("tableEvaluationObject");
-	fillingTheTableView("tableEvaluationMembers");
-	fillingTheTableView("tableEvaluation");
+	
 }
 
 void ES2EvaluationResultAnalyse::readEvaluationInfoFromDatafile()

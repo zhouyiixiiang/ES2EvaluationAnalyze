@@ -74,27 +74,26 @@ public:
 
 private:
     template <typename T>
-    void ReleaseQList(QList<T*>* qlist);
+    void ReleaseQList(QList<T*>*);
     void initGender();
     void readEvaluationInfoFromDatafile();
-    MEvaluationInfo* _currentEvaluationInfo = nullptr; // 当前测评
-    QStringList fileNamesEndWith(QString name);
-
+    QStringList fileNamesEndWith(QString);
+ 
     int _formPatternIndex = 0;
     QList<QString> _gender;
     QList<MEvaluationInfo*>* _evaluationInfos = nullptr; // 已有测评
+    MEvaluationInfo* _currentEvaluationInfo = nullptr; // 当前测评
     MRecognizeFormPattern* _currentrecognizePattern = nullptr;
     MemberInfo* _currentEvaluationMemberInfo = nullptr;
     ES2EvaluationSubjects* _evaluationSubjectInfo = nullptr;
-    QString _path;
+    ES2EvaluationMember* _currentEvaluationMember = nullptr;
+    QList<int> _selectedMembersIndex;
 
+    QString _path;
     QList<QMetaObject::Connection> _connections;
 
-
-    QThread* dataOperateThread;
     QThread* loadThread;
     LoadDataFile* loadDataFile;
-
     DlgWait* _waitOperate;
 
     TableItem* _tableEvaluation = nullptr;
@@ -102,9 +101,7 @@ private:
     TableItem* _tableEvaluationMembers = nullptr;
 
     int _evaluationIndex = 0;
-    int _evaluationMemberIndex = 0;
-    QList<int> _selectedMembersIndex;
-
     int _evaluationUnitIndex = 0;
     int _evaluationTableIndex = 0;
+    int _evaluationMemberIndex = 0;
 };

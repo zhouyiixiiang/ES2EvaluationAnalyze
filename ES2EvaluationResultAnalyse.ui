@@ -265,10 +265,60 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton_3</sender>
+   <signal>clicked()</signal>
+   <receiver>ES2EvaluationResultAnalyseClass</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1277</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1303</x>
+     <y>114</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>ES2EvaluationResultAnalyseClass</receiver>
+   <slot>selectOutputType(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1270</x>
+     <y>187</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1355</x>
+     <y>220</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_4</sender>
+   <signal>clicked()</signal>
+   <receiver>ES2EvaluationResultAnalyseClass</receiver>
+   <slot>onButtonOutputExcel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1208</x>
+     <y>669</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1298</x>
+     <y>723</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>countThreadSlot()</slot>
   <slot>OnButtonLoadDataFile()</slot>
   <slot>OnButtonLoadEvaluationData()</slot>
+  <slot>selectOutputType(int)</slot>
+  <slot>onButtonOutputExcel()</slot>
  </slots>
 </ui>
