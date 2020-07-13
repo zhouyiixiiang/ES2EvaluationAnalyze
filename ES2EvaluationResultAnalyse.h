@@ -30,6 +30,7 @@
 using namespace Cm3::CommonUtils;
 using namespace Cm3::FormResult;
 using namespace Es2::EvaluationSubject;
+using namespace Cm3::FormPattern;
 
 class ES2EvaluationResultAnalyse : public QMainWindow
 {
@@ -49,8 +50,9 @@ signals:
     void dataOperate();
 
 public slots:
-    void OnButtonLoadDataFile();
-    void OnButtonLoadEvaluationData();
+    void onButtonLoadDataFile();
+    void onButtonLoadEvaluationData();
+    void onButtonOutputExcel();
     void finishLoadDataFile();
     void uploadCountProgress(int, int);
     void selectionTableEvaluationChanged(const QItemSelection& selected, const QItemSelection& deselected);
@@ -59,6 +61,7 @@ public slots:
 
 public:
     void SetWait(bool);
+    void SetWaitExcel(bool);
     void fillingTheTableView(QString);
     void fillTableCell(QString value, TableItem* table, int row, int col);
 
@@ -89,6 +92,13 @@ private:
     ES2EvaluationSubjects* _evaluationSubjectInfo = nullptr;
     ES2EvaluationMember* _currentEvaluationMember = nullptr;
     QList<int> _selectedMembersIndex;
+
+    QList<MPattern*>* _mCurrentPatterns = nullptr;
+    MPattern* _mCurrentPattern = nullptr;
+    MFormPattern* McurrentFormPattern = nullptr;
+    int McurrentFormPatternIndex = 0;
+    int SelectedFilterdResultGroupLength = 0;
+    MResult* McurrentRecognizedResult = nullptr;
 
     QString _path;
     QList<QMetaObject::Connection> _connections;

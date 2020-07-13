@@ -14,6 +14,7 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 
     McurrentResults = new QList<MResult*>;
 	_evaluationInfos = new QList<MEvaluationInfo*>; 
+
 	_currentrecognizePattern = new MRecognizeFormPattern();
 	_currentEvaluationInfo = new MEvaluationInfo();
 
@@ -57,6 +58,7 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 
 ES2EvaluationResultAnalyse::~ES2EvaluationResultAnalyse()
 {
+
 	ReleaseQList(_evaluationInfos);
 	ReleaseQList(McurrentResults);
 
@@ -69,17 +71,6 @@ ES2EvaluationResultAnalyse::~ES2EvaluationResultAnalyse()
 		delete _evaluationSubjectInfo;
 		_evaluationSubjectInfo = nullptr;
 	}
-	if (_currentrecognizePattern != nullptr)
-	{
-		delete _currentrecognizePattern;
-		_currentrecognizePattern = nullptr;
-	}
-	if (_currentEvaluationInfo != nullptr)
-	{
-		delete _currentEvaluationInfo;
-		_currentEvaluationInfo = nullptr;
-	}
-
 	disconnectUsingMapFunc("tableEvaluation", _tableEvaluation);
 	disconnectUsingMapFunc("tableEvaluationObject", _tableEvaluationObject);
 	disconnectUsingMapFunc("tableEvaluationMembers", _tableEvaluationMembers);
@@ -106,6 +97,25 @@ void ES2EvaluationResultAnalyse::SetWait(bool flag)
     }
 }
 
+void ES2EvaluationResultAnalyse::SetWaitExcel(bool flag)
+{
+	if (flag)
+	{
+		//ui.frame_tool->setEnabled(false);
+		//ui.widget_pattern->setEnabled(false);
+		QString ss = u8"正在导出数据至Excel...";
+		ss = ss.toUtf8();
+		_waitOperate->startAnimation(ss);
+		_waitOperate->show();
+	}
+	else
+	{
+		//ui.frame_tool->setEnabled(true);
+		//ui.widget_pattern->setEnabled(true);
+		_waitOperate->stopAnimation();
+		_waitOperate->hide();
+	}
+}
 
 void ES2EvaluationResultAnalyse::startLoadThread()
 {
@@ -144,7 +154,7 @@ void ES2EvaluationResultAnalyse::ReleaseQList(QList<T*>* qlist)
 	}
 }
 
-void ES2EvaluationResultAnalyse::OnButtonLoadDataFile()
+void ES2EvaluationResultAnalyse::onButtonLoadDataFile()
 {
     QString fileName = QFileDialog::getOpenFileName(this, (u8"添加数据文件"), QString(), "Data Files(*.crst)");
     if (fileName.isEmpty())
@@ -158,7 +168,7 @@ void ES2EvaluationResultAnalyse::OnButtonLoadDataFile()
     dataOperate();
 }
 
-void ES2EvaluationResultAnalyse::OnButtonLoadEvaluationData()
+void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 {
     QString fileName = QFileDialog::getOpenFileName(this, (u8"添加测评参数"), QString(), "Data Files(*.evaluationinfo)");
     if (fileName.isEmpty())
@@ -187,14 +197,166 @@ void ES2EvaluationResultAnalyse::OnButtonLoadEvaluationData()
 		}
 	}
 	//readEvaluationInfoFromDatafile();
-	
 	_currentEvaluationInfo->readRecognizePatternsFromBinaryFile(fileName);
+	_evaluationInfos->append(_currentEvaluationInfo);
+	_currentrecognizePattern = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(_formPatternIndex);
+
 	updateAllTableviews();
 
     //SetWait(true);
     //loadDataFile->readEvaluationData(McurrentResults, fileName);
     //dataOperate();
 }
+
+void ES2EvaluationResultAnalyse::onButtonOutputExcel()
+{
+	QString dirName = QFileDialog::getExistingDirectory(this, u8"保存数据结果到...").toUtf8();
+	if (!dirName.isEmpty())
+	{
+		dirName = dirName + "/" + _mCurrentPattern->GetPatternName();
+		QDir dir(dirName);
+		if (!dir.exists()) //如果不存在这个文件夹，则创建这个文件夹
+		{
+			dir.mkdir(dirName);
+		}
+	}
+	else
+		return;
+
+	//新建Excel文件
+	QString excelSaveFileName = McurrentFormPattern->FormName.toUtf8();
+	excelSaveFileName += ".xlsx";
+	SetWaitExcel(true);
+	loadDataFile->setExcelData(McurrentRecognizedResult, _mCurrentPattern, dirName);
+	dataOperate();
+	//规定excel的单元格式样式
+	//QXlsx::Format format1;
+	//format1.setFontColor(QColor(Qt::black));/*文字为红色*/
+	//format1.setPatternBackgroundColor(QColor(152, 251, 152));/*背景颜色，使用rgb*/
+	//format1.setFontSize(15);
+	//format1.setHorizontalAlignment(QXlsx::Format::AlignHCenter);/*横向居中*/
+	//format1.setBorderStyle(QXlsx::Format::BorderMedium);/*边框样式*/
+	//
+	//if (SelectedResult->FormReuslts->count() > 0)
+	//{
+	//	QString excelName= McurrentFormPattern->FormName;
+	//	if (_mExcelReader->newExcel(excelName))
+	//	{
+	//		_mExcelReader->setSheetName();
+	//		/*
+	//			填充明细数据
+	//		*/
+	//		_mExcelReader->chooseSheet(0);
+	//		int excelRow = SelectedResult->FormReuslts->count();
+	//		//默认一个识别结果里面，都是根据一个模板进行识别的，因此结果的分组数是一样的，取第一个FormResult的分组数
+	//		int excelColumn = SelectedResult->FormReuslts->at(0)->MarkGroupResults->count();
+	//		//表头设置
+	//		unsigned k;
+	//		for (unsigned j = 0; j < excelColumn; j++)
+	//		{
+	//			_mExcelReader->writeExcel(1, j + 1, SelectedResult->FormReuslts->at(0)->MarkGroupResults->at(j)->GroupName, format1);
+	//			k = j;
+	//		}
+	//		_mExcelReader->writeExcel(1, k + 2, SelectedResult->FormReuslts->at(0)->IdentifierResult->Name, format1);
+	//		for (unsigned i = 0; i < excelRow; i++)
+	//		{
+	//			Cm3::FormResult::MFormResult *tempFormResult = SelectedResult->FormReuslts->at(i);
+	//			unsigned k;
+	//			for (unsigned j = 0; j < excelColumn; j++)
+	//			{
+	//				_mExcelReader->writeExcel(i + 2, j + 1, tempFormResult->MarkGroupResults->at(j)->TextResult, format1);
+	//				k = j;
+	//			}
+	//			_mExcelReader->writeExcel(i + 2, k + 2, tempFormResult->IdentifierResult->Result, format1);
+	//		}
+	//		/*
+	//			填充统计数据
+	//		*/
+	//		struct AnalyzeResult //建立一个结构体记录每一个统计对象的计数
+	//		{
+	//			QString patternName;
+	//			int count;
+	//		};
+	//		QList<AnalyzeResult> patternResult;
+	//		QList<QList<AnalyzeResult>> patternResults;
+	//		_mExcelReader->chooseSheet(1);
+	//		patternResults.clear();
+	//		//for (int k = 0; k < excelRow; k++)
+	//		{
+	//			for (int i = 0; i < McurrentFormPattern->MarkGroupPattern->size(); i++)
+	//			{
+	//				patternResult.clear();
+	//				for (int j = 0; j < McurrentFormPattern->MarkGroupPattern->at(i)->CellList->size(); j++)
+	//				{
+	//					AnalyzeResult eachPatternResult;
+	//					eachPatternResult.patternName = McurrentFormPattern->MarkGroupPattern->at(i)->CellList->at(j)->CellName;
+	//					eachPatternResult.count = 0;
+	//					patternResult.append(eachPatternResult);
+	//				}
+	//				//往patternResult里面填充未选和多选两种情况
+	//				AnalyzeResult eachPatternResult1;
+	//				AnalyzeResult eachPatternResult2;
+	//				eachPatternResult1.patternName = QString("*");
+	//				eachPatternResult2.patternName = QString("");
+	//				eachPatternResult1.count = 0;
+	//				eachPatternResult2.count = 0;
+	//				patternResult.append(eachPatternResult1);
+	//				patternResult.append(eachPatternResult2);
+	//				//最后在patternResults中添加当前patternResult
+	//				patternResults.append(patternResult);
+	//			}
+	//		}
+	//		//计算统计用参数
+	//		for (int i = 0; i < SelectedResult->GetFormResultCount(); i++)
+	//		{
+	//			for (int j = 0; j < SelectedResult->FormReuslts->at(i)->GetGroupResultCount(); j++)
+	//			{
+	//				for (int k = 0; k < patternResult.size(); k++)
+	//				{
+	//					if (SelectedResult->FormReuslts->at(i)->GetGroupResult(j)->TextResult==patternResult.at(k).patternName)
+	//					{
+	//						AnalyzeResult tempAnalyzeResult;
+	//						tempAnalyzeResult = patternResults.at(j).at(k);
+	//						tempAnalyzeResult.count += 1;
+	//						patternResults[j].replace(k, tempAnalyzeResult);
+	//						//patternResult[k].count++;
+	//					}
+	//				}
+	//			}
+	//		}
+	//		//初始化行与列的索引
+	//		int rowIndex = 1;
+	//		int columnIndex = 1;
+	//		//表头设计，根据得到的patternNames确定每一个group的大小，合并相应长度的单元格
+	//		int lenGroup = patternResults.at(0).size();
+	//		for (int i = 0; i < patternResults.size(); i++)
+	//		{
+	//			_mExcelReader->mergeCells(rowIndex, columnIndex, rowIndex, columnIndex + lenGroup - 1, format1);
+	//			for (int j = 0; j < patternResults.at(0).size(); j++)
+	//			{
+	//				_mExcelReader->writeExcel(rowIndex, columnIndex, McurrentFormPattern->MarkGroupPattern->at(i)->GroupName, format1);
+	//				QString tempPatternName = patternResults.at(i).at(j).patternName;
+	//				if (tempPatternName == QString("*"))
+	//				{
+	//					_mExcelReader->writeExcel(rowIndex + 1, columnIndex + j, (u8"多选"), format1);
+	//				}
+	//				else if (tempPatternName == QString(""))
+	//				{
+	//					_mExcelReader->writeExcel(rowIndex + 1, columnIndex + j, (u8"未选"), format1);
+	//				}
+	//				else
+	//				{
+	//					_mExcelReader->writeExcel(rowIndex + 1, columnIndex + j, patternResults.at(i).at(j).patternName, format1);
+	//				}
+	//				_mExcelReader->writeExcel(rowIndex + 1 + 1, columnIndex + j, QString::number(patternResults.at(i).at(j).count), format1);
+	//			}
+	//			columnIndex = columnIndex + lenGroup;
+	//		}
+	//	}
+	//}
+}
+
+
 
 void ES2EvaluationResultAnalyse::selectionTableEvaluationChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
@@ -208,7 +370,9 @@ void ES2EvaluationResultAnalyse::selectionTableEvaluationChanged(const QItemSele
 			_formPatternIndex = 0;
 			//getMemberDutyClass();
 			// 更新tablePatternInfo表格
-			updateAllTableviews();
+
+			fillingTheTableView("tableEvaluationMembers");
+			fillingTheTableView("tableEvaluationObject");
 		}
 	}
 }
@@ -276,7 +440,6 @@ void ES2EvaluationResultAnalyse::readEvaluationInfoFromDatafile()
 	}
 }
 
-
 QStringList ES2EvaluationResultAnalyse::fileNamesEndWith(QString name)
 {
 	QDir* dir = new QDir(_path + "/data");
@@ -327,9 +490,8 @@ void ES2EvaluationResultAnalyse::updateAllTableviews()
 {
 	fillingTheTableView("tableEvaluation");
 	fillingTheTableView("tableEvaluationMembers");
-	fillingTheTableView("tablePatternInfo");
+	fillingTheTableView("tableEvaluationObject");
 }
-
 
 void ES2EvaluationResultAnalyse::reconnectTableItem(QString sTable, QTableView*& tableview, TableItem*& table, QTableView*& exactTableview, TableItem*& exactTable)
 {
@@ -362,7 +524,6 @@ void ES2EvaluationResultAnalyse::getconnectUseMapFunc(QString s, QTableView* tab
 		QObject::connect(tableItem->Mmodel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(itemTableEvaluationMembersChanged(QStandardItem*)));
 	}
 }
-
 
 void ES2EvaluationResultAnalyse::deleteTableItem(TableItem*& tableItem) // 清空tableitem指针的泛型函数
 {
@@ -401,7 +562,27 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 		table->Mmodel->removeRows(0, table->Mmodel->rowCount());
 	}
 	table->MselectionModel->clear();
-	if (sTable == "tableEvaluationMembers")
+	if (sTable == "tableEvaluation")
+	{
+		//表格总体设计
+		table->Mmodel->setColumnCount(1);
+		tableview->verticalHeader()->hide();//隐藏行号 
+		table->Mmodel->setHeaderData(0, Qt::Horizontal, (u8"已有测评"));
+		tableview->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+		//往表格中填充模数据
+		int row = 0;
+		int column = 0;
+		if (_evaluationInfos != nullptr)
+		{
+			for (int i = 0; i < _evaluationInfos->size(); i++)
+			{
+				table->Mmodel->insertRows(i, 1, QModelIndex());//插入每一行
+				MEvaluationInfo* tempSInfo = _evaluationInfos->at(i);
+				fillTableCell(tempSInfo->RecognizePatternInfo->Name, table, i, 0);
+			}
+		}
+	}
+	else if (sTable == "tableEvaluationMembers")
 	{
 		//表格总体设计
 		table->Mmodel->setColumnCount(5);
@@ -419,6 +600,7 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 		//往表格中填充模数据
 		int row = 0;
 		int column = 0;
+		
 		if (_currentEvaluationInfo != nullptr)
 		{
 			//
@@ -442,24 +624,7 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 		}
 		table->MselectionModel->clear();
 	}
-	else if (sTable == "tableEvaluation")
-	{
-		//表格总体设计
-		table->Mmodel->setColumnCount(1);
-		tableview->verticalHeader()->hide();//隐藏行号 
-		//往表格中填充模数据
-		int row = 0;
-		int column = 0;
-		if (_evaluationInfos != nullptr)
-		{
-			for (int i = 0; i < _evaluationInfos->size(); i++)
-			{
-				table->Mmodel->insertRows(i, 1, QModelIndex());//插入每一行
-				MEvaluationInfo* tempSInfo = _evaluationInfos->at(i);
-				fillTableCell(tempSInfo->RecognizePatternInfo->Name, table, i, 0);
-			}
-		}
-	}
+
 	else if (sTable == "tableEvaluationObject")
 	{
 		table->Mmodel->setColumnCount(1);

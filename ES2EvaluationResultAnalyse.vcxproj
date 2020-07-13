@@ -83,7 +83,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\ES2EvaluationSubject;..\Cm3FormResult;..\Cocer200Scan;..\Cm3CommonUtils\GeneratedFiles;..\Cm3CommonUtils;..\ES2EvaluationDocs;..\ES2RecognizePattern;..\Cm3PublicObject;..\Cm3FormProcess;..\Cm3FormPattern;..\ThirdLibrary\Opencv\include;..\ThirdLibrary\libopc\lib-win\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\ES2EvaluationSubject;..\Cm3FormResult;..\Cocer200Scan;..\Cm3CommonUtils\GeneratedFiles;..\Cm3CommonUtils;..\ES2EvaluationDocs;..\ES2RecognizePattern;..\Cm3PublicObject;..\Cm3FormProcess;..\Cm3FormPattern;..\ThirdLibrary\Opencv\include;..\ThirdLibrary\libopc\lib-win\include;..\ThirdLibrary\qtxlsx\src\xlsx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8</AdditionalOptions>
     </ClCompile>
     <Link>

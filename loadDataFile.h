@@ -20,7 +20,7 @@
 #include "mresult.h"
 #include "mpattern.h"
 #include "mformpattern.h"
-//#include "excelreader.h"
+#include "excelreader.h"
 
 #include "dlgwait.h"
 
@@ -37,12 +37,13 @@ public:
     ~LoadDataFile();
 
     void readDataFile(QList<MResult*>*, QString);
-    void readEvaluationData(QList<MResult*>*, QString);
+    void setExcelData(MResult* result, MPattern* pattern, QString excelName);
 
 signals:
     void countStep(int, int);
     void countFile();
     void finish();
+    void finishExcel();
 
 public slots:
     void doDataOperate();
@@ -50,7 +51,7 @@ public slots:
 
 private:
     void readResultsFromFile();
-    //void generateExcelResult(MResult*, MPattern*, QString);
+    void generateExcelResult(MResult*, MPattern*, QString);
 
     QString _uid;
     QList<MResult*>* _results = nullptr;
@@ -59,6 +60,9 @@ private:
     QString _filePath;
     QString _dataOperateType;
     QString _path;
+    MPattern* _pattern = nullptr;
+    QString _excelName;
+    ExcelReader* _mExcelReader = nullptr;//excel操作对象
 
 };
 

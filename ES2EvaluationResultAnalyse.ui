@@ -237,7 +237,7 @@
    <sender>pushButton</sender>
    <signal>clicked()</signal>
    <receiver>ES2EvaluationResultAnalyseClass</receiver>
-   <slot>OnButtonLoadEvaluationData()</slot>
+   <slot>onButtonLoadEvaluationData()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>123</x>
@@ -253,7 +253,7 @@
    <sender>pushButton_2</sender>
    <signal>clicked(bool)</signal>
    <receiver>ES2EvaluationResultAnalyseClass</receiver>
-   <slot>OnButtonLoadDataFile()</slot>
+   <slot>onButtonLoadDataFile()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>586</x>
@@ -316,8 +316,8 @@
  </connections>
  <slots>
   <slot>countThreadSlot()</slot>
-  <slot>OnButtonLoadDataFile()</slot>
-  <slot>OnButtonLoadEvaluationData()</slot>
+  <slot>onButtonLoadDataFile()</slot>
+  <slot>onButtonLoadEvaluationData()</slot>
   <slot>selectOutputType(int)</slot>
   <slot>onButtonOutputExcel()</slot>
  </slots>
