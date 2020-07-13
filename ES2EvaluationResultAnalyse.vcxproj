@@ -39,6 +39,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
@@ -85,20 +88,24 @@
     <ClCompile>
       <AdditionalIncludeDirectories>..\ES2EvaluationSubject;..\Cm3FormResult;..\Cocer200Scan;..\Cm3CommonUtils\GeneratedFiles;..\Cm3CommonUtils;..\ES2EvaluationDocs;..\ES2RecognizePattern;..\Cm3PublicObject;..\Cm3FormProcess;..\Cm3FormPattern;..\ThirdLibrary\Opencv\include;..\ThirdLibrary\libopc\lib-win\include;..\ThirdLibrary\qtxlsx\src\xlsx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8</AdditionalOptions>
+      <PreprocessorDefinitions>XLSX_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\ThirdLibrary\Opencv\x64\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\ThirdLibrary\Opencv\x64\lib\;..\ThirdLibrary\qtxlsx\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Qt5Xlsx.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <QtRcc Include="ES2EvaluationResultAnalyse.qrc" />
     <QtMoc Include="ES2EvaluationResultAnalyse.h" />
     <ClCompile Include="ES2EvaluationResultAnalyse.cpp" />
+    <ClCompile Include="excelreader.cpp" />
     <ClCompile Include="loadDataFile.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="loadDataFile.h" />
+    <QtMoc Include="excelreader.h" />
     <ClInclude Include="resource.h" />
     <QtMoc Include="waitingwindow.h" />
   </ItemGroup>

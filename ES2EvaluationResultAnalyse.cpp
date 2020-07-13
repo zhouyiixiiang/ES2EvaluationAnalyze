@@ -18,6 +18,9 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 	_currentrecognizePattern = new MRecognizeFormPattern();
 	_currentEvaluationInfo = new MEvaluationInfo();
 
+	_mCurrentPatterns = new QList<MPattern*>;
+	//McurrentRecognizedResult = new MResult;
+
 	if (_evaluationInfos->size() > 0)
 	{
 		_currentEvaluationInfo = _evaluationInfos->at(0);
@@ -41,8 +44,6 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 	getconnectUseMapFunc("tableEvaluation", ui.tableView, _tableEvaluation);
 	getconnectUseMapFunc("tableEvaluationObject", ui.tableView_2, _tableEvaluationObject);
 	getconnectUseMapFunc("tableEvaluationMembers", ui.tableView_3, _tableEvaluationMembers);
-
-	//updateAllTableviews();
 
     _waitOperate = new DlgWait(this);
     _waitOperate->hide();
@@ -128,8 +129,8 @@ void ES2EvaluationResultAnalyse::startLoadThread()
 	connect(loadDataFile, &LoadDataFile::countStep, this, &ES2EvaluationResultAnalyse::uploadCountProgress);
 	connect(loadDataFile, &LoadDataFile::finish, this, &ES2EvaluationResultAnalyse::finishLoadDataFile);
 
-	//connect(loadThread, &LoadDataFile::finishExcel, this, &ES2EvaluationResultAnalyse::closeExcelThread);
-	//
+	connect(loadDataFile, &LoadDataFile::finishExcel, this, &ES2EvaluationResultAnalyse::finishSaveExcel);
+	
 	//开启线程
 	loadThread->start();
 }
@@ -210,6 +211,7 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 
 void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 {
+	_mCurrentPattern = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(0);
 	QString dirName = QFileDialog::getExistingDirectory(this, u8"保存数据结果到...").toUtf8();
 	if (!dirName.isEmpty())
 	{
@@ -224,10 +226,11 @@ void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 		return;
 
 	//新建Excel文件
+	McurrentFormPattern = _mCurrentPattern->GetFormPattern(0);
 	QString excelSaveFileName = McurrentFormPattern->FormName.toUtf8();
 	excelSaveFileName += ".xlsx";
 	SetWaitExcel(true);
-	loadDataFile->setExcelData(McurrentRecognizedResult, _mCurrentPattern, dirName);
+	loadDataFile->setExcelData(McurrentResult, _mCurrentPattern, dirName);
 	dataOperate();
 	//规定excel的单元格式样式
 	//QXlsx::Format format1;
@@ -377,37 +380,6 @@ void ES2EvaluationResultAnalyse::selectionTableEvaluationChanged(const QItemSele
 	}
 }
 
-void ES2EvaluationResultAnalyse::selectionTableEvaluationObjectChanged(const QItemSelection& selected, const QItemSelection& deselected)
-{
-	if (_tableEvaluationObject->MselectionModel->selectedIndexes().size() > 0)
-	{
-		int selectedRow = _tableEvaluationObject->MselectionModel->selectedIndexes().front().row();
-		if (_currentrecognizePattern->EvaluationUnits.size() > selectedRow)
-		{
-			_evaluationUnitIndex = selectedRow;
-		}
-	}
-	fillingTheTableView("tableEvaluationMembers");
-}
-
-void ES2EvaluationResultAnalyse::selectionTableEvaluationMembersChanged(const QItemSelection& selected, const QItemSelection& deselected)
-{
-	if (_tableEvaluationMembers->MselectionModel->selectedIndexes().size() > 0)
-	{
-		int selectedRow = _tableEvaluationMembers->MselectionModel->selectedIndexes().front().row();
-		if (_currentEvaluationInfo->EvaluationMemberInfo->at(_evaluationUnitIndex)->EvaluationMembers->at(_formPatternIndex)->EvaluationMembers->size() > selectedRow) {
-			_currentEvaluationMemberInfo = _currentEvaluationInfo->EvaluationMemberInfo->at(_evaluationUnitIndex)->EvaluationMembers->at(_formPatternIndex)->EvaluationMembers->at(selectedRow);
-			_evaluationMemberIndex = selectedRow;
-			//记录下多选项下标
-			_selectedMembersIndex.clear();
-			for (int i = 0; i < _tableEvaluationMembers->MselectionModel->selectedIndexes().size(); i++)
-			{
-				_selectedMembersIndex.append(_tableEvaluationMembers->MselectionModel->selectedIndexes().at(i).row());
-			}
-		}
-		_tableEvaluationMembers->MselectionModel->selectedIndexes().clear();
-	}
-}
 
 void ES2EvaluationResultAnalyse::uploadCountProgress(int rec, int sum)
 {
@@ -422,6 +394,15 @@ void ES2EvaluationResultAnalyse::finishLoadDataFile()
     SetWait(false);
 
 	
+}
+
+void ES2EvaluationResultAnalyse::finishSaveExcel()
+{
+	SetWait(false);
+	//执行窗口
+	QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"表格保存成功！"), QMessageBox::Yes);
+	msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
+	int res = msgBox.exec();
 }
 
 void ES2EvaluationResultAnalyse::readEvaluationInfoFromDatafile()
@@ -474,16 +455,6 @@ void ES2EvaluationResultAnalyse::disconnectUsingMapFunc(QString s, TableItem* ta
 		QObject::disconnect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectionTableEvaluationChanged(QItemSelection, QItemSelection)));
 		QObject::disconnect(tableItem->Mmodel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(itemTableEvaluationChanged(QStandardItem*)));
 	}
-	else if (s == "tableEvaluationObject")
-	{
-		QObject::disconnect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectionTableEvaluationObjectChanged(QItemSelection, QItemSelection)));
-		QObject::disconnect(tableItem->Mmodel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(itemTableEvaluationObjectChanged(QStandardItem*)));
-	}
-	else if (s == "tableEvaluationMembers")
-	{
-		QObject::disconnect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectionTableEvaluationMembersChanged(QItemSelection, QItemSelection)));
-		QObject::disconnect(tableItem->Mmodel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(itemTableEvaluationMembersChanged(QStandardItem*)));
-	}
 }
 
 void ES2EvaluationResultAnalyse::updateAllTableviews()
@@ -512,16 +483,6 @@ void ES2EvaluationResultAnalyse::getconnectUseMapFunc(QString s, QTableView* tab
 	{
 		QObject::connect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectionTableEvaluationChanged(QItemSelection, QItemSelection)));
 		QObject::connect(tableItem->Mmodel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(itemTableEvaluationChanged(QStandardItem*)));
-	}
-	else if (s == "tableEvaluationObject")
-	{
-		QObject::connect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectionTableEvaluationObjectChanged(QItemSelection, QItemSelection)));
-		QObject::connect(tableItem->Mmodel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(itemTableEvaluationObjectChanged(QStandardItem*)));
-	}
-	else if (s == "tableEvaluationMembers")
-	{
-		QObject::connect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectionTableEvaluationMembersChanged(QItemSelection, QItemSelection)));
-		QObject::connect(tableItem->Mmodel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(itemTableEvaluationMembersChanged(QStandardItem*)));
 	}
 }
 

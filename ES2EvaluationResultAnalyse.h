@@ -54,10 +54,9 @@ public slots:
     void onButtonLoadEvaluationData();
     void onButtonOutputExcel();
     void finishLoadDataFile();
+    void finishSaveExcel();
     void uploadCountProgress(int, int);
     void selectionTableEvaluationChanged(const QItemSelection& selected, const QItemSelection& deselected);
-    void selectionTableEvaluationObjectChanged(const QItemSelection& selected, const QItemSelection& deselected);
-    void selectionTableEvaluationMembersChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
 public:
     void SetWait(bool);
@@ -98,7 +97,7 @@ private:
     MFormPattern* McurrentFormPattern = nullptr;
     int McurrentFormPatternIndex = 0;
     int SelectedFilterdResultGroupLength = 0;
-    MResult* McurrentRecognizedResult = nullptr;
+    //MResult* McurrentRecognizedResult = nullptr;
 
     QString _path;
     QList<QMetaObject::Connection> _connections;

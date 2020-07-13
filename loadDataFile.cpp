@@ -3,6 +3,11 @@
 
 LoadDataFile::LoadDataFile(QObject *parent) : QObject(parent)
 {
+	_mExcelReader = new ExcelReader();
+	_filePath = "";
+	_dataOperateType = "";
+	_path = QCoreApplication::applicationDirPath().toUtf8();
+	_uid = "";
 
     //_filePath = "";
 }
@@ -42,7 +47,11 @@ void LoadDataFile::doDataOperate()
     }
 	else if (_dataOperateType == "setExcelData")
 	{
-		generateExcelResult(_result, _pattern, _excelName);
+		for (int i = 0; i < _results->count(); i++)
+		{
+			_result = _results->at(i);
+			generateExcelResult(_result, _pattern, _excelName);
+		}
 
 		emit finishExcel();
 	}

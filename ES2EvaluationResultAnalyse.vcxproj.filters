@@ -36,12 +36,18 @@
     <QtMoc Include="loadDataFile.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="excelreader.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="loadDataFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="excelreader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
