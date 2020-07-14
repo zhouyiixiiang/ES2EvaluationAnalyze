@@ -21,12 +21,16 @@
 #include "mpattern.h"
 #include "mformpattern.h"
 #include "excelreader.h"
+#include "mevaluationinfo.h"
 
+#include "es2evaluationsubject.h"
+#include "es2evaluationsubjects.h"
 #include "dlgwait.h"
 
 using namespace Cm3::CommonUtils;
 using namespace Cm3::FormResult;
 using namespace Cm3::FormPattern;
+
 
 class LoadDataFile : public QObject
 {
@@ -37,7 +41,8 @@ public:
     ~LoadDataFile();
 
     void readDataFile(QList<MResult*>*, QString);
-    void setExcelData(MResult* result, MPattern* pattern, QString excelName);
+    void setExcelData(MResult* result, QString excelName);
+    void setInfoData(MEvaluationInfo*);
 
 signals:
     void countStep(int, int);
@@ -51,7 +56,7 @@ public slots:
 
 private:
     void readResultsFromFile();
-    void generateExcelResult(MResult*, MPattern*, QString);
+    void generateExcelResult(QList<MResult*>*, QString);
 
     QString _uid;
     QList<MResult*>* _results = nullptr;
@@ -60,9 +65,9 @@ private:
     QString _filePath;
     QString _dataOperateType;
     QString _path;
-    MPattern* _pattern = nullptr;
     QString _excelName;
     ExcelReader* _mExcelReader = nullptr;//excel操作对象
+    MEvaluationInfo* _info = nullptr;
 
 };
 

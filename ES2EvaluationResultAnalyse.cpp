@@ -53,8 +53,8 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
     setWindowState(Qt::WindowMaximized);
 
     ui.tableView->setMouseTracking(true);
-    ui.tableView_2->setMouseTracking(true);
-
+	ui.pushButton_2->setEnabled(false);
+	ui.pushButton_4->setEnabled(false);
 }
 
 ES2EvaluationResultAnalyse::~ES2EvaluationResultAnalyse()
@@ -202,20 +202,19 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 	_evaluationInfos->append(_currentEvaluationInfo);
 	_currentrecognizePattern = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(_formPatternIndex);
 
+	loadDataFile->setInfoData(_currentEvaluationInfo);
 	updateAllTableviews();
 
-    //SetWait(true);
-    //loadDataFile->readEvaluationData(McurrentResults, fileName);
-    //dataOperate();
+	ui.pushButton_2->setEnabled(true);
+
 }
 
 void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 {
-	_mCurrentPattern = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(0);
 	QString dirName = QFileDialog::getExistingDirectory(this, u8"保存数据结果到...").toUtf8();
 	if (!dirName.isEmpty())
 	{
-		dirName = dirName + "/" + _mCurrentPattern->GetPatternName();
+		dirName = dirName + "/" +_currentEvaluationInfo->RecognizePatternInfo->Name;
 		QDir dir(dirName);
 		if (!dir.exists()) //如果不存在这个文件夹，则创建这个文件夹
 		{
@@ -226,11 +225,9 @@ void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 		return;
 
 	//新建Excel文件
-	McurrentFormPattern = _mCurrentPattern->GetFormPattern(0);
-	QString excelSaveFileName = McurrentFormPattern->FormName.toUtf8();
-	excelSaveFileName += ".xlsx";
+
 	SetWaitExcel(true);
-	loadDataFile->setExcelData(McurrentResult, _mCurrentPattern, dirName);
+	loadDataFile->setExcelData(McurrentResult, dirName);
 	dataOperate();
 	//规定excel的单元格式样式
 	//QXlsx::Format format1;
@@ -392,7 +389,7 @@ void ES2EvaluationResultAnalyse::uploadCountProgress(int rec, int sum)
 void ES2EvaluationResultAnalyse::finishLoadDataFile()
 {
     SetWait(false);
-
+	ui.pushButton_4->setEnabled(true);
 	
 }
 
@@ -403,6 +400,7 @@ void ES2EvaluationResultAnalyse::finishSaveExcel()
 	QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"表格保存成功！"), QMessageBox::Yes);
 	msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
 	int res = msgBox.exec();
+	
 }
 
 void ES2EvaluationResultAnalyse::readEvaluationInfoFromDatafile()

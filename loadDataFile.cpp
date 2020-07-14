@@ -8,8 +8,7 @@ LoadDataFile::LoadDataFile(QObject *parent) : QObject(parent)
 	_dataOperateType = "";
 	_path = QCoreApplication::applicationDirPath().toUtf8();
 	_uid = "";
-
-    //_filePath = "";
+	_info = new MEvaluationInfo();
 }
 
 LoadDataFile::~LoadDataFile()
@@ -24,10 +23,14 @@ void LoadDataFile::readDataFile(QList<MResult*>* results, QString filePath)
 	_dataOperateType = "readResultData";
 }
 
-void LoadDataFile::setExcelData(MResult* result, MPattern* pattern, QString excelName)
+void LoadDataFile::setInfoData(MEvaluationInfo* evaluationInfo)
+{
+	_info = evaluationInfo;
+}
+
+void LoadDataFile::setExcelData(MResult* result, QString excelName)
 {
 	_result = result;
-	_pattern = pattern;
 	_excelName = excelName;
 	_dataOperateType = "setExcelData";
 }
@@ -47,17 +50,13 @@ void LoadDataFile::doDataOperate()
     }
 	else if (_dataOperateType == "setExcelData")
 	{
-		for (int i = 0; i < _results->count(); i++)
-		{
-			_result = _results->at(i);
-			generateExcelResult(_result, _pattern, _excelName);
-		}
+		generateExcelResult(_results, _excelName);
 
 		emit finishExcel();
 	}
     else
     {
-
+		
     }
 }
 
@@ -72,19 +71,19 @@ void LoadDataFile::readResultsFromFile()
 		QString uid;
 		int lenResults;
 		input >> _uid >> lenResults;
-		for (int ii = 0; ii < lenResults; ii++)
+		for (int patternCount = 0; patternCount < lenResults; patternCount++)
 		{
 			MResult* rst = new MResult;
 			_results->append(rst);
 			
-			//MResult* rst = _results->at(ii);
+			//MResult* rst = _results->at(patternCount);
 			input >> rst->PatternGUID >> rst->_isInitialized >> rst->_validFormCount >> rst->FormResultsLen;
 			int len = rst->FormResultsLen;
 			for (int i = 0; i < len; i++)
 			{
 				getCount(i, len);
 				MFormResult* mfrst = new MFormResult();
-				_results->at(ii)->AddFormResult(mfrst);
+				_results->at(patternCount)->AddFormResult(mfrst);
 				QByteArray mfrstPic;
 				input >> mfrst->DeviceIndex >> mfrst->QueueIndex >> mfrst->IsBlankPaper >> mfrst->IsRecognizeSuccess >> mfrst->IsForwardDirection \
 					>> mfrst->FormIndex >> mfrst->IsRectified >> mfrst->LenMarkGroupResults >> mfrst->LenImageShotResults >> mfrst->ErrorReason >> mfrst->ImgUrl >> mfrstPic;
@@ -156,178 +155,206 @@ void LoadDataFile::readResultsFromFile()
 	//MFormResult::saveToFile(Path,*this->FormReuslts);
 }
 
-void LoadDataFile::generateExcelResult(MResult* curentResult, MPattern* pattern, QString excelName)
+void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelName)
 {
 	//规定excel的单元格式样式
 	QXlsx::Format format1;
-	format1.setFontColor(QColor(Qt::black));/*文字为红色*/
-	format1.setPatternBackgroundColor(QColor(152, 251, 152));/*背景颜色，使用rgb*/
+	format1.setFontColor(QColor(Qt::black));
+	format1.setPatternBackgroundColor(QColor(Qt::white));
 	format1.setFontSize(15);
 	format1.setHorizontalAlignment(QXlsx::Format::AlignHCenter);/*横向居中*/
 	format1.setBorderStyle(QXlsx::Format::BorderMedium);/*边框样式*/
-
+	MResult* currentResult;
 	//直接进行保存
-	for (int ii = 0; ii < pattern->GetFormPatternCount(); ii++)
-		//int ii = 0;
+	for (int resultConut = 0; resultConut < _results->count(); resultConut++)
 	{
-		MFormPattern* formPattern = pattern->GetFormPattern(ii);
-		MResult* result = new MResult();
-		for (int i = 0; i < curentResult->GetFormResultCount(); i++)
+		currentResult = _results->at(resultConut);
+		MPattern* pattern = _info->RecognizePatternInfo->RecognizeFormPatterns->at(resultConut);
+
+		for (int patternCount = 0; patternCount < pattern->GetFormPatternCount(); patternCount++)
 		{
-			if (curentResult->GetFormResult(i)->FormIndex == ii)
+			MFormPattern* formPattern = pattern->GetFormPattern(patternCount);
+			MResult* result = new MResult();
+			for (int i = 0; i < currentResult->GetFormResultCount(); i++)
 			{
-				result->AddFormResult(curentResult->GetFormResult(i));
+				if (currentResult->GetFormResult(i)->FormIndex == patternCount)
+				{
+					result->AddFormResult(currentResult->GetFormResult(i));
+				}
 			}
-		}
-		if (result->GetFormResultCount() > 0)
-		{
-			QString excelTempName = excelName + "/" + formPattern->FormName + ".xlsx";
-			//创建一个改名字的excel表
-			//QFile file(excelTempName);
-			//file.open(QIODevice::ReadWrite);
-			//file.close();
-			if (_mExcelReader->newExcel(excelTempName))
+			if (result->GetFormResultCount() > 0)
 			{
-				_mExcelReader->setSheetName();
-				/*
-					填充明细数据
-				*/
-				_mExcelReader->chooseSheet(0);
-				int excelRow = result->GetFormResultCount();
-				//默认一个识别结果里面，都是根据一个模板进行识别的，因此结果的分组数是一样的，取第一个FormResult的分组数
-				int excelColumn = result->FormReuslts->at(0)->MarkGroupResults->count();
-				//表头设置
-				unsigned k;
-				for (unsigned j = 0; j < excelColumn; j++)
+				QString patternName = _info->RecognizePatternInfo->RecognizeFormPatterns->at(patternCount)->FileName;
+				QString excelFileName = patternName;
+				//如果重复
+				QDir* dir = new QDir(excelName);
+				QStringList filter;
+				QList<QFileInfo>* fileInfo = new QList<QFileInfo>(dir->entryInfoList(filter));
+				int repeatCount = 0, fileCount = 0;
+				bool repeatFlag = 1;
+				while (repeatFlag)
 				{
-					_mExcelReader->writeExcel(1, j + 1, result->FormReuslts->at(0)->MarkGroupResults->at(j)->GroupName, format1);
-					k = j;
-				}
-				_mExcelReader->writeExcel(1, k + 2, result->FormReuslts->at(0)->IdentifierResult->Name, format1);
-				if (formPattern->ResultType == NumberValue)
-				{
-					for (unsigned i = 0; i < excelRow; i++)
+					for (fileCount = 0; fileCount < fileInfo->count(); fileCount++)
 					{
-						Cm3::FormResult::MFormResult* tempFormResult = result->FormReuslts->at(i);
-						unsigned k;
-						for (unsigned j = 0; j < excelColumn; j++)
-						{
-							_mExcelReader->writeExcel(i + 2, j + 1, tempFormResult->MarkGroupResults->at(j)->NumberResult, format1);
-							k = j;
+						if (excelFileName == fileInfo->at(fileCount).baseName()) {
+							repeatCount++;
+							excelFileName = patternName + "(" + QString::number(repeatCount) + ")";
+							break;
 						}
-						_mExcelReader->writeExcel(i + 2, k + 2, tempFormResult->IdentifierResult->Result, format1);
+					}
+					if (fileCount == fileInfo->count())
+					{
+						repeatFlag = 0;
 					}
 				}
-				else
+				QString excelTempName = excelName + "/" + excelFileName + ".xlsx";//目录=测评名 文件名=模式名
+				//创建一个改名字的excel表
+				//QFile file(excelTempName);
+				//file.open(QIODevice::ReadWrite);
+				//file.close();
+				if (_mExcelReader->newExcel(excelTempName))
 				{
-					for (unsigned i = 0; i < excelRow; i++)
+					_mExcelReader->setSheetName(patternName);
+					
+					//填充明细数据
+					_mExcelReader->chooseSheet(0);
+					int excelRow = result->GetFormResultCount();
+					//默认一个识别结果里面，都是根据一个模板进行识别的，因此结果的分组数是一样的，取第一个FormResult的分组数
+					int excelColumn = result->FormReuslts->at(0)->MarkGroupResults->count();
+					//表头设置
+					unsigned k;
+					for (unsigned j = 0; j < excelColumn; j++)
 					{
-						qDebug() << "excel add" << i << " result";
-						qDebug() << "MarkGroupResults count" << result->FormReuslts->at(i)->MarkGroupResults->count() << " result";
-						//qDebug() << "excel add" << i << " result";
-						Cm3::FormResult::MFormResult* tempFormResult = result->GetFormResult(i);
-						unsigned k;
-						for (unsigned j = 0; j < excelColumn; j++)
-						{
-							qDebug() << "MarkGroupResults at" << j;
-							_mExcelReader->writeExcel(i + 2, j + 1, tempFormResult->GetGroupResult(j)->TextResult, format1);
-							k = j;
-							qDebug() << "k  at" << k;
-						}
-						_mExcelReader->writeExcel(i + 2, k + 2, tempFormResult->IdentifierResult->Result, format1);
+						_mExcelReader->writeExcel(1, j + 1, result->FormReuslts->at(0)->MarkGroupResults->at(j)->GroupName, format1);
+						k = j;
 					}
-				}
-				/*
-					填充统计数据
-				*/
-				if (formPattern->ResultType == SingleSelect)
-				{
-					struct AnalyzeResult //建立一个结构体记录每一个统计对象的计数
+					_mExcelReader->writeExcel(1, k + 2, result->FormReuslts->at(0)->IdentifierResult->Name, format1);
+					if (formPattern->ResultType == NumberValue)
 					{
-						QString patternName;
-						int count;
-					};
-					QList<AnalyzeResult> patternResult;
-					QList<QList<AnalyzeResult>> patternResults;
-					_mExcelReader->chooseSheet(1);
-					patternResults.clear();
-					//for (int k = 0; k < excelRow; k++)
-					{
-						for (int i = 0; i < formPattern->MarkGroupPattern->size(); i++)
+						for (unsigned i = 0; i < excelRow; i++)
 						{
-							patternResult.clear();
-							for (int j = 0; j < formPattern->MarkGroupPattern->at(i)->CellList->size(); j++)
+							Cm3::FormResult::MFormResult* tempFormResult = result->FormReuslts->at(i);
+							unsigned k;
+							for (unsigned j = 0; j < excelColumn; j++)
 							{
-								AnalyzeResult eachPatternResult;
-								eachPatternResult.patternName = formPattern->MarkGroupPattern->at(i)->CellList->at(j)->CellName;
-								eachPatternResult.count = 0;
-								patternResult.append(eachPatternResult);
+								_mExcelReader->writeExcel(i + 2, j + 1, tempFormResult->MarkGroupResults->at(j)->NumberResult, format1);
+								k = j;
 							}
-							//往patternResult里面填充未选和多选两种情况
-							AnalyzeResult eachPatternResult1;
-							AnalyzeResult eachPatternResult2;
-							eachPatternResult1.patternName = QString("*");
-							eachPatternResult2.patternName = QString("");
-							eachPatternResult1.count = 0;
-							eachPatternResult2.count = 0;
-							patternResult.append(eachPatternResult1);
-							patternResult.append(eachPatternResult2);
-							//最后在patternResults中添加当前patternResult
-							patternResults.append(patternResult);
+							_mExcelReader->writeExcel(i + 2, k + 2, tempFormResult->IdentifierResult->Result, format1);
 						}
 					}
-					//计算统计用参数
-					for (int i = 0; i < result->GetFormResultCount(); i++)
+					else
 					{
-						for (int j = 0; j < result->FormReuslts->at(i)->GetGroupResultCount(); j++)
+						for (unsigned i = 0; i < excelRow; i++)
 						{
-							for (int k = 0; k < patternResults.at(j).size(); k++)
+							qDebug() << "excel add" << i << " result";
+							qDebug() << "MarkGroupResults count" << result->FormReuslts->at(i)->MarkGroupResults->count() << " result";
+							//qDebug() << "excel add" << i << " result";
+							Cm3::FormResult::MFormResult* tempFormResult = result->GetFormResult(i);
+							unsigned k;
+							for (unsigned j = 0; j < excelColumn; j++)
 							{
-								if (result->FormReuslts->at(i)->GetGroupResult(j)->TextResult == patternResults.at(j).at(k).patternName)
+								qDebug() << "MarkGroupResults at" << j;
+								_mExcelReader->writeExcel(i + 2, j + 1, tempFormResult->GetGroupResult(j)->TextResult, format1);
+								k = j;
+								qDebug() << "k  at" << k;
+							}
+							_mExcelReader->writeExcel(i + 2, k + 2, tempFormResult->IdentifierResult->Result, format1);
+						}
+					}
+					/*
+						填充统计数据
+					*/
+					if (formPattern->ResultType == SingleSelect)
+					{
+						struct AnalyzeResult //建立一个结构体记录每一个统计对象的计数
+						{
+							QString patternName;
+							int count;
+						};
+						QList<AnalyzeResult> patternResult;
+						QList<QList<AnalyzeResult>> patternResults;
+						_mExcelReader->chooseSheet(1);
+						patternResults.clear();
+						//for (int k = 0; k < excelRow; k++)
+						{
+							for (int i = 0; i < formPattern->MarkGroupPattern->size(); i++)
+							{
+								patternResult.clear();
+								for (int j = 0; j < formPattern->MarkGroupPattern->at(i)->CellList->size(); j++)
 								{
-									AnalyzeResult tempAnalyzeResult;
-									tempAnalyzeResult = patternResults.at(j).at(k);
-									tempAnalyzeResult.count += 1;
-									patternResults[j].replace(k, tempAnalyzeResult);
-									//patternResult[k].count++;
+									AnalyzeResult eachPatternResult;
+									eachPatternResult.patternName = formPattern->MarkGroupPattern->at(i)->CellList->at(j)->CellName;
+									eachPatternResult.count = 0;
+									patternResult.append(eachPatternResult);
+								}
+								//往patternResult里面填充未选和多选两种情况
+								AnalyzeResult eachPatternResult1;
+								AnalyzeResult eachPatternResult2;
+								eachPatternResult1.patternName = QString("*");
+								eachPatternResult2.patternName = QString("");
+								eachPatternResult1.count = 0;
+								eachPatternResult2.count = 0;
+								patternResult.append(eachPatternResult1);
+								patternResult.append(eachPatternResult2);
+								//最后在patternResults中添加当前patternResult
+								patternResults.append(patternResult);
+							}
+						}
+						//计算统计用参数
+						for (int i = 0; i < result->GetFormResultCount(); i++)
+						{
+							for (int j = 0; j < result->FormReuslts->at(i)->GetGroupResultCount(); j++)
+							{
+								for (int k = 0; k < patternResults.at(j).size(); k++)
+								{
+									if (result->FormReuslts->at(i)->GetGroupResult(j)->TextResult == patternResults.at(j).at(k).patternName)
+									{
+										AnalyzeResult tempAnalyzeResult;
+										tempAnalyzeResult = patternResults.at(j).at(k);
+										tempAnalyzeResult.count += 1;
+										patternResults[j].replace(k, tempAnalyzeResult);
+										//patternResult[k].count++;
+									}
 								}
 							}
 						}
-					}
-					//初始化行与列的索引
-					int rowIndex = 1;
-					int columnIndex = 1;
-					//表头设计，根据得到的patternNames确定每一个group的大小，合并相应长度的单元格
-					for (int i = 0; i < patternResults.size(); i++)
-					{
-						int lenGroup = patternResults.at(i).size();
-						_mExcelReader->mergeCells(rowIndex, columnIndex, rowIndex, columnIndex + lenGroup - 1, format1);
-						for (int j = 0; j < patternResults.at(i).size(); j++)
+						//初始化行与列的索引
+						int rowIndex = 1;
+						int columnIndex = 1;
+						//表头设计，根据得到的patternNames确定每一个group的大小，合并相应长度的单元格
+						for (int i = 0; i < patternResults.size(); i++)
 						{
-							_mExcelReader->writeExcel(rowIndex, columnIndex, formPattern->MarkGroupPattern->at(i)->GroupName, format1);
-							QString tempPatternName = patternResults.at(i).at(j).patternName;
-							if (tempPatternName == QString("*"))
+							int lenGroup = patternResults.at(i).size();
+							_mExcelReader->mergeCells(rowIndex, columnIndex, rowIndex, columnIndex + lenGroup - 1, format1);
+							for (int j = 0; j < patternResults.at(i).size(); j++)
 							{
-								_mExcelReader->writeExcel(rowIndex + 1, columnIndex + j, (u8"多选"), format1);
+								_mExcelReader->writeExcel(rowIndex, columnIndex, formPattern->MarkGroupPattern->at(i)->GroupName, format1);
+								QString tempPatternName = patternResults.at(i).at(j).patternName;
+								if (tempPatternName == QString("*"))
+								{
+									_mExcelReader->writeExcel(rowIndex + 1, columnIndex + j, (u8"多选"), format1);
+								}
+								else if (tempPatternName == QString(""))
+								{
+									_mExcelReader->writeExcel(rowIndex + 1, columnIndex + j, (u8"未选"), format1);
+								}
+								else
+								{
+									_mExcelReader->writeExcel(rowIndex + 1, columnIndex + j, patternResults.at(i).at(j).patternName, format1);
+								}
+								_mExcelReader->writeExcel(rowIndex + 1 + 1, columnIndex + j, QString::number(patternResults.at(i).at(j).count), format1);
 							}
-							else if (tempPatternName == QString(""))
-							{
-								_mExcelReader->writeExcel(rowIndex + 1, columnIndex + j, (u8"未选"), format1);
-							}
-							else
-							{
-								_mExcelReader->writeExcel(rowIndex + 1, columnIndex + j, patternResults.at(i).at(j).patternName, format1);
-							}
-							_mExcelReader->writeExcel(rowIndex + 1 + 1, columnIndex + j, QString::number(patternResults.at(i).at(j).count), format1);
+							columnIndex = columnIndex + lenGroup;
 						}
-						columnIndex = columnIndex + lenGroup;
 					}
 				}
 			}
-		}
-		//在进入下一个循环之前，delete掉新建的指针
-		delete result;
-		result = nullptr;
-	}
+			//在进入下一个循环之前，delete掉新建的指针
+			delete result;
+			result = nullptr;
+			
 
+		}
+	}
 }

@@ -1,4 +1,4 @@
-﻿#include "excelreader.h"
+#include "excelreader.h"
 #include "xlsxdocument.h"
 
 ExcelReader::ExcelReader(QWidget *parent) : QDialog(parent)
@@ -34,7 +34,7 @@ bool ExcelReader::newExcel(QString mexcelName)
 {
 	if (_mExcel != nullptr)
 	{
-		delete _mExcel;
+		//delete _mExcel;
 		_mExcel = nullptr;
 	}
 	_mExcel = new QXlsx::Document(mexcelName);
@@ -151,30 +151,35 @@ bool ExcelReader::writeExcel(const int iRow, const int iColumn, const QString co
 }
 
 
-bool ExcelReader::setSheetName()
+bool ExcelReader::setSheetName(QString patternName)
 {
-    if (!_mExcel->insertSheet(0, (u8"明细数据")))
+    if (!_mExcel->insertSheet(0, (u8"单位")))
 	{
         _mExcel->insertSheet(0, (u8"abcdefghijklabsdkfj1"));
-        _mExcel->deleteSheet((u8"明细数据"));
-        _mExcel->renameSheet((u8"abcdefghijklabsdkfj1"), (u8"明细数据"));
+        _mExcel->deleteSheet((u8"单位"));
+        _mExcel->renameSheet((u8"abcdefghijklabsdkfj1"), (u8"单位"));
 	}
-    if (!_mExcel->insertSheet(1, (u8"统计数据")))
+    if (!_mExcel->insertSheet(1, (u8"个人")))
 	{
         _mExcel->insertSheet(1, (u8"abcdefghijklabsdkfj2"));
-        _mExcel->deleteSheet((u8"统计数据"));
-        _mExcel->renameSheet((u8"abcdefghijklabsdkfj2"), (u8"统计数据"));
+        _mExcel->deleteSheet((u8"个人"));
+        _mExcel->renameSheet((u8"abcdefghijklabsdkfj2"), (u8"个人"));
+	}
+	if (!_mExcel->insertSheet(2, patternName))
+	{
+		_mExcel->insertSheet(2, (u8"abcdefghijklabsdkfj3"));
+		_mExcel->deleteSheet(patternName);
+		_mExcel->renameSheet((u8"abcdefghijklabsdkfj3"), patternName);
 	}
 	QStringList sheetsName = _mExcel->sheetNames();
-	for (int i = 0; i < sheetsName.size(); i++)
+	if (sheetsName.at(0)== (u8"单位")|| sheetsName.at(1) == (u8"个人") || sheetsName.at(2) == patternName)
+	{ 
+	}
+	else
 	{
-        if (sheetsName.at(i)== (u8"统计数据")|| sheetsName.at(i) == (u8"明细数据"))
-		{ 
-		}
-		else
-		{
-			_mExcel->deleteSheet(sheetsName.at(i));
-		}
+		_mExcel->deleteSheet(sheetsName.at(0));
+		_mExcel->deleteSheet(sheetsName.at(1));
+		_mExcel->deleteSheet(sheetsName.at(2));
 	}
 	return true;
 }
