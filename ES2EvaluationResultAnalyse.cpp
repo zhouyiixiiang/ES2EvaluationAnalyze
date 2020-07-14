@@ -212,7 +212,7 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 {
 	QString dirName = QFileDialog::getExistingDirectory(this, u8"保存数据结果到...").toUtf8();
-	if (!dirName.isEmpty())
+	/*if (!dirName.isEmpty())
 	{
 		dirName = dirName + "/" +_currentEvaluationInfo->RecognizePatternInfo->Name;
 		QDir dir(dirName);
@@ -223,7 +223,7 @@ void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 	}
 	else
 		return;
-
+	*/
 	//新建Excel文件
 
 	SetWaitExcel(true);
