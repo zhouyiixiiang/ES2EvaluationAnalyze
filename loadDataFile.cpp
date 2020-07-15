@@ -1,5 +1,6 @@
 #include "loadDataFile.h"
 #include <windows.h>
+#include <QDebug>
 
 LoadDataFile::LoadDataFile(QObject *parent) : QObject(parent)
 {
@@ -167,7 +168,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 	MResult* currentResult;
 	//直接进行保存
 	QString evaluationName = _info->RecognizePatternInfo->Name;
-	QString excelFileName = evaluationName;
+	QString excelFileName = evaluationName + ".xlsx";
 	//如果文件名重复
 	QDir* dir = new QDir(excelName);
 	QStringList filter;
@@ -178,9 +179,9 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 	{
 		for (fileCount = 0; fileCount < fileInfo->count(); fileCount++)
 		{
-			if (excelFileName == fileInfo->at(fileCount).baseName()) {
+			if (excelFileName == fileInfo->at(fileCount).fileName()) {
 				repeatCount++;
-				excelFileName = evaluationName + "(" + QString::number(repeatCount) + ")";
+				excelFileName = evaluationName + "(" + QString::number(repeatCount) + ").xlsx";
 				break;
 			}
 		}
@@ -189,7 +190,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			repeatFlag = 0;
 		}
 	}
-	QString excelTempName = excelName + "/" + excelFileName + ".xlsx";
+	QString excelTempName = excelName + "/" + excelFileName;
 	if (_mExcelReader->newExcel(excelTempName))
 	{
 		_mExcelReader->setSheetName(evaluationName);
@@ -203,11 +204,10 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 		_mExcelReader->writeExcel(2, 2, u8"表类型", format1);
 		_mExcelReader->writeExcel(2, 3, u8"收回数", format1);
 
-		_mExcelReader->mergeCells(1, 1, 1, 3, format1);
-		_mExcelReader->mergeCells(2, 1, 5, 1, format1);
-		_mExcelReader->mergeCells(2, 2, 5, 2, format1);
-		_mExcelReader->mergeCells(2, 3, 5, 3, format1);
-
+		_mExcelReader->mergeCells(2, 1, 4, 1, format1);
+		_mExcelReader->mergeCells(2, 2, 4, 2, format1);
+		_mExcelReader->mergeCells(2, 3, 4, 3, format1);
+		//遍历模式
 		int patternCount = _info->RecognizePatternInfo->RecognizeFormPatterns->count();
 		QList<QString> patternName;
 		patternName.clear();
@@ -216,24 +216,26 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			patternName.append(_info->RecognizePatternInfo->RecognizeFormPatterns->at(i)->FileName);
 			_mExcelReader->writeExcel(i + 5, 2, patternName.at(i), format1);
 		}
-		_mExcelReader->writeExcel(patternCount + 3, 2, u8"合计", format1);
+		//遍历单位
+		_mExcelReader->writeExcel(patternCount + 5, 2, u8"合计", format1);
 		int unitCount = _info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->EvaluationUnits.count();
 		QList<QString> unitName;
 		unitName.clear();
 		for (unsigned i = 0; i < unitCount; i++)
 		{
 			unitName.append(_info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->EvaluationUnits.at(i));
-			_mExcelReader->writeExcel(i * patternCount + 5, 1, unitName.at(i), format1);
-			_mExcelReader->mergeCells(i * patternCount + 5, 1, (i + 1)* patternCount + 5, 1, format1);
+			_mExcelReader->writeExcel(i * (patternCount + 1) + 5, 1, unitName.at(i), format1);
+			_mExcelReader->mergeCells(i * (patternCount + 1) + 5, 1, (i + 1)*(patternCount + 1) + 4, 1, format1);
 
 		}
-		int indexCountF = _info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->MemberIndexs->count();
+		//遍历指标
+		int indexCountF = _info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->MemberIndexs->at(0)->MemberDetailIndexs->count();
 		int indexCountS = 4;
 		QList<QString> indexNameF;
-		QList<MemberDetailIndex*>* indexNode;
+		QList<MemberDetailIndex*>* indexNode = new QList<MemberDetailIndex*>;
 		indexNameF.clear();
 		indexNode->clear();
-		for (unsigned i = 0; i < indexCountF; i++)
+		for (unsigned i = 0; i < indexCountF; i ++)
 		{
 			indexNode->append(_info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->MemberIndexs->at(0)->MemberDetailIndexs->at(i));
 			//_info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->MemberIndexs->at(0)->MemberDetailIndexs->at()->FirstLevelIndex.name
@@ -241,14 +243,24 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			_mExcelReader->writeExcel(2, indexCountS, indexNameF.at(i), format1);
 			//二级指标
 			unsigned j;
-			for (j = 0; j < indexNode->at(i)->SecondLevelIndex.count(); j ++)
+			for (j = 0; j < indexNode->at(i)->SecondLevelIndex.count(); j++)
 			{
 				_mExcelReader->writeExcel(4, indexCountS, indexNode->at(i)->SecondLevelIndex.at(j).name, format1);
+				indexCountS++;
+			}
+			if (j == 0)
+			{
+				_mExcelReader->mergeCells(2, indexCountS, 4, indexCountS, format1);
 				indexCountS ++;
 			}
-			_mExcelReader->mergeCells(2, indexCountS - j, 3, indexCountS - 1, format1);
+			else
+			{
+				_mExcelReader->mergeCells(2, indexCountS - j, 3, indexCountS - 1, format1);
+			}
 		}
 
+		//_mExcelReader->mergeCells(1, 1, 1, 3, format1);//无指标情况
+		_mExcelReader->mergeCells(1, 1, 1, indexCountS - 1, format1);
 		//计票人
 
 
@@ -262,7 +274,8 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 		_mExcelReader->writeExcel(2, 6, u8"表类型", format1);
 		_mExcelReader->writeExcel(2, 7, u8"收回数", format1);
 		//index
-		for (unsigned i = 0, indexCountS = 8; i < indexCountF; i++)
+		indexCountS = 8;
+		for (unsigned i = 0; i < indexCountF; i++)
 		{
 			_mExcelReader->writeExcel(2, indexCountS, indexNameF.at(i), format1);
 			//二级指标
@@ -272,39 +285,52 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				_mExcelReader->writeExcel(4, indexCountS, indexNode->at(i)->SecondLevelIndex.at(j).name, format1);
 				indexCountS++;
 			}
-			_mExcelReader->mergeCells(2, indexCountS - j, 3, indexCountS - 1, format1);
+			if (j == 0)
+			{
+				_mExcelReader->mergeCells(2, indexCountS, 4, indexCountS, format1);
+				indexCountS++;
+			}
+			else
+			{
+				_mExcelReader->mergeCells(2, indexCountS - j, 3, indexCountS - 1, format1);
+			}
 		}
 
-		//_mExcelReader->mergeCells(1, 1, 1, 3, format1);
-		_mExcelReader->mergeCells(2, 1, 5, 1, format1);
-		_mExcelReader->mergeCells(2, 2, 5, 2, format1);
-		_mExcelReader->mergeCells(2, 3, 5, 3, format1);
-		_mExcelReader->mergeCells(2, 4, 5, 4, format1);
-		_mExcelReader->mergeCells(2, 5, 5, 5, format1);
-		_mExcelReader->mergeCells(2, 6, 5, 6, format1);
-		_mExcelReader->mergeCells(2, 7, 5, 7, format1);
-		//index
-
-		for (int i = 0; i < unitCount; i++)
+		_mExcelReader->mergeCells(1, 1, 1, indexCountS - 1, format1);
+		_mExcelReader->mergeCells(2, 1, 4, 1, format1);
+		_mExcelReader->mergeCells(2, 2, 4, 2, format1);
+		_mExcelReader->mergeCells(2, 3, 4, 3, format1);
+		_mExcelReader->mergeCells(2, 4, 4, 4, format1);
+		_mExcelReader->mergeCells(2, 5, 4, 5, format1);
+		_mExcelReader->mergeCells(2, 6, 4, 6, format1);
+		_mExcelReader->mergeCells(2, 7, 4, 7, format1);
+	
+		for (int i = 0, takenSpace = 5 ; i < unitCount; i++)
 		{
 			int memberCount = _info->EvaluationMemberInfo->at(0)->EvaluationMembers->at(i)->EvaluationMembers->count();
-			_mExcelReader->writeExcel(i * patternCount + 5, 1, unitName.at(i), format1);
+			_mExcelReader->writeExcel(takenSpace, 1, unitName.at(i), format1);
 			for (int j = 0; j < memberCount; j++)
 			{
 				MemberInfo* newMember = _info->EvaluationMemberInfo->at(0)->EvaluationMembers->at(i)->EvaluationMembers->at(j);
-				_mExcelReader->writeExcel(i * patternCount + 5, 2, newMember->name, format1);
-				//_mExcelReader->writeExcel(i * patternCount + 5, 3, newMember->gender, format1); //int?
-				_mExcelReader->writeExcel(i * patternCount + 5, 4, newMember->duty, format1);
-				_mExcelReader->writeExcel(i * patternCount + 5, 5, newMember->dutyClass, format1);
+				_mExcelReader->writeExcel(takenSpace, 2, newMember->name, format1);
+				//_mExcelReader->writeExcel(takenSpace + memberSpace, 3, newMember->gender, format1); //int?
+				_mExcelReader->writeExcel(takenSpace, 4, newMember->duty, format1);
+				_mExcelReader->writeExcel(takenSpace, 5, newMember->dutyClass, format1);
+				for (int k = 0; k < patternCount; k++)
+				{
+					_mExcelReader->writeExcel(takenSpace + k, 6, patternName.at(k), format1);
+				}
+				_mExcelReader->writeExcel(takenSpace+ patternCount, 6, u8"合计", format1);
 
-				_mExcelReader->mergeCells(i * patternCount + 5, 2, (i + 1) * patternCount + 5, 2, format1);
-				_mExcelReader->mergeCells(i * patternCount + 5, 3, (i + 1) * patternCount + 5, 3, format1);
-				_mExcelReader->mergeCells(i * patternCount + 5, 4, (i + 1) * patternCount + 5, 4, format1);
-				_mExcelReader->mergeCells(i * patternCount + 5, 5, (i + 1) * patternCount + 5, 5, format1);
+				_mExcelReader->mergeCells(takenSpace, 2, takenSpace + patternCount, 2, format1);
+				_mExcelReader->mergeCells(takenSpace, 3, takenSpace + patternCount, 3, format1);
+				_mExcelReader->mergeCells(takenSpace, 4, takenSpace + patternCount, 4, format1);
+				_mExcelReader->mergeCells(takenSpace, 5, takenSpace + patternCount, 5, format1);
 
 				//_info->EvaluationMemberInfo->at(0)->EvaluationMembers->at(i)->EvaluationMembers->at(j)->name;
-
+				takenSpace += patternCount + 1;
 			}
+			_mExcelReader->mergeCells(takenSpace - memberCount *(patternCount + 1), 1, takenSpace - 1, 1, format1);
 		}
 
 		_mExcelReader->chooseSheet(2);
@@ -316,7 +342,8 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 		_mExcelReader->writeExcel(2, 4, u8"表类型", format1);
 		_mExcelReader->writeExcel(2, 5, u8"收回数", format1);
 		//index
-		for (unsigned i = 0, indexCountS = 8; i < indexCountF; i++)
+		indexCountS = 6;
+		for (unsigned i = 0; i < indexCountF; i++)
 		{
 			_mExcelReader->writeExcel(2, indexCountS, indexNameF.at(i), format1);
 			//二级指标
@@ -326,29 +353,44 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				_mExcelReader->writeExcel(4, indexCountS, indexNode->at(i)->SecondLevelIndex.at(j).name, format1);
 				indexCountS++;
 			}
-			_mExcelReader->mergeCells(2, indexCountS - j, 3, indexCountS - 1, format1);
+			if (j == 0)
+			{
+				_mExcelReader->mergeCells(2, indexCountS, 4, indexCountS, format1);
+				indexCountS++;
+			}
+			else
+			{
+				_mExcelReader->mergeCells(2, indexCountS - j, 3, indexCountS - 1, format1);
+			}
 		}
 
-		_mExcelReader->mergeCells(2, 1, 5, 1, format1);
-		_mExcelReader->mergeCells(2, 2, 5, 2, format1);
-		_mExcelReader->mergeCells(2, 3, 5, 3, format1);
-		_mExcelReader->mergeCells(2, 4, 5, 4, format1);
-		_mExcelReader->mergeCells(2, 5, 5, 5, format1);
+		_mExcelReader->mergeCells(1, 1, 1, indexCountS - 1, format1);
+		_mExcelReader->mergeCells(2, 1, 4, 1, format1);
+		_mExcelReader->mergeCells(2, 2, 4, 2, format1);
+		_mExcelReader->mergeCells(2, 3, 4, 3, format1);
+		_mExcelReader->mergeCells(2, 4, 4, 4, format1);
+		_mExcelReader->mergeCells(2, 5, 4, 5, format1);
 		//index
 
 		//初始化结束
-		int indexCount = 0;
-		QList<QString> indexName;
-		indexName.clear();
-		for (int i = 0; i < indexCount; i++)
-		{
-			indexName.append(_info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->MemberIndexs->at(indexCount)->MemberName);
-			
-		}
+
 		//填充数据
-		int excelRow = result->GetFormResultCount();
+		QList<int> receiveCount;//收回数 计数patternCount
+
+		for (int resultCount = 0; resultCount < results->count(); resultCount++)
+		{
+			currentResult = results->at(resultCount);
+
+			//if(currentResult->PatternGUID)
+			
+			qDebug() << currentResult->PatternGUID;
+
+		}
+
+		/*
+		//int excelRow = result->GetFormResultCount();
 		//默认一个识别结果里面，都是根据一个模板进行识别的，因此结果的分组数是一样的，取第一个FormResult的分组数
-		int excelColumn = result->FormReuslts->at(0)->MarkGroupResults->count();
+		//int excelColumn = result->FormReuslts->at(0)->MarkGroupResults->count();
 
 		//int patternCount = 0;
 
@@ -394,9 +436,9 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				_mExcelReader->writeExcel(i + 2, k + 2, tempFormResult->IdentifierResult->Result, format1);
 			}
 		}
-		/*
-			填充统计数据
-		*/
+
+		//	填充统计数据
+
 		if (formPattern->ResultType == SingleSelect)
 		{
 			struct AnalyzeResult //建立一个结构体记录每一个统计对象的计数
@@ -482,7 +524,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 		}
 	}
 
-
+	/*
 	for (int resultConut = 0; resultConut < _results->count(); resultConut++)
 	{
 		currentResult = _results->at(resultConut);
@@ -508,7 +550,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				if (_mExcelReader->newExcel(excelTempName))
 				{
 					_mExcelReader->setSheetName(evaluationName);
-					
+
 					//填充明细数据
 					//单位页
 					_mExcelReader->chooseSheet(0);
@@ -524,7 +566,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 					{
 						_mExcelReader->writeExcel(2, j + 4, _info->RecognizePatternInfo->RecognizeFormPatterns->at(patternCount)->EvaluationUnits.at(j), format1);
 					}
-					int 
+					int
 					//int excelRow = result->GetFormResultCount();
 					//默认一个识别结果里面，都是根据一个模板进行识别的，因此结果的分组数是一样的，取第一个FormResult的分组数
 					//int excelColumn = result->FormReuslts->at(0)->MarkGroupResults->count();
@@ -573,9 +615,9 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							_mExcelReader->writeExcel(i + 2, k + 2, tempFormResult->IdentifierResult->Result, format1);
 						}
 					}
-					/*
-						填充统计数据
-					*/
+
+					//	填充统计数据
+
 					if (formPattern->ResultType == SingleSelect)
 					{
 						struct AnalyzeResult //建立一个结构体记录每一个统计对象的计数
@@ -664,8 +706,11 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			//在进入下一个循环之前，delete掉新建的指针
 			delete result;
 			result = nullptr;
-			
+
 
 		}
 	}
+	*/
+	}
+
 }
