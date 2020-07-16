@@ -363,11 +363,11 @@ void ES2EvaluationResultAnalyse::selectionTableEvaluationChanged(const QItemSele
 	if (_tableEvaluation->MselectionModel->selectedIndexes().count() > 0)
 	{
 		int selectedRow = _tableEvaluation->MselectionModel->selectedIndexes().front().row();
-		if (_evaluationInfos->size() > selectedRow)
+		if (_currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->size() > selectedRow)
 		{
-			_currentEvaluationInfo = _evaluationInfos->at(selectedRow);
-			_evaluationIndex = selectedRow;
-			_formPatternIndex = 0;
+			//_currentEvaluationInfo = _evaluationInfos->at(selectedRow);
+			_currentrecognizePattern = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(selectedRow);
+			_formPatternIndex = selectedRow;
 			//getMemberDutyClass();
 			// 更新tablePatternInfo表格
 
@@ -503,13 +503,13 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 {
 	QTableView* tableview = nullptr;
 	TableItem* table = nullptr;
-	if (sTable == "tableEvaluationMembers")
-	{
-		reconnectTableItem(sTable, tableview, table, ui.tableView_3, _tableEvaluationMembers);
-	}
-	else if (sTable == "tableEvaluation")
+	if (sTable == "tableEvaluation")
 	{
 		reconnectTableItem(sTable, tableview, table, ui.tableView, _tableEvaluation);
+	}
+	else if (sTable == "tableEvaluationMembers")
+	{
+		reconnectTableItem(sTable, tableview, table, ui.tableView_3, _tableEvaluationMembers);
 	}
 	else if (sTable == "tableEvaluationObject")
 	{
@@ -526,18 +526,18 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 		//表格总体设计
 		table->Mmodel->setColumnCount(1);
 		tableview->verticalHeader()->hide();//隐藏行号 
-		table->Mmodel->setHeaderData(0, Qt::Horizontal, (u8"已有测评"));
+		table->Mmodel->setHeaderData(0, Qt::Horizontal, (u8"已有模式"));
 		tableview->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 		//往表格中填充模数据
 		int row = 0;
 		int column = 0;
-		if (_evaluationInfos != nullptr)
+		if (_currentEvaluationInfo != nullptr)
 		{
-			for (int i = 0; i < _evaluationInfos->size(); i++)
+			for (int i = 0; i < _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->count(); i++)
 			{
 				table->Mmodel->insertRows(i, 1, QModelIndex());//插入每一行
-				MEvaluationInfo* tempSInfo = _evaluationInfos->at(i);
-				fillTableCell(tempSInfo->RecognizePatternInfo->Name, table, i, 0);
+				MRecognizeFormPattern* tempFormPattern = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(i);
+				fillTableCell(tempFormPattern->FileName, table, i, 0);
 			}
 		}
 	}

@@ -162,8 +162,9 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 	QXlsx::Format format1;
 	format1.setFontColor(QColor(Qt::black));
 	format1.setPatternBackgroundColor(QColor(Qt::white));
-	format1.setFontSize(15);
+	format1.setFontSize(11);
 	format1.setHorizontalAlignment(QXlsx::Format::AlignHCenter);/*横向居中*/
+	format1.setVerticalAlignment(QXlsx::Format::AlignVCenter);
 	format1.setBorderStyle(QXlsx::Format::BorderMedium);/*边框样式*/
 	MResult* currentResult;
 	//直接进行保存
@@ -227,10 +228,11 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			_mExcelReader->writeExcel(i * (patternCount + 1) + 5, 1, unitName.at(i), format1);
 			_mExcelReader->mergeCells(i * (patternCount + 1) + 5, 1, (i + 1)*(patternCount + 1) + 4, 1, format1);
 
-		}
+		}  
 		//遍历指标
 		int indexCountF = _info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->MemberIndexs->at(0)->MemberDetailIndexs->count();
-		int indexCountS = 4;
+		int indexCountGroup = 0;
+		int indexCountT = 4;
 		QList<QString> indexNameF;
 		QList<MemberDetailIndex*>* indexNode = new QList<MemberDetailIndex*>;
 		indexNameF.clear();
@@ -240,27 +242,59 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			indexNode->append(_info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->MemberIndexs->at(0)->MemberDetailIndexs->at(i));
 			//_info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->MemberIndexs->at(0)->MemberDetailIndexs->at()->FirstLevelIndex.name
 			indexNameF.append(indexNode->at(i)->FirstLevelIndex.name);
-			_mExcelReader->writeExcel(2, indexCountS, indexNameF.at(i), format1);
+			_mExcelReader->writeExcel(2, indexCountT, indexNameF.at(i), format1);
+			int initMark = indexCountT;
 			//二级指标
 			unsigned j;
 			for (j = 0; j < indexNode->at(i)->SecondLevelIndex.count(); j++)
 			{
-				_mExcelReader->writeExcel(4, indexCountS, indexNode->at(i)->SecondLevelIndex.at(j).name, format1);
-				indexCountS++;
+				_mExcelReader->writeExcel(3, indexCountT, indexNode->at(i)->SecondLevelIndex.at(j).name, format1);
+				unsigned k;
+				MGroupPattern* tempGroupPattern = _info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->GetFormPattern(0)->MarkGroupPattern->at(indexCountGroup);
+				for (k = 0; k < tempGroupPattern->CellList->count(); k ++)
+				{
+					_mExcelReader->writeExcel(4, indexCountT, tempGroupPattern->CellList->at(k)->CellName, format1);
+					indexCountT++;
+				}
+				indexCountGroup++;
+				if (k == 0)
+				{
+					_mExcelReader->mergeCells(3, indexCountT, 4, indexCountT, format1);
+					indexCountT++;
+				}
+				else
+				{
+					_mExcelReader->mergeCells(3, indexCountT - k, 3, indexCountT - 1, format1);
+				}
 			}
 			if (j == 0)
 			{
-				_mExcelReader->mergeCells(2, indexCountS, 4, indexCountS, format1);
-				indexCountS ++;
+				unsigned k;
+				MGroupPattern* tempGroupPattern = _info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->GetFormPattern(0)->MarkGroupPattern->at(indexCountGroup);
+				for (k = 0; k < tempGroupPattern->CellList->count(); k++)
+				{
+					_mExcelReader->writeExcel(4, indexCountT, tempGroupPattern->CellList->at(k)->CellName, format1);
+					indexCountT++;
+				}
+				indexCountGroup++;
+				if (k == 0)
+				{
+					_mExcelReader->mergeCells(2, indexCountT, 4, indexCountT, format1);
+					indexCountT++;
+				}
+				else
+				{
+					_mExcelReader->mergeCells(2, indexCountT - k, 3, indexCountT - 1, format1);
+				}
 			}
 			else
 			{
-				_mExcelReader->mergeCells(2, indexCountS - j, 3, indexCountS - 1, format1);
+				_mExcelReader->mergeCells(2, initMark, 2, indexCountT - 1, format1);
 			}
 		}
 
 		//_mExcelReader->mergeCells(1, 1, 1, 3, format1);//无指标情况
-		_mExcelReader->mergeCells(1, 1, 1, indexCountS - 1, format1);
+		_mExcelReader->mergeCells(1, 1, 1, indexCountT - 1, format1);
 		//计票人
 
 
@@ -274,7 +308,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 		_mExcelReader->writeExcel(2, 6, u8"表类型", format1);
 		_mExcelReader->writeExcel(2, 7, u8"收回数", format1);
 		//index
-		indexCountS = 8;
+		/*
 		for (unsigned i = 0; i < indexCountF; i++)
 		{
 			_mExcelReader->writeExcel(2, indexCountS, indexNameF.at(i), format1);
@@ -295,8 +329,66 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				_mExcelReader->mergeCells(2, indexCountS - j, 3, indexCountS - 1, format1);
 			}
 		}
+		*/
+		indexCountT = 8;
+		indexCountGroup = 0;
+		for (unsigned i = 0; i < indexCountF; i++)
+		{
+			indexNode->append(_info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->MemberIndexs->at(0)->MemberDetailIndexs->at(i));
+			//_info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->MemberIndexs->at(0)->MemberDetailIndexs->at()->FirstLevelIndex.name
+			indexNameF.append(indexNode->at(i)->FirstLevelIndex.name);
+			_mExcelReader->writeExcel(2, indexCountT, indexNameF.at(i), format1);
+			int initMark = indexCountT;
+			//二级指标
+			unsigned j;
+			for (j = 0; j < indexNode->at(i)->SecondLevelIndex.count(); j++)
+			{
+				_mExcelReader->writeExcel(3, indexCountT, indexNode->at(i)->SecondLevelIndex.at(j).name, format1);
+				unsigned k;
+				MGroupPattern* tempGroupPattern = _info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->GetFormPattern(0)->MarkGroupPattern->at(indexCountGroup);
+				for (k = 0; k < tempGroupPattern->CellList->count(); k++)
+				{
+					_mExcelReader->writeExcel(4, indexCountT, tempGroupPattern->CellList->at(k)->CellName, format1);
+					indexCountT++;
+				}
+				indexCountGroup++;
+				if (k == 0)
+				{
+					_mExcelReader->mergeCells(3, indexCountT, 4, indexCountT, format1);
+					indexCountT++;
+				}
+				else
+				{
+					_mExcelReader->mergeCells(3, indexCountT - k, 3, indexCountT - 1, format1);
+				}
+			}
+			if (j == 0)
+			{
+				unsigned k;
+				MGroupPattern* tempGroupPattern = _info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->GetFormPattern(0)->MarkGroupPattern->at(indexCountGroup);
+				for (k = 0; k < tempGroupPattern->CellList->count(); k++)
+				{
+					_mExcelReader->writeExcel(4, indexCountT, tempGroupPattern->CellList->at(k)->CellName, format1);
+					indexCountT++;
+				}
+				indexCountGroup++;
+				if (k == 0)
+				{
+					_mExcelReader->mergeCells(2, indexCountT, 4, indexCountT, format1);
+					indexCountT++;
+				}
+				else
+				{
+					_mExcelReader->mergeCells(2, indexCountT - k, 3, indexCountT - 1, format1);
+				}
+			}
+			else
+			{
+				_mExcelReader->mergeCells(2, initMark, 2, indexCountT - 1, format1);
+			}
+		}
 
-		_mExcelReader->mergeCells(1, 1, 1, indexCountS - 1, format1);
+		_mExcelReader->mergeCells(1, 1, 1, indexCountT - 1, format1);
 		_mExcelReader->mergeCells(2, 1, 4, 1, format1);
 		_mExcelReader->mergeCells(2, 2, 4, 2, format1);
 		_mExcelReader->mergeCells(2, 3, 4, 3, format1);
@@ -342,6 +434,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 		_mExcelReader->writeExcel(2, 4, u8"表类型", format1);
 		_mExcelReader->writeExcel(2, 5, u8"收回数", format1);
 		//index
+		/*
 		indexCountS = 6;
 		for (unsigned i = 0; i < indexCountF; i++)
 		{
@@ -363,8 +456,66 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				_mExcelReader->mergeCells(2, indexCountS - j, 3, indexCountS - 1, format1);
 			}
 		}
+		*/
+		indexCountT = 6;
+		indexCountGroup = 0;
+		for (unsigned i = 0; i < indexCountF; i++)
+		{
+			indexNode->append(_info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->MemberIndexs->at(0)->MemberDetailIndexs->at(i));
+			//_info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->MemberIndexs->at(0)->MemberDetailIndexs->at()->FirstLevelIndex.name
+			indexNameF.append(indexNode->at(i)->FirstLevelIndex.name);
+			_mExcelReader->writeExcel(2, indexCountT, indexNameF.at(i), format1);
+			int initMark = indexCountT;
+			//二级指标
+			unsigned j;
+			for (j = 0; j < indexNode->at(i)->SecondLevelIndex.count(); j++)
+			{
+				_mExcelReader->writeExcel(3, indexCountT, indexNode->at(i)->SecondLevelIndex.at(j).name, format1);
+				unsigned k;
+				MGroupPattern* tempGroupPattern = _info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->GetFormPattern(0)->MarkGroupPattern->at(indexCountGroup);
+				for (k = 0; k < tempGroupPattern->CellList->count(); k++)
+				{
+					_mExcelReader->writeExcel(4, indexCountT, tempGroupPattern->CellList->at(k)->CellName, format1);
+					indexCountT++;
+				}
+				indexCountGroup++;
+				if (k == 0)
+				{
+					_mExcelReader->mergeCells(3, indexCountT, 4, indexCountT, format1);
+					indexCountT++;
+				}
+				else
+				{
+					_mExcelReader->mergeCells(3, indexCountT - k, 3, indexCountT - 1, format1);
+				}
+			}
+			if (j == 0)
+			{
+				unsigned k;
+				MGroupPattern* tempGroupPattern = _info->RecognizePatternInfo->RecognizeFormPatterns->at(0)->GetFormPattern(0)->MarkGroupPattern->at(indexCountGroup);
+				for (k = 0; k < tempGroupPattern->CellList->count(); k++)
+				{
+					_mExcelReader->writeExcel(4, indexCountT, tempGroupPattern->CellList->at(k)->CellName, format1);
+					indexCountT++;
+				}
+				indexCountGroup++;
+				if (k == 0)
+				{
+					_mExcelReader->mergeCells(2, indexCountT, 4, indexCountT, format1);
+					indexCountT++;
+				}
+				else
+				{
+					_mExcelReader->mergeCells(2, indexCountT - k, 3, indexCountT - 1, format1);
+				}
+			}
+			else
+			{
+				_mExcelReader->mergeCells(2, initMark, 2, indexCountT - 1, format1);
+			}
+		}
 
-		_mExcelReader->mergeCells(1, 1, 1, indexCountS - 1, format1);
+		_mExcelReader->mergeCells(1, 1, 1, indexCountT - 1, format1);
 		_mExcelReader->mergeCells(2, 1, 4, 1, format1);
 		_mExcelReader->mergeCells(2, 2, 4, 2, format1);
 		_mExcelReader->mergeCells(2, 3, 4, 3, format1);
@@ -376,15 +527,61 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 
 		//填充数据
 		QList<int> receiveCount;//收回数 计数patternCount
-
+		QList<int> score;
+		MRecognizeFormPattern* currentFormPattern;
 		for (int resultCount = 0; resultCount < results->count(); resultCount++)
 		{
+			currentFormPattern = nullptr;
 			currentResult = results->at(resultCount);
+			QString patternID = currentResult->PatternGUID;
+			for (int i = 0; i < patternCount; i ++)
+			{
+				currentFormPattern = _info->RecognizePatternInfo->RecognizeFormPatterns->at(i);
+				if (patternID == currentFormPattern->GetPatternGUID())
+				{
+					break;
+				}
+			}
 
-			//if(currentResult->PatternGUID)
-			
-			qDebug() << currentResult->PatternGUID;
+			if (currentFormPattern == nullptr)
+			{
+				return;
+			}
+			QList<QList<int>> scoreCount;//该模式下所有成员的得分
+			for (int formResultCount = 0; formResultCount < currentResult->FormReuslts->count(); formResultCount++)
+			{
+				//分码1-0-0-0
+				MFormResult* tempResult = currentResult->GetFormResult(formResultCount);
+				MFormPattern* tempPattern = currentFormPattern->GetFormPattern(formResultCount);
+				vector<int> memberIndexsList = currentFormPattern->FormPatternHash[0];
+				//
+				//
+				indexCountGroup;
+				_mExcelReader->chooseSheet(1);
+				for (int i = 0; i < currentFormPattern->MemberIndexs->count(); i++)
+				{
+					MemberIndex* currentMember = new MemberIndex();
+					currentMember = currentFormPattern->MemberIndexs->at(i);
+					for (int j = 0; j < indexCountGroup; j++)
+					{
+						indexCountT = 8;
+						tempPattern->MarkGroupPattern->at(j + i * indexCountGroup);
+						//_mExcelReader->writeExcel(, indexCountT, );
+						//float modulus = currentDetailIndex->FirstLevelIndex.weightNumerator / currentDetailIndex->FirstLevelIndex.weightDenominator;
 
+						int score = currentResult->FormReuslts->at(0)->MarkGroupResults->at(i)->NumberResult.toInt();//
+					}
+
+
+					//取得分数
+				}
+			}
+
+			//取得对应下标
+			//currentResult->FormReuslts->at(0)->MarkGroupResults->at(i)->
+			//取得主体权重
+
+			//
 		}
 
 		/*
@@ -436,9 +633,9 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				_mExcelReader->writeExcel(i + 2, k + 2, tempFormResult->IdentifierResult->Result, format1);
 			}
 		}
-
+		*/
 		//	填充统计数据
-
+		/*
 		if (formPattern->ResultType == SingleSelect)
 		{
 			struct AnalyzeResult //建立一个结构体记录每一个统计对象的计数
@@ -542,38 +739,6 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			}
 			if (result->GetFormResultCount() > 0)
 			{
-
-				//创建一个改名字的excel表
-				//QFile file(excelTempName);
-				//file.open(QIODevice::ReadWrite);
-				//file.close();
-				if (_mExcelReader->newExcel(excelTempName))
-				{
-					_mExcelReader->setSheetName(evaluationName);
-
-					//填充明细数据
-					//单位页
-					_mExcelReader->chooseSheet(0);
-					_mExcelReader->writeExcel(1, 1, u8"单位指标汇总表", format1);
-
-					_mExcelReader->writeExcel(2, 1, u8"单位", format1);
-					_mExcelReader->writeExcel(2, 2, u8"表类型", format1);
-					_mExcelReader->writeExcel(2, 3, u8"收回数", format1);
-
-					_mExcelReader->mergeCells(1, 1, 1, 3, format1);
-					int memberCount = _info->RecognizePatternInfo->RecognizeFormPatterns->at(patternCount)->EvaluationUnits.count();
-					for (unsigned j = 0; j < memberCount; j++)
-					{
-						_mExcelReader->writeExcel(2, j + 4, _info->RecognizePatternInfo->RecognizeFormPatterns->at(patternCount)->EvaluationUnits.at(j), format1);
-					}
-					int
-					//int excelRow = result->GetFormResultCount();
-					//默认一个识别结果里面，都是根据一个模板进行识别的，因此结果的分组数是一样的，取第一个FormResult的分组数
-					//int excelColumn = result->FormReuslts->at(0)->MarkGroupResults->count();
-
-					//int patternCount = 0;
-
-					QString patternName = _info->RecognizePatternInfo->RecognizeFormPatterns->at(patternCount)->FileName;
 					_mExcelReader->chooseSheet(1);
 					unsigned k;
 					for (unsigned j = 0; j < excelColumn; j++)
@@ -702,7 +867,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 						}
 					}
 				}
-			}
+			
 			//在进入下一个循环之前，delete掉新建的指针
 			delete result;
 			result = nullptr;
