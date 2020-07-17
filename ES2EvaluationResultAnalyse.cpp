@@ -212,7 +212,7 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 {
 	QString dirName = QFileDialog::getExistingDirectory(this, u8"保存数据结果到...").toUtf8();
-	/*if (!dirName.isEmpty())
+	if (!dirName.isEmpty())
 	{
 		dirName = dirName + "/" +_currentEvaluationInfo->RecognizePatternInfo->Name;
 		QDir dir(dirName);
@@ -223,137 +223,13 @@ void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 	}
 	else
 		return;
-	*/
+	
 	//新建Excel文件
 
 	SetWaitExcel(true);
 	loadDataFile->setExcelData(McurrentResult, dirName);
 	dataOperate();
-	//规定excel的单元格式样式
-	//QXlsx::Format format1;
-	//format1.setFontColor(QColor(Qt::black));/*文字为红色*/
-	//format1.setPatternBackgroundColor(QColor(152, 251, 152));/*背景颜色，使用rgb*/
-	//format1.setFontSize(15);
-	//format1.setHorizontalAlignment(QXlsx::Format::AlignHCenter);/*横向居中*/
-	//format1.setBorderStyle(QXlsx::Format::BorderMedium);/*边框样式*/
-	//
-	//if (SelectedResult->FormReuslts->count() > 0)
-	//{
-	//	QString excelName= McurrentFormPattern->FormName;
-	//	if (_mExcelReader->newExcel(excelName))
-	//	{
-	//		_mExcelReader->setSheetName();
-	//		/*
-	//			填充明细数据
-	//		*/
-	//		_mExcelReader->chooseSheet(0);
-	//		int excelRow = SelectedResult->FormReuslts->count();
-	//		//默认一个识别结果里面，都是根据一个模板进行识别的，因此结果的分组数是一样的，取第一个FormResult的分组数
-	//		int excelColumn = SelectedResult->FormReuslts->at(0)->MarkGroupResults->count();
-	//		//表头设置
-	//		unsigned k;
-	//		for (unsigned j = 0; j < excelColumn; j++)
-	//		{
-	//			_mExcelReader->writeExcel(1, j + 1, SelectedResult->FormReuslts->at(0)->MarkGroupResults->at(j)->GroupName, format1);
-	//			k = j;
-	//		}
-	//		_mExcelReader->writeExcel(1, k + 2, SelectedResult->FormReuslts->at(0)->IdentifierResult->Name, format1);
-	//		for (unsigned i = 0; i < excelRow; i++)
-	//		{
-	//			Cm3::FormResult::MFormResult *tempFormResult = SelectedResult->FormReuslts->at(i);
-	//			unsigned k;
-	//			for (unsigned j = 0; j < excelColumn; j++)
-	//			{
-	//				_mExcelReader->writeExcel(i + 2, j + 1, tempFormResult->MarkGroupResults->at(j)->TextResult, format1);
-	//				k = j;
-	//			}
-	//			_mExcelReader->writeExcel(i + 2, k + 2, tempFormResult->IdentifierResult->Result, format1);
-	//		}
-	//		/*
-	//			填充统计数据
-	//		*/
-	//		struct AnalyzeResult //建立一个结构体记录每一个统计对象的计数
-	//		{
-	//			QString patternName;
-	//			int count;
-	//		};
-	//		QList<AnalyzeResult> patternResult;
-	//		QList<QList<AnalyzeResult>> patternResults;
-	//		_mExcelReader->chooseSheet(1);
-	//		patternResults.clear();
-	//		//for (int k = 0; k < excelRow; k++)
-	//		{
-	//			for (int i = 0; i < McurrentFormPattern->MarkGroupPattern->size(); i++)
-	//			{
-	//				patternResult.clear();
-	//				for (int j = 0; j < McurrentFormPattern->MarkGroupPattern->at(i)->CellList->size(); j++)
-	//				{
-	//					AnalyzeResult eachPatternResult;
-	//					eachPatternResult.patternName = McurrentFormPattern->MarkGroupPattern->at(i)->CellList->at(j)->CellName;
-	//					eachPatternResult.count = 0;
-	//					patternResult.append(eachPatternResult);
-	//				}
-	//				//往patternResult里面填充未选和多选两种情况
-	//				AnalyzeResult eachPatternResult1;
-	//				AnalyzeResult eachPatternResult2;
-	//				eachPatternResult1.patternName = QString("*");
-	//				eachPatternResult2.patternName = QString("");
-	//				eachPatternResult1.count = 0;
-	//				eachPatternResult2.count = 0;
-	//				patternResult.append(eachPatternResult1);
-	//				patternResult.append(eachPatternResult2);
-	//				//最后在patternResults中添加当前patternResult
-	//				patternResults.append(patternResult);
-	//			}
-	//		}
-	//		//计算统计用参数
-	//		for (int i = 0; i < SelectedResult->GetFormResultCount(); i++)
-	//		{
-	//			for (int j = 0; j < SelectedResult->FormReuslts->at(i)->GetGroupResultCount(); j++)
-	//			{
-	//				for (int k = 0; k < patternResult.size(); k++)
-	//				{
-	//					if (SelectedResult->FormReuslts->at(i)->GetGroupResult(j)->TextResult==patternResult.at(k).patternName)
-	//					{
-	//						AnalyzeResult tempAnalyzeResult;
-	//						tempAnalyzeResult = patternResults.at(j).at(k);
-	//						tempAnalyzeResult.count += 1;
-	//						patternResults[j].replace(k, tempAnalyzeResult);
-	//						//patternResult[k].count++;
-	//					}
-	//				}
-	//			}
-	//		}
-	//		//初始化行与列的索引
-	//		int rowIndex = 1;
-	//		int columnIndex = 1;
-	//		//表头设计，根据得到的patternNames确定每一个group的大小，合并相应长度的单元格
-	//		int lenGroup = patternResults.at(0).size();
-	//		for (int i = 0; i < patternResults.size(); i++)
-	//		{
-	//			_mExcelReader->mergeCells(rowIndex, columnIndex, rowIndex, columnIndex + lenGroup - 1, format1);
-	//			for (int j = 0; j < patternResults.at(0).size(); j++)
-	//			{
-	//				_mExcelReader->writeExcel(rowIndex, columnIndex, McurrentFormPattern->MarkGroupPattern->at(i)->GroupName, format1);
-	//				QString tempPatternName = patternResults.at(i).at(j).patternName;
-	//				if (tempPatternName == QString("*"))
-	//				{
-	//					_mExcelReader->writeExcel(rowIndex + 1, columnIndex + j, (u8"多选"), format1);
-	//				}
-	//				else if (tempPatternName == QString(""))
-	//				{
-	//					_mExcelReader->writeExcel(rowIndex + 1, columnIndex + j, (u8"未选"), format1);
-	//				}
-	//				else
-	//				{
-	//					_mExcelReader->writeExcel(rowIndex + 1, columnIndex + j, patternResults.at(i).at(j).patternName, format1);
-	//				}
-	//				_mExcelReader->writeExcel(rowIndex + 1 + 1, columnIndex + j, QString::number(patternResults.at(i).at(j).count), format1);
-	//			}
-	//			columnIndex = columnIndex + lenGroup;
-	//		}
-	//	}
-	//}
+
 }
 
 
@@ -365,11 +241,9 @@ void ES2EvaluationResultAnalyse::selectionTableEvaluationChanged(const QItemSele
 		int selectedRow = _tableEvaluation->MselectionModel->selectedIndexes().front().row();
 		if (_currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->size() > selectedRow)
 		{
-			//_currentEvaluationInfo = _evaluationInfos->at(selectedRow);
 			_currentrecognizePattern = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(selectedRow);
 			_formPatternIndex = selectedRow;
-			//getMemberDutyClass();
-			// 更新tablePatternInfo表格
+			// 更新表格
 
 			fillingTheTableView("tableEvaluationMembers");
 			fillingTheTableView("tableEvaluationObject");
