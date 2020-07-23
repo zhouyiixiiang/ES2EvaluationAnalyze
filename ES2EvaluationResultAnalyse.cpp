@@ -199,6 +199,11 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 	}
 	//readEvaluationInfoFromDatafile();
 	_currentEvaluationInfo->readRecognizePatternsFromBinaryFile(fileName);
+	/*
+	ES2EvaluationSubjects* tempSubjectInfo = _currentEvaluationInfo->EvaluationSubjectInfo;
+	int tempsize = tempSubjectInfo->EvaluationSubjects->size();
+	ES2EvaluationSubject* tempSub = tempSubjectInfo->EvaluationSubjects->at(0);
+	*/
 	_evaluationInfos->append(_currentEvaluationInfo);
 	_currentrecognizePattern = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(_formPatternIndex);
 
