@@ -22,6 +22,7 @@
 #include "dlgwait.h"
 #include "loadDataFile.h"
 #include "mevaluationinfo.h"
+#include "setBenchmark.h"
 
 #include "es2evaluationsubject.h"
 #include "es2evaluationsubjects.h"
@@ -63,6 +64,7 @@ public slots:
     void selectionTableEvaluationChanged(const QItemSelection& selected, const QItemSelection& deselected);
     void selectionTableTemplateListChanged(const QItemSelection& selected, const QItemSelection& deselected);
     void selectOutputType(int);
+    void finishSetAnswer();
 
 public:
     void SetWait(bool);
@@ -109,6 +111,7 @@ private:
     QThread* loadThread;
     LoadDataFile* loadDataFile;
     DlgWait* _waitOperate;
+    SetBenchmark* _setAnswer;
 
     TableItem* _tableEvaluation = nullptr;
     TableItem* _tableEvaluationObject = nullptr;

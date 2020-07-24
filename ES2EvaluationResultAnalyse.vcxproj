@@ -96,6 +96,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="setBenchmark.cpp" />
     <QtRcc Include="ES2EvaluationResultAnalyse.qrc" />
     <QtMoc Include="ES2EvaluationResultAnalyse.h" />
     <ClCompile Include="ES2EvaluationResultAnalyse.cpp" />
@@ -104,6 +105,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="setBenchmark.h" />
     <QtMoc Include="loadDataFile.h" />
     <QtMoc Include="excelreader.h" />
     <ClInclude Include="resource.h" />
@@ -114,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="ES2EvaluationResultAnalyse.ui" />
+    <QtUic Include="setBenchmark.ui" />
     <QtUic Include="waitingwindow.ui" />
   </ItemGroup>
   <ItemGroup>

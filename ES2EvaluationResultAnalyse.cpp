@@ -274,7 +274,8 @@ void ES2EvaluationResultAnalyse::onButtonDeleteTemplate()
 
 void ES2EvaluationResultAnalyse::onButtonReadBenchmark()
 {
-
+	_setAnswer = new SetBenchmark(this);
+	_setAnswer->show();
 }
 
 void ES2EvaluationResultAnalyse::selectionTableTemplateListChanged(const QItemSelection& selected, const QItemSelection& deselected)
@@ -318,6 +319,11 @@ void ES2EvaluationResultAnalyse::selectOutputType(int index)
 		ui.pushButton_7->setVisible(true);
 
 	}
+}
+
+void ES2EvaluationResultAnalyse::finishSetAnswer()
+{
+
 }
 
 void ES2EvaluationResultAnalyse::uploadCountProgress(int rec, int sum)
@@ -481,7 +487,6 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 	}
 	if (table->Mmodel->rowCount() > 0)
 	{
-		//int j = table->Mmodel->rowCount();
 		table->Mmodel->removeRows(0, table->Mmodel->rowCount());
 	}
 	table->MselectionModel->clear();
@@ -568,7 +573,7 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 	else if (sTable == "tableTemplateList")
 	{
 		table->Mmodel->setColumnCount(1);
-		table->Mmodel->setHeaderData(0, Qt::Horizontal, (u8"测评单位"));
+		table->Mmodel->setHeaderData(0, Qt::Horizontal, (u8"可选模板"));
 		tableview->verticalHeader()->hide();//隐藏行号
 		tableview->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 		table->Mmodel->insertRows(0, 1, QModelIndex());//插入每一行

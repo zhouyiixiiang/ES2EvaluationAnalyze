@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>setBenchmark</class>
- <widget class="QWidget" name="setBenchmark">
+ <class>SetBenchmark</class>
+ <widget class="QDialog" name="SetBenchmark">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1052</width>
+    <width>1033</width>
     <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Dialog</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <item>
     <widget class="QFrame" name="frame">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -76,5 +76,41 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>SetBenchmark</receiver>
+   <slot>finishSetAnswer()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>840</x>
+     <y>256</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>760</x>
+     <y>294</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>SetBenchmark</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>960</x>
+     <y>250</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>956</x>
+     <y>292</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>finishSetAnswer()</slot>
+ </slots>
 </ui>
