@@ -57,6 +57,7 @@ public slots:
 private:
     void readResultsFromFile();
     void generateExcelResult(QList<MResult*>*, QString);
+    void formatSet(QXlsx::Format&);
 
     QString _uid;
     QList<MResult*>* _results = nullptr;
@@ -68,6 +69,11 @@ private:
     QString _excelName;
     ExcelReader* _mExcelReader = nullptr;//excel操作对象
     MEvaluationInfo* _info = nullptr;
+    QXlsx::Format format1;
+    MRecognizeFormPattern* _currentPattern;
+    ES2EvaluationMembers* _currentMemberInfo;
+    ES2EvaluationSubject* _currentSubject;
+    QString patternName;
 
 };
 
