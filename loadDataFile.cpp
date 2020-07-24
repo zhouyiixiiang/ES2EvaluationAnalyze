@@ -821,7 +821,8 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				int excelRowCount = 5;
 				int excelColumnIndex = 8;
 				int subjectCount = 2;
-				
+
+				QList<QList<int>> memberScore;
 				for (int subjectIndex = 0; subjectIndex < subjectCount; subjectIndex++)
 				{
 					if (subjectIndex != 0)
@@ -831,42 +832,69 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 					//_mExcelReader->writeExcel(excelRowCount + subjectCount, 7, QString::number(ceil(receiveCount[subjectCount] * 1.0 / pageCount * 1.0)), format1);
 					for (int memberIndex = 0; memberIndex < memberSum; memberIndex++)
 					{
-						QList<int> memberScore;
-						memberScore.append(0);
-						_mExcelReader->writeExcel(excelRowCount + subjectIndex, 7, QString::number(receiveCount.at(subjectIndex)), format1);
-						for (int i = 0; i < indexCountGroup; i++)
+						if (subjectIndex == 0)
 						{
-							//MFormPattern* currentformpattern = _currentPattern->GetFormPattern(0);
-							//_currentPattern->MemberIndexs->at(0)->MemberDetailIndexs->at(i)->FirstLevelIndex.groupIndex;
-							int empty = cellListCount.at(i) - scoreCount[unitIndex][subjectIndex][memberIndex][i].count();
-							for (int j = 0; j < empty; j++)
+							QList<int> memberScore_sub;
+							memberScore_sub.append(0);
+							_mExcelReader->writeExcel(excelRowCount + subjectIndex, 7, QString::number(receiveCount.at(subjectIndex)), format1);
+							for (int i = 0; i < indexCountGroup; i++)
 							{
-								_mExcelReader->writeExcel(excelRowCount + subjectIndex, excelColumnIndex, "0", format1);
-								memberScore[excelColumnIndex - 8] += 0;
-								memberScore.append(0);
-								excelColumnIndex++;
+								int empty = cellListCount.at(i) - scoreCount[unitIndex][subjectIndex][memberIndex][i].count();
+								for (int j = 0; j < empty; j++)
+								{
+									_mExcelReader->writeExcel(excelRowCount + subjectIndex, excelColumnIndex, "0", format1);
+									memberScore_sub[excelColumnIndex - 8] += 0;
+									memberScore_sub.append(0);
+									excelColumnIndex++;
+								}
+								for (int n = 0; n < cellListCount.at(i) - empty; n++)
+								{
+									QString result = scoreCount[unitIndex][subjectIndex][memberIndex][i][n];
+									_mExcelReader->writeExcel(excelRowCount + subjectIndex, excelColumnIndex, result, format1);
+									memberScore_sub[excelColumnIndex - 8] += result.toInt(); //?
+									memberScore_sub.append(0);
+									excelColumnIndex++;
+								}
 							}
-							for (int n = 0; n < cellListCount.at(i) - empty; n++)
-							{
-								QString result = scoreCount[unitIndex][subjectIndex][memberIndex][i][n];
-								_mExcelReader->writeExcel(excelRowCount + subjectIndex, excelColumnIndex, result, format1);
-								memberScore[excelColumnIndex - 8] += result.toInt(); //?
-								memberScore.append(0);
-								excelColumnIndex++;
-							}
+							memberScore.append(memberScore_sub);
+							excelColumnIndex = 8;
 						}
-						excelColumnIndex = 8;
-						if(subjectIndex == subjectCount - 1)
+						else
 						{
-							_mExcelReader->writeExcel(excelRowCount - 1, 7, QString::number(receiveCount.at(subjectCount)), format1);
-							for (int i = 0; i < memberScore.size() - 1; i++) //总计
+							_mExcelReader->writeExcel(excelRowCount + subjectIndex, 7, QString::number(receiveCount.at(subjectIndex)), format1);
+							for (int i = 0; i < indexCountGroup; i++)
 							{
-								_mExcelReader->writeExcel(excelRowCount + subjectCount, excelColumnIndex, QString::number(memberScore.at(i)), format1);
+								//MFormPattern* currentformpattern = _currentPattern->GetFormPattern(0);
+								//_currentPattern->MemberIndexs->at(0)->MemberDetailIndexs->at(i)->FirstLevelIndex.groupIndex;
+								int empty = cellListCount.at(i) - scoreCount[unitIndex][subjectIndex][memberIndex][i].count();
+								for (int j = 0; j < empty; j++)
+								{
+									_mExcelReader->writeExcel(excelRowCount + subjectIndex, excelColumnIndex, "0", format1);
+									memberScore[memberIndex][excelColumnIndex - 8] += 0;
+									excelColumnIndex++;
+								}
+								for (int n = 0; n < cellListCount.at(i) - empty; n++)
+								{
+									QString result = scoreCount[unitIndex][subjectIndex][memberIndex][i][n];
+									_mExcelReader->writeExcel(excelRowCount + subjectIndex, excelColumnIndex, result, format1);
+									memberScore[memberIndex][excelColumnIndex - 8] += result.toInt(); //?
+									excelColumnIndex++;
+								}
+							}
+							excelColumnIndex = 8;
+						}
+						if (subjectIndex == subjectCount - 1)
+						{
+							_mExcelReader->writeExcel(excelRowCount + subjectCount, 7, QString::number(receiveCount.at(subjectCount)), format1);
+							for (int i = 0; i < memberScore[memberIndex].size() - 1; i++) //总计
+							{
+								_mExcelReader->writeExcel(excelRowCount + subjectCount, excelColumnIndex, QString::number(memberScore.at(memberIndex).at(i)), format1);
 								excelColumnIndex++;
 							}
 						}
 						excelColumnIndex = 8;
 						excelRowCount += subjectCount + 1;
+						
 					}
 				}
 			
