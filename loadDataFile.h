@@ -41,7 +41,7 @@ public:
     ~LoadDataFile();
 
     void readDataFile(QList<MResult*>*, QString);
-    void setExcelData(MResult* result, QString excelName);
+    void setExcelData(MResult*, QString, int);
     void setInfoData(MEvaluationInfo*);
 
 signals:
@@ -49,6 +49,7 @@ signals:
     void countFile();
     void finish();
     void finishExcel();
+    void outputError();
 
 public slots:
     void doDataOperate();
@@ -75,6 +76,7 @@ private:
     ES2EvaluationSubject* _currentSubject;
     QString patternName;
 
+    int _outputType;
 };
 
 

@@ -53,10 +53,16 @@ public slots:
     void onButtonLoadDataFile();
     void onButtonLoadEvaluationData();
     void onButtonOutputExcel();
+    void onButtonAddTemplate();
+    void onButtonDeleteTemplate();
+    void onButtonReadBenchmark();
     void finishLoadDataFile();
     void finishSaveExcel();
+    void outputErrorPrompt();
     void uploadCountProgress(int, int);
     void selectionTableEvaluationChanged(const QItemSelection& selected, const QItemSelection& deselected);
+    void selectionTableTemplateListChanged(const QItemSelection& selected, const QItemSelection& deselected);
+    void selectOutputType(int);
 
 public:
     void SetWait(bool);
@@ -82,7 +88,7 @@ private:
     void readEvaluationInfoFromDatafile();
     QStringList fileNamesEndWith(QString);
  
-    int _formPatternIndex = 0;
+
     QList<QString> _gender;
     QList<MEvaluationInfo*>* _evaluationInfos = nullptr; // 已有测评
     MEvaluationInfo* _currentEvaluationInfo = nullptr; // 当前测评
@@ -95,9 +101,7 @@ private:
     QList<MPattern*>* _mCurrentPatterns = nullptr;
     MPattern* _mCurrentPattern = nullptr;
     MFormPattern* McurrentFormPattern = nullptr;
-    int McurrentFormPatternIndex = 0;
     int SelectedFilterdResultGroupLength = 0;
-    //MResult* McurrentRecognizedResult = nullptr;
 
     QString _path;
     QList<QMetaObject::Connection> _connections;
@@ -109,9 +113,14 @@ private:
     TableItem* _tableEvaluation = nullptr;
     TableItem* _tableEvaluationObject = nullptr;
     TableItem* _tableEvaluationMembers = nullptr;
+    TableItem* _tableTemplateList = nullptr;
 
     int _evaluationIndex = 0;
     int _evaluationUnitIndex = 0;
     int _evaluationTableIndex = 0;
     int _evaluationMemberIndex = 0;
+    
+    int _formPatternIndex = 0;
+    int _templateIndex = 0;
+    int _outputType = 0;
 };

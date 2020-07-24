@@ -40,10 +40,12 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 	_tableEvaluation = new TableItem();
 	_tableEvaluationObject = new TableItem();
 	_tableEvaluationMembers = new TableItem();
+	_tableTemplateList = new TableItem();
 
 	getconnectUseMapFunc("tableEvaluation", ui.tableView, _tableEvaluation);
 	getconnectUseMapFunc("tableEvaluationObject", ui.tableView_2, _tableEvaluationObject);
 	getconnectUseMapFunc("tableEvaluationMembers", ui.tableView_3, _tableEvaluationMembers);
+	getconnectUseMapFunc("tableTemplateList", ui.tableView_4, _tableTemplateList);
 
     _waitOperate = new DlgWait(this);
     _waitOperate->hide();
@@ -53,8 +55,15 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
     setWindowState(Qt::WindowMaximized);
 
     ui.tableView->setMouseTracking(true);
+	ui.tableView_4->setMouseTracking(true);
+
 	ui.pushButton_2->setEnabled(false);
 	ui.pushButton_4->setEnabled(false);
+	ui.pushButton_5->setEnabled(false);
+	ui.pushButton_6->setEnabled(false);
+	ui.pushButton_7->setVisible(false);
+	
+	//fillingTheTableView("tableTemplateList");
 }
 
 ES2EvaluationResultAnalyse::~ES2EvaluationResultAnalyse()
@@ -75,10 +84,12 @@ ES2EvaluationResultAnalyse::~ES2EvaluationResultAnalyse()
 	disconnectUsingMapFunc("tableEvaluation", _tableEvaluation);
 	disconnectUsingMapFunc("tableEvaluationObject", _tableEvaluationObject);
 	disconnectUsingMapFunc("tableEvaluationMembers", _tableEvaluationMembers);
+	disconnectUsingMapFunc("tableTemplateList", _tableTemplateList);
+
 	deleteTableItem(_tableEvaluation);
 	deleteTableItem(_tableEvaluationObject);
 	deleteTableItem(_tableEvaluationMembers);
-
+	deleteTableItem(_tableTemplateList);
 }
 
 void ES2EvaluationResultAnalyse::SetWait(bool flag)
@@ -128,8 +139,8 @@ void ES2EvaluationResultAnalyse::startLoadThread()
 	connect(this, &ES2EvaluationResultAnalyse::dataOperate, loadDataFile, &LoadDataFile::doDataOperate);
 	connect(loadDataFile, &LoadDataFile::countStep, this, &ES2EvaluationResultAnalyse::uploadCountProgress);
 	connect(loadDataFile, &LoadDataFile::finish, this, &ES2EvaluationResultAnalyse::finishLoadDataFile);
-
 	connect(loadDataFile, &LoadDataFile::finishExcel, this, &ES2EvaluationResultAnalyse::finishSaveExcel);
+	connect(loadDataFile, &LoadDataFile::outputError, this, &ES2EvaluationResultAnalyse::outputErrorPrompt);
 	
 	//开启线程
 	loadThread->start();
@@ -232,12 +243,50 @@ void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 	//新建Excel文件
 
 	SetWaitExcel(true);
-	loadDataFile->setExcelData(McurrentResult, dirName);
+	loadDataFile->setExcelData(McurrentResult, dirName, _outputType);
 	dataOperate();
+}
+
+void ES2EvaluationResultAnalyse::onButtonAddTemplate()
+{
+	QString fileName = QFileDialog::getOpenFileName(this, (u8"添加Excel模板"), QString(), "Data Files(*.xlsx)");
+	if (fileName.isEmpty())
+	{
+		return;
+	}
+	QFile file(fileName);
+	QString uid;
+	if (file.exists())
+	{
+		file.open(QIODevice::ReadOnly);
+		//QDataStream input(&file);
+		//input >> uid;
+		file.close();
+	}
+	//_currentTemplateList
+	//_templateIndex
+}
+void ES2EvaluationResultAnalyse::onButtonDeleteTemplate()
+{
+	//_currentTemplateList
+	//_templateIndex
+}
+
+void ES2EvaluationResultAnalyse::onButtonReadBenchmark()
+{
 
 }
 
+void ES2EvaluationResultAnalyse::selectionTableTemplateListChanged(const QItemSelection& selected, const QItemSelection& deselected)
+{
+	if (_tableTemplateList->MselectionModel->selectedIndexes().count() > 0)
+	{
+		int selectedRow = _tableTemplateList->MselectionModel->selectedIndexes().front().row();
+		_templateIndex = selectedRow;
 
+		fillingTheTableView("tableTemplateList");
+	}
+}
 
 void ES2EvaluationResultAnalyse::selectionTableEvaluationChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
@@ -256,6 +305,20 @@ void ES2EvaluationResultAnalyse::selectionTableEvaluationChanged(const QItemSele
 	}
 }
 
+void ES2EvaluationResultAnalyse::selectOutputType(int index)
+{
+	_outputType = index;
+	if (index == 0)
+	{//测评
+		ui.pushButton_7->setVisible(false);
+
+	}
+	else if (index == 1)
+	{//考评
+		ui.pushButton_7->setVisible(true);
+
+	}
+}
 
 void ES2EvaluationResultAnalyse::uploadCountProgress(int rec, int sum)
 {
@@ -269,7 +332,8 @@ void ES2EvaluationResultAnalyse::finishLoadDataFile()
 {
     SetWait(false);
 	ui.pushButton_4->setEnabled(true);
-	
+	ui.pushButton_5->setEnabled(true);
+	ui.pushButton_6->setEnabled(true);
 }
 
 void ES2EvaluationResultAnalyse::finishSaveExcel()
@@ -280,6 +344,16 @@ void ES2EvaluationResultAnalyse::finishSaveExcel()
 	msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
 	int res = msgBox.exec();
 	
+}
+
+void ES2EvaluationResultAnalyse::outputErrorPrompt()
+{
+	SetWait(false);
+	//执行窗口
+	QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"操作失败"), QMessageBox::Yes);
+	msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
+	int res = msgBox.exec();
+
 }
 
 void ES2EvaluationResultAnalyse::readEvaluationInfoFromDatafile()
@@ -330,7 +404,10 @@ void ES2EvaluationResultAnalyse::disconnectUsingMapFunc(QString s, TableItem* ta
 	if (s == "tableEvaluation")
 	{
 		QObject::disconnect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectionTableEvaluationChanged(QItemSelection, QItemSelection)));
-		QObject::disconnect(tableItem->Mmodel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(itemTableEvaluationChanged(QStandardItem*)));
+	}
+	else if (s == "tableTemplateList")
+	{
+		QObject::disconnect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectiontableTemplateListChanged(QItemSelection, QItemSelection)));
 	}
 }
 
@@ -339,6 +416,7 @@ void ES2EvaluationResultAnalyse::updateAllTableviews()
 	fillingTheTableView("tableEvaluation");
 	fillingTheTableView("tableEvaluationMembers");
 	fillingTheTableView("tableEvaluationObject");
+	fillingTheTableView("tableTemplateList");
 }
 
 void ES2EvaluationResultAnalyse::reconnectTableItem(QString sTable, QTableView*& tableview, TableItem*& table, QTableView*& exactTableview, TableItem*& exactTable)
@@ -358,8 +436,11 @@ void ES2EvaluationResultAnalyse::getconnectUseMapFunc(QString s, QTableView* tab
 	tableItem->MselectionModel = table->selectionModel();// 获得视图上的选择项
 	if (s == "tableEvaluation")
 	{
-		QObject::connect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectionTableEvaluationChanged(QItemSelection, QItemSelection)));
-		QObject::connect(tableItem->Mmodel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(itemTableEvaluationChanged(QStandardItem*)));
+		QObject::connect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectionTableEvaluationChanged(QItemSelection, QItemSelection)));\
+	}
+	else if (s == "tableTemplateList")
+	{
+		QObject::connect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectiontableTemplateListChanged(QItemSelection, QItemSelection)));
 	}
 }
 
@@ -394,9 +475,13 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 	{
 		reconnectTableItem(sTable, tableview, table, ui.tableView_2, _tableEvaluationObject);
 	}
+	else if (sTable == "tableTemplateList")
+	{
+		reconnectTableItem(sTable, tableview, table, ui.tableView_4, _tableTemplateList);
+	}
 	if (table->Mmodel->rowCount() > 0)
 	{
-		int j = table->Mmodel->rowCount();
+		//int j = table->Mmodel->rowCount();
 		table->Mmodel->removeRows(0, table->Mmodel->rowCount());
 	}
 	table->MselectionModel->clear();
@@ -462,12 +547,11 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 		}
 		table->MselectionModel->clear();
 	}
-
 	else if (sTable == "tableEvaluationObject")
 	{
 		table->Mmodel->setColumnCount(1);
-		tableview->verticalHeader()->hide();//隐藏行号 
 		table->Mmodel->setHeaderData(0, Qt::Horizontal, (u8"测评单位"));
+		tableview->verticalHeader()->hide();//隐藏行号 
 		tableview->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 		//往表格中填充模数据
 		int row = 0;
@@ -480,6 +564,17 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 				fillTableCell(_currentrecognizePattern->EvaluationUnits.at(i), table, i, 0);
 			}
 		}
+	}
+	else if (sTable == "tableTemplateList")
+	{
+		table->Mmodel->setColumnCount(1);
+		table->Mmodel->setHeaderData(0, Qt::Horizontal, (u8"测评单位"));
+		tableview->verticalHeader()->hide();//隐藏行号
+		tableview->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+		table->Mmodel->insertRows(0, 1, QModelIndex());//插入每一行
+		fillTableCell(u8"默认Excel文件", table, 0, 0);
+		//if(_currentTemplateList)
+
 	}
 	if (table->Mmodel->rowCount() > 0)
 	{

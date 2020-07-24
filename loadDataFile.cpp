@@ -50,10 +50,11 @@ void LoadDataFile::setInfoData(MEvaluationInfo* evaluationInfo)
 	_info = evaluationInfo;
 }
 
-void LoadDataFile::setExcelData(MResult* result, QString excelName)
+void LoadDataFile::setExcelData(MResult* result, QString excelName, int outputType)
 {
 	_result = result;
 	_excelName = excelName;
+	_outputType = outputType;
 	_dataOperateType = "setExcelData";
 }
 
@@ -72,13 +73,25 @@ void LoadDataFile::doDataOperate()
     }
 	else if (_dataOperateType == "setExcelData")
 	{
-		generateExcelResult(_results, _excelName);
+		if (_outputType == 0)
+		{
+			generateExcelResult(_results, _excelName);
+		}
+		else if(_outputType == 1)
+		{
+			
+		}
+		else
+		{
+			emit outputError();
+			return;
+		}
 
 		emit finishExcel();
 	}
     else
     {
-		
+		emit outputError();
     }
 }
 
@@ -374,7 +387,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			QList<int> cellListCount;
 			for (unsigned i = 0; i < indexCountF; i++)
 			{
-				indexNode->append(_currentPattern->MemberIndexs->at(patternCount)->MemberDetailIndexs->at(i));
+				indexNode->append(_currentPattern->MemberIndexs->at(0)->MemberDetailIndexs->at(i));
 				//_currentPattern->MemberIndexs->at(patternCount)->MemberDetailIndexs->at()->FirstLevelIndex.name
 				indexNameF.append(indexNode->at(i)->FirstLevelIndex.name);
 				_mExcelReader->writeExcel(2, indexCountT, indexNameF.at(i), format1);
@@ -835,7 +848,6 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 						}
 						excelColumnIndex = 9;
 						excelRowCount += subjectCount + 1;
-						
 					}
 				}
 			}
