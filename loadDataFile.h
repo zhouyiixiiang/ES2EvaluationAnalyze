@@ -43,6 +43,7 @@ public:
     void readDataFile(QList<MResult*>*, QString);
     void setExcelData(MResult*, QString, int);
     void setInfoData(MEvaluationInfo*);
+    void setAnswer(QList<QString>);
 
 signals:
     void countStep(int, int);
@@ -58,7 +59,11 @@ public slots:
 private:
     void readResultsFromFile();
     void generateExcelResult(QList<MResult*>*, QString);
+    void generateTestResult(QList<MResult*>*, QString);
     void formatSet(QXlsx::Format&);
+    void initSheet(int, int);
+    void initSheet_test(int, int);
+
 
     QString _uid;
     QList<MResult*>* _results = nullptr;
@@ -74,9 +79,15 @@ private:
     MRecognizeFormPattern* _currentPattern;
     ES2EvaluationMembers* _currentMemberInfo;
     ES2EvaluationSubject* _currentSubject;
+    MResult* _currentResult;
     QString patternName;
 
     int _outputType;
+    int subjectCount;
+    int indexCountGroup;
+    int unitCount;
+    QList<int> cellListCount;
+    QList<QString> _answerList;
 };
 
 

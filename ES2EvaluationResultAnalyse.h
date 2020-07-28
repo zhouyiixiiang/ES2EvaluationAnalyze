@@ -49,6 +49,7 @@ private:
 
 signals:
     void dataOperate();
+    void setPattern(MRecognizeFormPattern*);
 
 public slots:
     void onButtonLoadDataFile();
@@ -64,7 +65,7 @@ public slots:
     void selectionTableEvaluationChanged(const QItemSelection& selected, const QItemSelection& deselected);
     void selectionTableTemplateListChanged(const QItemSelection& selected, const QItemSelection& deselected);
     void selectOutputType(int);
-    void finishSetAnswer();
+    void finishSetAnswer(QList<QString>);
 
 public:
     void SetWait(bool);
@@ -87,18 +88,16 @@ private:
     template <typename T>
     void ReleaseQList(QList<T*>*);
     void initGender();
-    void readEvaluationInfoFromDatafile();
-    QStringList fileNamesEndWith(QString);
  
 
     QList<QString> _gender;
-    QList<MEvaluationInfo*>* _evaluationInfos = nullptr; // 已有测评
     MEvaluationInfo* _currentEvaluationInfo = nullptr; // 当前测评
     MRecognizeFormPattern* _currentrecognizePattern = nullptr;
     MemberInfo* _currentEvaluationMemberInfo = nullptr;
     ES2EvaluationSubjects* _evaluationSubjectInfo = nullptr;
     ES2EvaluationMember* _currentEvaluationMember = nullptr;
     QList<int> _selectedMembersIndex;
+    QList<QString> _benchmark;
 
     QList<MPattern*>* _mCurrentPatterns = nullptr;
     MPattern* _mCurrentPattern = nullptr;
@@ -125,5 +124,5 @@ private:
     
     int _formPatternIndex = 0;
     int _templateIndex = 0;
-    int _outputType = 0;
+    int _outputType = 1;
 };
