@@ -469,8 +469,8 @@ void ES2EvaluationResultAnalyse::fillTableCell(QString value, TableItem* table, 
 
 void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 {
-	QTableView* tableview = nullptr;
-	TableItem* table = nullptr;
+	QTableView* tableview;
+	TableItem* table;
 	if (sTable == "tableEvaluation")
 	{
 		reconnectTableItem(sTable, tableview, table, ui.tableView, _tableEvaluation);
@@ -486,6 +486,10 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 	else if (sTable == "tableTemplateList")
 	{
 		reconnectTableItem(sTable, tableview, table, ui.tableView_4, _tableTemplateList);
+	}
+	else
+	{
+		return;
 	}
 	if (table->Mmodel->rowCount() > 0)
 	{
