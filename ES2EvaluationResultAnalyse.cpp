@@ -17,7 +17,6 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 	_currentrecognizePattern = new MRecognizeFormPattern();
 	_currentEvaluationInfo = new MEvaluationInfo();
 
-	_mCurrentPatterns = new QList<MPattern*>;
 	//McurrentRecognizedResult = new MResult;
 
 	//初始化并从本地读取测评主体与测评成员信息
@@ -271,6 +270,7 @@ void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 
 	loadDataFile->setExcelData(McurrentResult, dirName, _outputType);
 	dataOperate();
+
 }
 
 void ES2EvaluationResultAnalyse::onButtonAddTemplate()
@@ -289,8 +289,10 @@ void ES2EvaluationResultAnalyse::onButtonAddTemplate()
 		//input >> uid;
 		file.close();
 	}
-	//_currentTemplateList
+	_currentTemplateList.append(fileName);
+
 	//_templateIndex
+	fillingTheTableView("tableTemplateList");
 }
 void ES2EvaluationResultAnalyse::onButtonDeleteTemplate()
 {
@@ -583,7 +585,7 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 	}
 	if (table->Mmodel->rowCount() > 0)
 	{
-		int ijk = table->Mmodel->rowCount();
+		//int ijk = table->Mmodel->rowCount();
 		tableview->selectRow(0);
 	}
 }

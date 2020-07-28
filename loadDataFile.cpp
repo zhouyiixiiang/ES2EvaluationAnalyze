@@ -445,6 +445,8 @@ void LoadDataFile::initSheet_test(int sheetIndex, int patternCount)
 void LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelName)
 {
 	formatSet(format1);
+	formatSet(format2);
+	format2.setFontColor(QColor(Qt::red));
 
 	for (int patternCount = 0; patternCount < _info->RecognizePatternInfo->RecognizeFormPatterns->count(); patternCount++)
 	{
@@ -550,7 +552,7 @@ void LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 					}
 					else
 					{
-						_mExcelReader->writeExcel(rowCount + 2, colunmCount, u8"错", format1);
+						_mExcelReader->writeExcel(rowCount + 2, colunmCount, u8"错", format2);
 						_mExcelReader->writeExcel(rowCount + 3, colunmCount, "0/" + score, format1);
 					}
 					colunmCount ++;

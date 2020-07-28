@@ -98,10 +98,8 @@ private:
     ES2EvaluationMember* _currentEvaluationMember = nullptr;
     QList<int> _selectedMembersIndex;
     QList<QString> _benchmark;
+    QList<QString> _currentTemplateList;
 
-    QList<MPattern*>* _mCurrentPatterns = nullptr;
-    MPattern* _mCurrentPattern = nullptr;
-    MFormPattern* McurrentFormPattern = nullptr;
     int SelectedFilterdResultGroupLength = 0;
 
     QString _path;

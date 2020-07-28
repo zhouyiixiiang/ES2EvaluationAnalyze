@@ -76,6 +76,7 @@ private:
     ExcelReader* _mExcelReader = nullptr;//excel操作对象
     MEvaluationInfo* _info = nullptr;
     QXlsx::Format format1;
+    QXlsx::Format format2;
     MRecognizeFormPattern* _currentPattern;
     ES2EvaluationMembers* _currentMemberInfo;
     ES2EvaluationSubject* _currentSubject;

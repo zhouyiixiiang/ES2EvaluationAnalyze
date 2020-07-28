@@ -26,7 +26,11 @@ void SetBenchmark::finishSetAnswer()
 	{
 		index = table->Mmodel->index(1, i, QModelIndex());
 		benchmark.append(index.data().toString());
-		//判断空
+		if (index.data().toString() == "") 
+		{
+
+			//判断空?
+		}
 	}
 	emit sendMessage(benchmark);
 	this->accept();
@@ -36,7 +40,7 @@ void SetBenchmark::setPatternSheet(MRecognizeFormPattern* _pattern)
 {
 	//MFormPattern* tempFormPattern = _pattern->GetFormPattern(0);
 	//_pattern->GetFormPattern(0)->MarkGroupPattern->at(0);
-
+	//?缓存
 	table->Mmodel->setRowCount(2);
 	table->Mmodel->setHeaderData(0, Qt::Vertical, u8"题号");
 	table->Mmodel->setHeaderData(1, Qt::Vertical, u8"正确结果");
