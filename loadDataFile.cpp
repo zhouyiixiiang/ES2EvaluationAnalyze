@@ -918,11 +918,11 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			//初始化结束
 
 			//统计数据
-			//MRecognizeFormPattern* currentFormPattern;
-			QList<QList<QList<QList<QString>>>> scoreCount;//单位-主体-成员-得分情况
-			//vector<vector<vector<vector<int>>>> scoreCount;
-			QList<int> receiveCount;//收回数 计数subjectIndex
 
+			//MRecognizeFormPattern* currentFormPattern;
+			//vector<vector<vector<vector<int>>>> scoreCount;
+			QList<QList<QList<QList<QString>>>> scoreCount;//单位-主体-成员-得分情况
+			QList<int> receiveCount;//收回数 计数subjectIndex
 			for (int resultCount = 0; resultCount < results->count(); resultCount++)
 			{
 				//currentFormPattern = nullptr;
@@ -1077,9 +1077,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 									*/
 								}
 							}
-
 							scoreCount_unit.append(scoreCount_subject);
-
 						}
 						scoreCount.append(scoreCount_unit);
 					}
