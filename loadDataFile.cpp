@@ -1140,12 +1140,12 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			for (int memberTypeIndex = 0; memberTypeIndex < _currentPattern->MemberTypes.count(); memberTypeIndex++)
 			{
 				_mExcelReader->chooseSheet(memberTypeIndex);
+				int excelRowCount = 5;
+				int excelColumnIndex = 9;
+
 				for (int unitIndex = 0; unitIndex < unitCount; unitIndex++)
 				{
 					int memberCount = _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->count();
-					int excelRowCount = 5;
-					int excelColumnIndex = 9;
-
 					QList<QList<int>> memberScore;
 					for (int subjectIndex = 0; subjectIndex < subjectCount; subjectIndex++)
 					{
