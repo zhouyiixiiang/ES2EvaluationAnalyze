@@ -320,7 +320,7 @@ void ES2EvaluationResultAnalyse::selectionTableTemplateListChanged(const QItemSe
 		int selectedRow = _tableTemplateList->MselectionModel->selectedIndexes().front().row();
 		_templateIndex = selectedRow;
 
-		int i = 0;
+		//int i = 0;
 		//fillingTheTableView("tableTemplateList");
 	}
 }
