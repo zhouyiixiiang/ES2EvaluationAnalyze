@@ -151,35 +151,16 @@ bool ExcelReader::writeExcel(const int iRow, const int iColumn, const QString co
 }
 
 
-bool ExcelReader::setSheetName(QString patternName)
+bool ExcelReader::setSheetName(QList<QString> memberTypeList)
 {
-    if (!_mExcel->insertSheet(0, (u8"单位")))
+	for (int i = 0; i < memberTypeList.count(); i++)
 	{
-        _mExcel->insertSheet(0, (u8"abcdefghijklabsdkfj1"));
-        _mExcel->deleteSheet((u8"单位"));
-        _mExcel->renameSheet((u8"abcdefghijklabsdkfj1"), (u8"单位"));
-	}
-    if (!_mExcel->insertSheet(1, (u8"个人")))
-	{
-        _mExcel->insertSheet(1, (u8"abcdefghijklabsdkfj2"));
-        _mExcel->deleteSheet((u8"个人"));
-        _mExcel->renameSheet((u8"abcdefghijklabsdkfj2"), (u8"个人"));
-	}
-	if (!_mExcel->insertSheet(2, patternName))
-	{
-		_mExcel->insertSheet(2, (u8"abcdefghijklabsdkfj3"));
-		_mExcel->deleteSheet(patternName);
-		_mExcel->renameSheet((u8"abcdefghijklabsdkfj3"), patternName);
-	}
-	QStringList sheetsName = _mExcel->sheetNames();
-	if (sheetsName.at(0)== (u8"单位")|| sheetsName.at(1) == (u8"个人") || sheetsName.at(2) == patternName)
-	{ 
-	}
-	else
-	{
-		_mExcel->deleteSheet(sheetsName.at(0));
-		_mExcel->deleteSheet(sheetsName.at(1));
-		_mExcel->deleteSheet(sheetsName.at(2));
+		if (!_mExcel->insertSheet(0, memberTypeList.at(i)))
+		{
+			_mExcel->insertSheet(0, "abcdefghijklabsdkfj1");
+			_mExcel->deleteSheet(memberTypeList.at(i));
+			_mExcel->renameSheet("abcdefghijklabsdkfj1", memberTypeList.at(i));
+		}
 	}
 	return true;
 }

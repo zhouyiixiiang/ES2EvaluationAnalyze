@@ -87,7 +87,7 @@ private:
     int subjectCount;
     int indexCountGroup;
     int unitCount;
-    QList<int> cellListCount;
+    QList<QList<int>> cellListCount;
     QList<QString> _answerList;
 };
 
