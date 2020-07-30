@@ -225,6 +225,7 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 	_currentrecognizePattern = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(_formPatternIndex);
 
 	loadDataFile->setInfoData(_currentEvaluationInfo);
+	_currentTemplateList.clear();
 	updateAllTableviews();
 
 	ui.pushButton_2->setEnabled(true);
@@ -281,23 +282,23 @@ void ES2EvaluationResultAnalyse::onButtonAddTemplate()
 		return;
 	}
 	QFile file(fileName);
-	QString uid;
+
 	if (file.exists())
 	{
 		file.open(QIODevice::ReadOnly);
-		//QDataStream input(&file);
-		//input >> uid;
+
+
 		file.close();
 	}
 	_currentTemplateList.append(fileName);
 
-	//_templateIndex
+
 	fillingTheTableView("tableTemplateList");
 }
 void ES2EvaluationResultAnalyse::onButtonDeleteTemplate()
 {
-	//_currentTemplateList
-	//_templateIndex
+	_currentTemplateList.removeAt(_templateIndex - 1);
+	fillingTheTableView("tableTemplateList");
 }
 
 void ES2EvaluationResultAnalyse::onButtonReadBenchmark()
@@ -319,7 +320,8 @@ void ES2EvaluationResultAnalyse::selectionTableTemplateListChanged(const QItemSe
 		int selectedRow = _tableTemplateList->MselectionModel->selectedIndexes().front().row();
 		_templateIndex = selectedRow;
 
-		fillingTheTableView("tableTemplateList");
+		int i = 0;
+		//fillingTheTableView("tableTemplateList");
 	}
 }
 
@@ -448,7 +450,7 @@ void ES2EvaluationResultAnalyse::getconnectUseMapFunc(QString s, QTableView* tab
 	}
 	else if (s == "tableTemplateList")
 	{
-		QObject::connect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectiontableTemplateListChanged(QItemSelection, QItemSelection)));
+		QObject::connect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectionTableTemplateListChanged(QItemSelection, QItemSelection)));
 	}
 }
 
@@ -584,7 +586,12 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 		tableview->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 		table->Mmodel->insertRows(0, 1, QModelIndex());//插入每一行
 		fillTableCell(u8"默认Excel文件", table, 0, 0);
-		//if(_currentTemplateList)
+		for (int i = 0; i < _currentTemplateList.size(); i++)
+		{
+			QFileInfo fileInfo(_currentTemplateList.at(i));
+			table->Mmodel->insertRows(i + 1, 1, QModelIndex());//插入每一行
+			fillTableCell(fileInfo.fileName(), table, i + 1, 0);
+		}
 
 	}
 	if (table->Mmodel->rowCount() > 0)
