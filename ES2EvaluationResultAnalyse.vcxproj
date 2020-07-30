@@ -95,6 +95,17 @@
       <AdditionalDependencies>Qt5Xlsx.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Link>
+      <AdditionalLibraryDirectories>..\ThirdLibrary\qtxlsx\lib\;..\ThirdLibrary\Opencv\x64\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Qt5Xlsx.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\ThirdLibrary\qtxlsx\src\xlsx;..\ThirdLibrary\libopc\lib-win\include;..\ThirdLibrary\Opencv\include;..\ES2EvaluationSubject;..\Cm3FormResult;..\Cocer200Scan;..\Cm3CommonUtils\GeneratedFiles;..\Cm3CommonUtils;..\ES2EvaluationDocs;..\Cm3PublicObject;..\ES2RecognizePattern;..\Cm3FormProcess;..\Cm3FormPattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>XLSX_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="setBenchmark.cpp" />
     <QtRcc Include="ES2EvaluationResultAnalyse.qrc" />

@@ -60,12 +60,12 @@ public slots:
     void onButtonReadBenchmark();
     void finishLoadDataFile();
     void finishSaveExcel();
+    void finishSetAnswer(QList<QString>);
     void outputErrorPrompt();
     void uploadCountProgress(int, int);
     void selectionTableEvaluationChanged(const QItemSelection& selected, const QItemSelection& deselected);
     void selectionTableTemplateListChanged(const QItemSelection& selected, const QItemSelection& deselected);
     void selectOutputType(int);
-    void finishSetAnswer(QList<QString>);
 
 public:
     void SetWait(bool);
@@ -96,14 +96,10 @@ private:
     MemberInfo* _currentEvaluationMemberInfo = nullptr;
     ES2EvaluationSubjects* _evaluationSubjectInfo = nullptr;
     ES2EvaluationMember* _currentEvaluationMember = nullptr;
-    QList<int> _selectedMembersIndex;
     QList<QString> _benchmark;
     QList<QString> _currentTemplateList;
 
-    int SelectedFilterdResultGroupLength = 0;
-
     QString _path;
-    QList<QMetaObject::Connection> _connections;
 
     QThread* loadThread;
     LoadDataFile* loadDataFile;

@@ -9,8 +9,6 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 
 	initGender();
 	_path = QCoreApplication::applicationDirPath().toUtf8();
-	_selectedMembersIndex.clear();
-	_connections.clear();
 
     McurrentResults = new QList<MResult*>;
 
@@ -62,10 +60,6 @@ ES2EvaluationResultAnalyse::~ES2EvaluationResultAnalyse()
 
 	ReleaseQList(McurrentResults);
 
-	for (int i = 0; i < _connections.size(); i++)
-	{
-		disconnect(_connections.at(i));
-	}
 	if (_evaluationSubjectInfo != nullptr)
 	{
 		delete _evaluationSubjectInfo;
