@@ -1,4 +1,4 @@
-#include "excelreader.h"
+﻿#include "excelreader.h"
 #include "xlsxdocument.h"
 
 ExcelReader::ExcelReader(QWidget *parent) : QDialog(parent)
@@ -155,9 +155,9 @@ bool ExcelReader::setSheetName(QList<QString> memberTypeList)
 {
 	for (int i = 0; i < memberTypeList.count(); i++)
 	{
-		if (!_mExcel->insertSheet(0, memberTypeList.at(i)))
+		if (!_mExcel->insertSheet(i, memberTypeList.at(i)))
 		{
-			_mExcel->insertSheet(0, "abcdefghijklabsdkfj1");
+			_mExcel->insertSheet(i, "abcdefghijklabsdkfj1");
 			_mExcel->deleteSheet(memberTypeList.at(i));
 			_mExcel->renameSheet("abcdefghijklabsdkfj1", memberTypeList.at(i));
 		}
