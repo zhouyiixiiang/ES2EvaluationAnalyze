@@ -981,7 +981,8 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				//currentFormPattern = nullptr;
 				_currentResult = results->at(resultCount);
 				
-				if (_currentResult->FormReuslts->at(0)->IdentifierResult->Result.at(0) == tableIndex) //判断模式一致
+				QStringList currentIR = _currentResult->FormReuslts->at(0)->IdentifierResult->Result.split("-");
+				if (currentIR.at(0) == tableIndex) //判断模式一致
 				{
 					QList<MFormResult*>* currentFormResults = new QList<MFormResult*>;
 					for (int unitIndex = 0; unitIndex < _currentPattern->EvaluationUnits.count(); unitIndex++)
@@ -994,7 +995,9 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 						{
 							if (_currentResult->FormReuslts->at(formIndex)->IsRecognizeSuccess)
 							{
-								if (_currentResult->FormReuslts->at(formIndex)->IdentifierResult->Result.at(6).toLatin1() - 48 == unitIndex)
+								currentIR.clear();
+								currentIR = _currentResult->FormReuslts->at(formIndex)->IdentifierResult->Result.split("-");
+								if (currentIR.at(3).toInt() == unitIndex)
 								{
 									currentFormResults->append(_currentResult->FormReuslts->at(formIndex));
 								}
@@ -1014,11 +1017,13 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							//scoreCount_unit.append(scoreCount_subject);
 							for (int formIndex = 0; formIndex < currentFormResults->count(); formIndex++)
 							{
-								if (currentFormResults->at(formIndex)->IdentifierResult->Result.at(4).toLatin1() - 48 == subjectIndex)
+								MFormResult* currentFormResult = currentFormResults->at(formIndex);
+								currentIR.clear();
+								currentIR = currentFormResult->IdentifierResult->Result.split("-");
+								if (currentIR.at(2).toInt() == subjectIndex)
 								{
 									receiveCount[subjectIndex] ++;
-									MFormResult* currentFormResult = currentFormResults->at(formIndex);
-									int page = currentFormResult->IdentifierResult->Result.at(2).toLatin1() - 48;
+									int page = currentIR.at(1).toInt();
 									int shift = 0;
 									for (int i = 0; i < page; i++)
 									{
@@ -1035,7 +1040,12 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 										}
 										scoreCount_member.clear();
 										MemberIndex* currentMember = _currentPattern->MemberIndexs->at(memberIndex + shift);
-										for (int groupCount = 0; groupCount < cellListCount.at(currentMember->MemberType).count();)
+										int tempType = 0;
+										if (currentMember->MemberType != -1)
+										{
+											tempType = currentMember->MemberType;
+										}
+										for (int groupCount = 0; groupCount < cellListCount.at(tempType).count();)
 										{
 											MemberDetailIndex* currentIndex =  currentMember->MemberDetailIndexs->at(groupCount);
 											if (currentIndex->IndexLevel == 1)
