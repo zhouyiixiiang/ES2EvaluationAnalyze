@@ -1173,6 +1173,14 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			}
 			subjectWeight.append(subjectWeightSum);
 
+			int validSubject = 0;
+			for (; validSubject < subjectCount; validSubject++)
+			{
+				if (!memberTypeRecord.at(0).at(validSubject).isEmpty())
+				{
+					break;
+				}
+			}
 			//输出
 			for (int memberTypeIndex = 0; memberTypeIndex < _currentPattern->MemberTypes.count(); memberTypeIndex++)
 			{
@@ -1204,9 +1212,9 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 						int tempMemberIndex = 0;
 						for (int memberIndex = 0; memberIndex < _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->count(); memberIndex++)
 						{
-							if (memberTypeRecord.at(unitIndex).at(0).at(memberIndex) != -1)
+							if (memberTypeRecord.at(unitIndex).at(validSubject).at(memberIndex) != -1)
 							{
-								if (memberTypeRecord.at(unitIndex).at(0).at(memberIndex) != memberTypeIndex)
+								if (memberTypeRecord.at(unitIndex).at(validSubject).at(memberIndex) != memberTypeIndex)
 								{
 									continue;
 								}
