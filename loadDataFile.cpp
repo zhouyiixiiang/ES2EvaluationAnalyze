@@ -221,7 +221,6 @@ void LoadDataFile::initSheet(int sheetIndex, int patternCount)
 	_mExcelReader->writeExcel(2, 7, u8"权重", format1);
 	_mExcelReader->writeExcel(2, 8, u8"收回数", format1);
 
-	int indexCountF = _currentPattern->MemberIndexs->at(0)->MemberDetailIndexs->count();
 	indexCountGroup = 0;
 	int indexCountT = 9;
 	QList<QString> indexNameF;
@@ -240,6 +239,7 @@ void LoadDataFile::initSheet(int sheetIndex, int patternCount)
 			}
 		}
 
+		int indexCountF = _currentPattern->MemberIndexs->at(memberIndexCount)->MemberDetailIndexs->count();
 		for (unsigned i = 0; i < indexCountF; i++)
 		{
 			indexNode->append(_currentPattern->MemberIndexs->at(memberIndexCount)->MemberDetailIndexs->at(i));
@@ -254,6 +254,7 @@ void LoadDataFile::initSheet(int sheetIndex, int patternCount)
 				_mExcelReader->writeExcel(3, indexCountT, indexNode->at(i)->SecondLevelIndex.at(j).name, format1);
 				unsigned k;
 				MGroupPattern* tempGroupPattern = _currentPattern->GetFormPattern(0)->MarkGroupPattern->at(indexNode->at(i)->SecondLevelIndex.at(j).groupIndex);
+				MFormPattern* a = _currentPattern->GetFormPattern(0);
 				cellListCount[sheetIndex].append(0);
 				cellListCount[sheetIndex][indexCountGroup] = tempGroupPattern->CellList->count();
 				for (k = 0; k < tempGroupPattern->CellList->count(); k++)
@@ -1034,7 +1035,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 										}
 										scoreCount_member.clear();
 										MemberIndex* currentMember = _currentPattern->MemberIndexs->at(memberIndex + shift);
-										for (int groupCount = 0; groupCount < indexCountGroup;)
+										for (int groupCount = 0; groupCount < cellListCount.at(currentMember->MemberType).count();)
 										{
 											MemberDetailIndex* currentIndex =  currentMember->MemberDetailIndexs->at(groupCount);
 											if (currentIndex->IndexLevel == 1)
@@ -1203,9 +1204,9 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 						int tempMemberIndex = 0;
 						for (int memberIndex = 0; memberIndex < _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->count(); memberIndex++)
 						{
-							if (memberTypeRecord.at(unitIndex).at(subjectIndex).at(memberIndex) != -1)
+							if (memberTypeRecord.at(unitIndex).at(0).at(memberIndex) != -1)
 							{
-								if (memberTypeRecord.at(unitIndex).at(subjectIndex).at(memberIndex) != memberTypeIndex)
+								if (memberTypeRecord.at(unitIndex).at(0).at(memberIndex) != memberTypeIndex)
 								{
 									continue;
 								}
@@ -1217,7 +1218,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 								memberScore_sub.append(0);
 								_mExcelReader->writeExcel(excelRowCount + subjectIndex, 7, QString::number(subjectWeight.at(subjectIndex)), format1);
 								_mExcelReader->writeExcel(excelRowCount + subjectIndex, 8, QString::number(receiveCount.at(subjectIndex)), format1);
-								for (int i = 0; i < indexCountGroup; i++)
+								for (int i = 0; i < cellListCount.at(memberTypeIndex).count(); i++)
 								{
 									int empty = 0;
 									if (scoreCount.at(unitIndex).at(subjectIndex).isEmpty()) //当前主体数据为空
@@ -1253,7 +1254,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							{
 								_mExcelReader->writeExcel(excelRowCount + subjectIndex, 7, QString::number(subjectWeight.at(subjectIndex)), format1);
 								_mExcelReader->writeExcel(excelRowCount + subjectIndex, 8, QString::number(receiveCount.at(subjectIndex)), format1);
-								for (int i = 0; i < indexCountGroup; i++)
+								for (int i = 0; i < cellListCount.at(memberTypeIndex).count(); i++)
 								{
 									//MFormPattern* currentformpattern = _currentPattern->GetFormPattern(0);
 									//_currentPattern->MemberIndexs->at(0)->MemberDetailIndexs->at(i)->FirstLevelIndex.groupIndex;
