@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1366</width>
-    <height>750</height>
+    <height>749</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -65,7 +65,34 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_7">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>录入正确结果</string>
+            </property>
+           </widget>
+          </item>
          </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>当前输出类型:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>当前文件名:</string>
+         </property>
         </widget>
        </item>
        <item alignment="Qt::AlignRight">
@@ -169,39 +196,6 @@
           <string>结果输出</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_8">
-          <item alignment="Qt::AlignTop">
-           <widget class="QFrame" name="frame_5">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_4">
-             <item>
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>选择结果输出类别:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="comboBox">
-               <item>
-                <property name="text">
-                 <string>测评结果输出</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>考评结果输出</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
           <item>
            <widget class="QGroupBox" name="groupBox_6">
             <property name="sizePolicy">
@@ -275,16 +269,16 @@
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_7">
              <item>
-              <widget class="QPushButton" name="pushButton_7">
+              <widget class="QPushButton" name="pushButton_8">
                <property name="text">
-                <string>录入正确结果</string>
+                <string>生成单个模式结果</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QPushButton" name="pushButton_4">
                <property name="text">
-                <string>生成excel结果</string>
+                <string>生成所有结果</string>
                </property>
               </widget>
              </item>
@@ -321,7 +315,7 @@
    <slot>onButtonLoadEvaluationData()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>275</x>
+     <x>133</x>
      <y>76</y>
     </hint>
     <hint type="destinationlabel">
@@ -337,7 +331,7 @@
    <slot>onButtonLoadDataFile()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>523</x>
+     <x>239</x>
      <y>76</y>
     </hint>
     <hint type="destinationlabel">
@@ -359,22 +353,6 @@
     <hint type="destinationlabel">
      <x>1303</x>
      <y>114</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>comboBox</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>ES2EvaluationResultAnalyseClass</receiver>
-   <slot>selectOutputType(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1270</x>
-     <y>187</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1355</x>
-     <y>220</y>
     </hint>
    </hints>
   </connection>
@@ -433,12 +411,28 @@
    <slot>onButtonReadBenchmark()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1107</x>
-     <y>622</y>
+     <x>345</x>
+     <y>76</y>
     </hint>
     <hint type="destinationlabel">
      <x>1359</x>
      <y>629</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_8</sender>
+   <signal>clicked()</signal>
+   <receiver>ES2EvaluationResultAnalyseClass</receiver>
+   <slot>onButtonOutputCurrentExcel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1152</x>
+     <y>619</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1041</x>
+     <y>716</y>
     </hint>
    </hints>
   </connection>
@@ -452,5 +446,6 @@
   <slot>onButtonAddTemplate()</slot>
   <slot>onButtonDeleteTemplate()</slot>
   <slot>onButtonReadBenchmark()</slot>
+  <slot>onButtonOutputCurrentExcel()</slot>
  </slots>
 </ui>

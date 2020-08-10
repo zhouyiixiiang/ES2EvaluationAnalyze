@@ -44,13 +44,14 @@ public:
     void setExcelData(MResult*, QString, int);
     void setInfoData(MEvaluationInfo*);
     void setAnswer(QList<QString>);
+    void setTemplate(QString);
 
 signals:
     void countStep(int, int);
     void countFile();
     void finish();
     void finishExcel();
-    void outputError();
+    void outputError(QString);
 
 public slots:
     void doDataOperate();
@@ -68,7 +69,7 @@ private:
     QString _uid;
     QList<MResult*>* _results = nullptr;
     MResult* _result = nullptr;
-    QStringList _fileNames;
+    //QStringList _fileNames;
     QString _filePath;
     QString _dataOperateType;
     QString _path;
@@ -89,6 +90,7 @@ private:
     int unitCount;
     QList<QList<int>> cellListCount;
     QList<QString> _answerList;
+    QString _templateName;
 };
 
 

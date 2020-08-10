@@ -61,11 +61,11 @@ public slots:
     void finishLoadDataFile();
     void finishSaveExcel();
     void finishSetAnswer(QList<QString>);
-    void outputErrorPrompt();
+    void outputErrorPrompt(QString);
     void uploadCountProgress(int, int);
     void selectionTableEvaluationChanged(const QItemSelection& selected, const QItemSelection& deselected);
     void selectionTableTemplateListChanged(const QItemSelection& selected, const QItemSelection& deselected);
-    void selectOutputType(int);
+    //void selectOutputType(int);
 
 public:
     void SetWait(bool);

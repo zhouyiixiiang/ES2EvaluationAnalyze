@@ -12,6 +12,7 @@ LoadDataFile::LoadDataFile(QObject *parent) : QObject(parent)
 	_info = new MEvaluationInfo();
 	_currentPattern = new MRecognizeFormPattern();
 	_currentMemberInfo = new ES2EvaluationMembers();
+	_templateName = "";
 }
 
 LoadDataFile::~LoadDataFile()
@@ -83,7 +84,7 @@ void LoadDataFile::doDataOperate()
 		}
 		else
 		{
-			emit outputError();
+			emit outputError("输出类型错误");
 			return;
 		}
 
@@ -91,8 +92,13 @@ void LoadDataFile::doDataOperate()
 	}
     else
     {
-		emit outputError();
+		emit outputError("数据内容未读入");
     }
+}
+
+void LoadDataFile::setTemplate(QString filename)
+{
+	_templateName = filename;
 }
 
 void LoadDataFile::setAnswer(QList<QString> answerList)
@@ -607,6 +613,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 		QString tableIndex = _currentPattern->GetFormPattern(0)->IdentifierCodePattern->CodeValue;
 		_currentSubject = _info->EvaluationSubjectInfo->EvaluationSubjects->at(_currentPattern->EvaluationSubjectIndex);
 		_currentMemberInfo = _info->EvaluationMemberInfo->at(patternCount);
+
 		//直接进行保存
 		QString patternName = _currentPattern->FileName;
 		QString excelFileName = patternName + ".xlsx";
@@ -632,6 +639,11 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 		}
 		QString excelTempName = excelName + "/" + excelFileName;
 		//QString excelTempName = excelName + "/" + "1.xlsx";
+		//如果有模板 先复制模板
+		if (!_templateName.isEmpty())
+		{
+			QFile::copy(_templateName, excelTempName);
+		}
 		if (_mExcelReader->newExcel(excelTempName))
 		{
 
@@ -743,7 +755,6 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			{
 				_currentPattern->MemberTypes.append("sheet1");
 			}
-			_mExcelReader->setSheetName(_currentPattern->MemberTypes);
 			for (int i = 0; i < _currentPattern->MemberTypes.count(); i++)
 			{
 				QList<int> temp;
@@ -980,7 +991,10 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			{
 				//currentFormPattern = nullptr;
 				_currentResult = results->at(resultCount);
-				
+				if (_currentResult->GetFormResultCount() == 0)
+				{
+					continue;
+				}
 				QStringList currentIR = _currentResult->FormReuslts->at(0)->IdentifierResult->Result.split("-");
 				if (currentIR.at(0) == tableIndex) //判断模式一致
 				{
@@ -1214,6 +1228,10 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 					QList<QList<int>> memberScore;
 					for (int subjectIndex = 0; subjectIndex < subjectCount; subjectIndex++)
 					{
+						if (scoreCount.at(unitIndex).at(subjectIndex).isEmpty())
+						{
+							continue;
+						}
 						if (subjectIndex != 0)
 						{
 							excelRowCount -= memberCount * (subjectCount + 1);

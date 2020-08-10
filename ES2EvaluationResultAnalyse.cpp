@@ -1,4 +1,4 @@
-﻿#include "ES2EvaluationResultAnalyse.h"
+#include "ES2EvaluationResultAnalyse.h"
 
 ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
     : QMainWindow(parent)
@@ -208,6 +208,7 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 	}
 
 	
+
 	delete _currentEvaluationInfo;
 	_currentEvaluationInfo = new MEvaluationInfo();
 	_currentEvaluationInfo->readRecognizePatternsFromBinaryFile(fileName);
@@ -218,8 +219,27 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 	*/
 	_currentrecognizePattern = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(_formPatternIndex);
 
+
+	if (_currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(0)->TableType == 0)
+	{
+		//考评
+		ui.label_2->setText(u8"当前输出类型: 考评");
+	}
+	else if (_currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(0)->TableType == 1)
+	{
+		//测评
+		ui.label_2->setText(u8"当前输出类型: 测评");
+	}
+	else
+	{
+		ui.label_2->setText(u8"当前输出类型: 未知");
+	}
+
+	ui.label_3->setText(u8"当前文件名: " + _currentEvaluationInfo->RecognizePatternInfo->Name);
+
 	loadDataFile->setInfoData(_currentEvaluationInfo);
 	_currentTemplateList.clear();
+	_currentTemplateList.append("");
 	updateAllTableviews();
 
 	ui.pushButton_2->setEnabled(true);
@@ -232,6 +252,7 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 
 void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 {
+	/*
 	if (_currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(0)->TableType != _outputType)//判断类型是否一致:考评/测评
 	{
 		QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"结果输出类别与数据类别不匹配！"), QMessageBox::Yes);
@@ -239,6 +260,7 @@ void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 		int res = msgBox.exec();
 		return;
 	}
+	*/
 	if (_outputType == 0 && _benchmark.isEmpty())
 	{
 		QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"还没有录入正确结果！"), QMessageBox::Yes);
@@ -264,6 +286,7 @@ void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 	SetWaitExcel(true);
 
 	loadDataFile->setExcelData(McurrentResult, dirName, _outputType);
+	loadDataFile->setTemplate(_currentTemplateList.at(_templateIndex));
 	dataOperate();
 
 }
@@ -291,7 +314,14 @@ void ES2EvaluationResultAnalyse::onButtonAddTemplate()
 }
 void ES2EvaluationResultAnalyse::onButtonDeleteTemplate()
 {
-	_currentTemplateList.removeAt(_templateIndex - 1);
+	if (_templateIndex == 0)
+	{
+		QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"不能删除默认模板！"), QMessageBox::Yes);
+		msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
+		int res = msgBox.exec();
+		return;
+	}
+	_currentTemplateList.removeAt(_templateIndex);
 	fillingTheTableView("tableTemplateList");
 }
 
@@ -335,7 +365,7 @@ void ES2EvaluationResultAnalyse::selectionTableEvaluationChanged(const QItemSele
 		}
 	}
 }
-
+/*
 void ES2EvaluationResultAnalyse::selectOutputType(int index)
 {
 	//_outputType = index;
@@ -350,7 +380,7 @@ void ES2EvaluationResultAnalyse::selectOutputType(int index)
 		_outputType = 0;
 	}
 }
-
+*/
 void ES2EvaluationResultAnalyse::finishSetAnswer(QList<QString> benchmark)
 {
 	_benchmark = benchmark;
@@ -384,11 +414,11 @@ void ES2EvaluationResultAnalyse::finishSaveExcel()
 	
 }
 
-void ES2EvaluationResultAnalyse::outputErrorPrompt()
+void ES2EvaluationResultAnalyse::outputErrorPrompt(QString hint)
 {
 	SetWait(false);
 	//执行窗口
-	QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"操作失败"), QMessageBox::Yes);
+	QMessageBox msgBox(QMessageBox::Information, (u8"提示"), hint, QMessageBox::Yes);
 	msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
 	int res = msgBox.exec();
 
@@ -580,11 +610,11 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 		tableview->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 		table->Mmodel->insertRows(0, 1, QModelIndex());//插入每一行
 		fillTableCell(u8"默认Excel文件", table, 0, 0);
-		for (int i = 0; i < _currentTemplateList.size(); i++)
+		for (int i = 1; i < _currentTemplateList.size(); i++)
 		{
 			QFileInfo fileInfo(_currentTemplateList.at(i));
-			table->Mmodel->insertRows(i + 1, 1, QModelIndex());//插入每一行
-			fillTableCell(fileInfo.fileName(), table, i + 1, 0);
+			table->Mmodel->insertRows(i, 1, QModelIndex());//插入每一行
+			fillTableCell(fileInfo.fileName(), table, i, 0);
 		}
 
 	}
