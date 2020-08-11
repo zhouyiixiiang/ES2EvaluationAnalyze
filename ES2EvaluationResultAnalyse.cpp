@@ -50,6 +50,7 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 	ui.pushButton_5->setEnabled(false);
 	ui.pushButton_6->setEnabled(false);
 	ui.pushButton_7->setEnabled(false);
+	ui.pushButton_8->setEnabled(false);
 	ui.pushButton_7->setVisible(false);
 	
 	//fillingTheTableView("tableTemplateList");
@@ -219,13 +220,13 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 	*/
 	_currentrecognizePattern = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(_formPatternIndex);
 
-
-	if (_currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(0)->TableType == 0)
+	_outputType = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(0)->TableType;
+	if (_outputType == 0)
 	{
 		//考评
 		ui.label_2->setText(u8"当前输出类型: 考评");
 	}
-	else if (_currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(0)->TableType == 1)
+	else if (_outputType == 1)
 	{
 		//测评
 		ui.label_2->setText(u8"当前输出类型: 测评");
@@ -247,8 +248,28 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 	ui.pushButton_5->setEnabled(false);
 	ui.pushButton_6->setEnabled(false);
 	ui.pushButton_7->setEnabled(false);
+	ui.pushButton_8->setEnabled(false);
 	_benchmark.clear();
 }
+
+void ES2EvaluationResultAnalyse::onButtonOutputCurrentExcel()
+{
+	if (_outputType == 0 && _benchmark.isEmpty())
+	{
+		QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"还没有录入正确结果！"), QMessageBox::Yes);
+		msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
+		int res = msgBox.exec();
+		return;
+	}
+	QString dirName = QFileDialog::getExistingDirectory(this, u8"保存数据结果到...").toUtf8();
+
+	SetWaitExcel(true);
+
+	loadDataFile->setExcelData(McurrentResult, dirName, _outputType, _formPatternIndex);
+	loadDataFile->setTemplate(_currentTemplateList.at(_templateIndex));
+	dataOperate();
+}
+
 
 void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 {
@@ -285,7 +306,7 @@ void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 
 	SetWaitExcel(true);
 
-	loadDataFile->setExcelData(McurrentResult, dirName, _outputType);
+	loadDataFile->setExcelData(McurrentResult, dirName, _outputType, -1);
 	loadDataFile->setTemplate(_currentTemplateList.at(_templateIndex));
 	dataOperate();
 
@@ -402,6 +423,7 @@ void ES2EvaluationResultAnalyse::finishLoadDataFile()
 	ui.pushButton_5->setEnabled(true);
 	ui.pushButton_6->setEnabled(true);
 	ui.pushButton_7->setEnabled(true);
+	ui.pushButton_8->setEnabled(true);
 }
 
 void ES2EvaluationResultAnalyse::finishSaveExcel()

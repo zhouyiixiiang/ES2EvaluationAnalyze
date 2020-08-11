@@ -51,12 +51,13 @@ void LoadDataFile::setInfoData(MEvaluationInfo* evaluationInfo)
 	_info = evaluationInfo;
 }
 
-void LoadDataFile::setExcelData(MResult* result, QString excelName, int outputType)
+void LoadDataFile::setExcelData(MResult* result, QString excelName, int outputType, int patternIndex)
 {
 	_result = result;
 	_excelName = excelName;
 	_outputType = outputType;
 	_dataOperateType = "setExcelData";
+	_patternIndex = patternIndex;
 }
 
 void LoadDataFile::getCount(int rec, int sum)
@@ -487,6 +488,10 @@ void LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 
 	for (int patternCount = 0; patternCount < _info->RecognizePatternInfo->RecognizeFormPatterns->count(); patternCount++)
 	{
+		if (_patternIndex >= 0 && _patternIndex != patternCount)
+		{
+			continue;
+		}
 		_currentPattern = _info->RecognizePatternInfo->RecognizeFormPatterns->at(patternCount);
 		QString tableIndex = _currentPattern->GetFormPattern(0)->IdentifierCodePattern->CodeValue;
 		//_currentSubject = _info->EvaluationSubjectInfo->EvaluationSubjects->at(_currentPattern->EvaluationSubjectIndex);
@@ -515,6 +520,10 @@ void LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 			}
 		}
 		QString excelTempName = excelName + "/" + excelFileName;
+		if (!_templateName.isEmpty() && _patternIndex >= 0)
+		{
+			QFile::copy(_templateName, excelTempName);
+		}
 		if (_mExcelReader->newExcel(excelTempName))
 		{
 			//初始化
@@ -609,6 +618,10 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 
 	for (int patternCount = 0; patternCount < _info->RecognizePatternInfo->RecognizeFormPatterns->count(); patternCount++)
 	{
+		if (_patternIndex >= 0 && _patternIndex != patternCount)
+		{
+			continue;
+		}
 		_currentPattern = _info->RecognizePatternInfo->RecognizeFormPatterns->at(patternCount);
 		QString tableIndex = _currentPattern->GetFormPattern(0)->IdentifierCodePattern->CodeValue;
 		_currentSubject = _info->EvaluationSubjectInfo->EvaluationSubjects->at(_currentPattern->EvaluationSubjectIndex);
@@ -640,7 +653,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 		QString excelTempName = excelName + "/" + excelFileName;
 		//QString excelTempName = excelName + "/" + "1.xlsx";
 		//如果有模板 先复制模板
-		if (!_templateName.isEmpty())
+		if (!_templateName.isEmpty() && _patternIndex >= 0)
 		{
 			QFile::copy(_templateName, excelTempName);
 		}
@@ -749,12 +762,16 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			_mExcelReader->mergeCells(1, 1, 1, indexCountT - 1, format1);
 			*/
 			//计票人
+
 			cellListCount.clear();
 			
+
 			if (_currentPattern->MemberTypes.isEmpty())
 			{
 				_currentPattern->MemberTypes.append("sheet1");
 			}
+
+			_mExcelReader->setSheetName(_currentPattern->MemberTypes);
 			for (int i = 0; i < _currentPattern->MemberTypes.count(); i++)
 			{
 				QList<int> temp;
@@ -1228,10 +1245,12 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 					QList<QList<int>> memberScore;
 					for (int subjectIndex = 0; subjectIndex < subjectCount; subjectIndex++)
 					{
+						/*
 						if (scoreCount.at(unitIndex).at(subjectIndex).isEmpty())
 						{
 							continue;
 						}
+						*/
 						if (subjectIndex != 0)
 						{
 							excelRowCount -= memberCount * (subjectCount + 1);

@@ -41,7 +41,7 @@ public:
     ~LoadDataFile();
 
     void readDataFile(QList<MResult*>*, QString);
-    void setExcelData(MResult*, QString, int);
+    void setExcelData(MResult*, QString, int, int);
     void setInfoData(MEvaluationInfo*);
     void setAnswer(QList<QString>);
     void setTemplate(QString);
@@ -85,6 +85,7 @@ private:
     QString patternName;
 
     int _outputType;
+    int _patternIndex;
     int subjectCount;
     int indexCountGroup;
     int unitCount;

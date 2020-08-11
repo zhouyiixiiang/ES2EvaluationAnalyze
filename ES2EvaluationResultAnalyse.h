@@ -54,6 +54,7 @@ signals:
 public slots:
     void onButtonLoadDataFile();
     void onButtonLoadEvaluationData();
+    void onButtonOutputCurrentExcel();
     void onButtonOutputExcel();
     void onButtonAddTemplate();
     void onButtonDeleteTemplate();
