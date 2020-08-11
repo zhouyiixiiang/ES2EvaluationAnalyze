@@ -640,9 +640,13 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			for (fileCount = 0; fileCount < fileInfo->count(); fileCount++)
 			{
 				if (excelFileName == fileInfo->at(fileCount).fileName()) {
+					/*//文件名递增重命名
 					repeatCount++;
 					excelFileName = patternName + "(" + QString::number(repeatCount) + ").xlsx";
 					break;
+					*/
+					//测试用非递增 删除同名文件
+					QFile::remove(fileInfo->at(fileCount).fileName());
 				}
 			}
 			if (fileCount == fileInfo->count())

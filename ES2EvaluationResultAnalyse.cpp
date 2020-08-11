@@ -225,11 +225,13 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 	{
 		//考评
 		ui.label_2->setText(u8"当前输出类型: 考评");
+		ui.pushButton_7->setVisible(true);
 	}
 	else if (_outputType == 1)
 	{
 		//测评
 		ui.label_2->setText(u8"当前输出类型: 测评");
+		ui.pushButton_7->setVisible(false);
 	}
 	else
 	{
