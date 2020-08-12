@@ -61,7 +61,7 @@ public slots:
     void onButtonReadBenchmark();
     void finishLoadDataFile();
     void finishSaveExcel();
-    void finishSetAnswer(QList<QList<QString>>);
+    void finishSetAnswer(QList<QString>);
     void outputErrorPrompt(QString);
     void uploadCountProgress(int, int);
     void selectionTableEvaluationChanged(const QItemSelection& selected, const QItemSelection& deselected);

@@ -416,9 +416,9 @@ void ES2EvaluationResultAnalyse::selectOutputType(int index)
 	}
 }
 */
-void ES2EvaluationResultAnalyse::finishSetAnswer(QList<QList<QString>> benchmark)
+void ES2EvaluationResultAnalyse::finishSetAnswer(QList<QString> benchmark)
 {
-	_benchmark = benchmark;
+	_benchmark[_formPatternIndex] = benchmark;
 	loadDataFile->setAnswer(_benchmark);
 }
 
