@@ -49,7 +49,7 @@ private:
 
 signals:
     void dataOperate();
-    void setPattern(MRecognizeFormPattern*);
+    void setPattern(MRecognizeFormPattern*, QList<QString>);
 
 public slots:
     void onButtonLoadDataFile();
@@ -61,7 +61,7 @@ public slots:
     void onButtonReadBenchmark();
     void finishLoadDataFile();
     void finishSaveExcel();
-    void finishSetAnswer(QList<QString>);
+    void finishSetAnswer(QList<QList<QString>>);
     void outputErrorPrompt(QString);
     void uploadCountProgress(int, int);
     void selectionTableEvaluationChanged(const QItemSelection& selected, const QItemSelection& deselected);
@@ -97,7 +97,7 @@ private:
     MemberInfo* _currentEvaluationMemberInfo = nullptr;
     ES2EvaluationSubjects* _evaluationSubjectInfo = nullptr;
     ES2EvaluationMember* _currentEvaluationMember = nullptr;
-    QList<QString> _benchmark;
+    QList<QList<QString>> _benchmark;
     QList<QString> _currentTemplateList;
 
     QString _path;

@@ -43,7 +43,7 @@ public:
     void readDataFile(QList<MResult*>*, QString);
     void setExcelData(MResult*, QString, int, int);
     void setInfoData(MEvaluationInfo*);
-    void setAnswer(QList<QString>);
+    void setAnswer(QList<QList<QString>>);
     void setTemplate(QString);
 
 signals:
@@ -90,7 +90,7 @@ private:
     int indexCountGroup;
     int unitCount;
     QList<QList<int>> cellListCount;
-    QList<QString> _answerList;
+    QList<QList<QString>> _answerList;
     QString _templateName;
 };
 

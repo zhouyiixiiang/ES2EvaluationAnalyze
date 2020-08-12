@@ -18,7 +18,7 @@ public:
 	~SetBenchmark();
 public slots:
 	void finishSetAnswer();
-	void setPatternSheet(MRecognizeFormPattern*);
+	void setPatternSheet(MRecognizeFormPattern*, QList<QString>);
 
 signals:
 	void sendMessage(QList<QString>);

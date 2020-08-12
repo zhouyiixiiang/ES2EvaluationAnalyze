@@ -226,6 +226,12 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 		//考评
 		ui.label_2->setText(u8"当前输出类型: 考评");
 		ui.pushButton_7->setVisible(true);
+		_benchmark.clear();
+		for (int i = 0; i < _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->count(); i++)
+		{
+			QList<QString> temp;
+			_benchmark.append(temp);
+		}
 	}
 	else if (_outputType == 1)
 	{
@@ -256,7 +262,7 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 
 void ES2EvaluationResultAnalyse::onButtonOutputCurrentExcel()
 {
-	if (_outputType == 0 && _benchmark.isEmpty())
+	if (_outputType == 0 && _benchmark.at(_formPatternIndex).isEmpty())
 	{
 		QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"还没有录入正确结果！"), QMessageBox::Yes);
 		msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
@@ -284,12 +290,18 @@ void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 		return;
 	}
 	*/
-	if (_outputType == 0 && _benchmark.isEmpty())
+	if (_outputType == 0)
 	{
-		QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"还没有录入正确结果！"), QMessageBox::Yes);
-		msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
-		int res = msgBox.exec();
-		return;
+		for (int i = 0; i < _benchmark.size(); i++)
+		{
+			if (_benchmark.at(i).isEmpty())
+			{
+				QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"还没有录入正确结果！"), QMessageBox::Yes);
+				msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
+				int res = msgBox.exec();
+				return;
+			}
+		}
 	}
 	QString dirName = QFileDialog::getExistingDirectory(this, u8"保存数据结果到...").toUtf8();
 	if (!dirName.isEmpty())
@@ -355,7 +367,7 @@ void ES2EvaluationResultAnalyse::onButtonReadBenchmark()
 	connect(this, &ES2EvaluationResultAnalyse::setPattern, _setAnswer, &SetBenchmark::setPatternSheet);
 	connect(_setAnswer, &SetBenchmark::sendMessage, this, &ES2EvaluationResultAnalyse::finishSetAnswer);
 
-	setPattern(_currentrecognizePattern);
+	setPattern(_currentrecognizePattern, _benchmark.at(_formPatternIndex));
 
 	_setAnswer->show();
 }
@@ -404,7 +416,7 @@ void ES2EvaluationResultAnalyse::selectOutputType(int index)
 	}
 }
 */
-void ES2EvaluationResultAnalyse::finishSetAnswer(QList<QString> benchmark)
+void ES2EvaluationResultAnalyse::finishSetAnswer(QList<QList<QString>> benchmark)
 {
 	_benchmark = benchmark;
 	loadDataFile->setAnswer(_benchmark);
@@ -562,6 +574,8 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 			{
 				table->Mmodel->insertRows(i, 1, QModelIndex());//插入每一行
 				MRecognizeFormPattern* tempFormPattern = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(i);
+				QString status = "";
+				//if() 未录入
 				fillTableCell(tempFormPattern->FileName, table, i, 0);
 			}
 		}

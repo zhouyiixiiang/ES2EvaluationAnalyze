@@ -37,8 +37,9 @@ void SetBenchmark::finishSetAnswer()
 	this->accept();
 }
 
-void SetBenchmark::setPatternSheet(MRecognizeFormPattern* _pattern)
+void SetBenchmark::setPatternSheet(MRecognizeFormPattern* _pattern, QList<QString> benchmarkCookie)
 {
+	benchmark = benchmarkCookie;
 	//MFormPattern* tempFormPattern = _pattern->GetFormPattern(0);
 	//_pattern->GetFormPattern(0)->MarkGroupPattern->at(0);
 	//?缓存

@@ -30,9 +30,6 @@
     <ClCompile Include="ES2EvaluationResultAnalyse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <QtMoc Include="waitingwindow.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="loadDataFile.h">
       <Filter>Header Files</Filter>
     </QtMoc>
@@ -40,6 +37,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="setBenchmark.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="waitingwindow.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

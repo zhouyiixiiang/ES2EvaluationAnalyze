@@ -102,7 +102,7 @@ void LoadDataFile::setTemplate(QString filename)
 	_templateName = filename;
 }
 
-void LoadDataFile::setAnswer(QList<QString> answerList)
+void LoadDataFile::setAnswer(QList<QList<QString>> answerList)
 {
 	_answerList = answerList;
 }
@@ -590,9 +590,9 @@ void LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 				for (int groupIndex = 0; groupIndex < resultCollect.at(memberIndex).size(); groupIndex++)
 				{
 					_mExcelReader->writeExcel(rowCount, colunmCount, resultCollect.at(memberIndex).at(groupIndex), format1);
-					_mExcelReader->writeExcel(rowCount + 1, colunmCount, _answerList.at(groupIndex), format1);
+					_mExcelReader->writeExcel(rowCount + 1, colunmCount, _answerList.at(patternCount).at(groupIndex), format1);
 					QString score = QString::number(scoreWeight.at(groupIndex));
-					if (resultCollect.at(memberIndex).at(groupIndex) == _answerList.at(groupIndex))
+					if (resultCollect.at(memberIndex).at(groupIndex) == _answerList.at(patternCount).at(groupIndex))
 					{
 						_mExcelReader->writeExcel(rowCount + 2, colunmCount, u8"对", format1);
 						_mExcelReader->writeExcel(rowCount + 3, colunmCount, score + "/" + score, format1);
