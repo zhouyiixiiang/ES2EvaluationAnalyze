@@ -4,6 +4,8 @@
 #include "xlsxdocument.h"
 #include "xlsxdocument_p.h"
 #include "xlsxformat.h"
+#include "xlsxcellformula.h" 
+
 #include <QString>
 #include <QtCore>
 #include <QDebug>
@@ -31,7 +33,7 @@ public:
 	void unmergeCells(const int firstRow, const int firstColumn, const int lastRow, const int lastColumn);//拆分某个区域单元格
 	bool chooseSheet(int i);
 	bool setSheetName(QList<QString>);//选定第一个表格，填充明细数据
-
+	QStringList readFormula();
 
 /***************************************
 *定义：成员变量

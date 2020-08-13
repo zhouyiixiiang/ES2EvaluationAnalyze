@@ -100,6 +100,7 @@ void LoadDataFile::doDataOperate()
 void LoadDataFile::setTemplate(QString filename, int mode)
 {
 	_templateName = filename;
+	_templateType = mode;
 }
 
 void LoadDataFile::setAnswer(QList<QList<QString>> answerList)
@@ -665,6 +666,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 		{
 
 			//初始化表头
+
 			//单位页
 			//_mExcelReader->chooseSheet(0);
 			/*
@@ -769,7 +771,15 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 
 			cellListCount.clear();
 			
-
+			QStringList formulaList;
+			if (!_templateName.isEmpty())
+			{
+				formulaList.append(_mExcelReader->readFormula());
+				if (formulaList.isEmpty())
+				{
+					return;
+				}
+			}
 			if (_currentPattern->MemberTypes.isEmpty())
 			{
 				_currentPattern->MemberTypes.append("sheet1");
@@ -1358,6 +1368,19 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							tempMemberIndex++;
 						}
 					}
+				}
+			}
+		
+			//模板内容处理
+			if (_patternIndex >= 0 && _templateType > 0)
+			{
+				if (_templateType == 1)
+				{
+
+				}
+				else if (_templateType == 2)
+				{
+					 //_mExcelReader
 				}
 			}
 		}

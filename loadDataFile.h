@@ -89,6 +89,7 @@ private:
     int subjectCount;
     int indexCountGroup;
     int unitCount;
+    int _templateType;
     QList<QList<int>> cellListCount;
     QList<QList<QString>> _answerList;
     QString _templateName;

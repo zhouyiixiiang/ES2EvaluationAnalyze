@@ -75,7 +75,6 @@ bool ExcelReader::openExcel()
         QMessageBox::critical(0, (u8"错误信息"), (u8"EXCEL对象丢失"));
 		return false;
 	}
-
 	return true;
 }
 
@@ -118,6 +117,32 @@ bool ExcelReader::readExcel()
 	return true;
 }
 
+QStringList ExcelReader::readFormula()
+{
+	QStringList res;
+	if (_mExcel == nullptr)
+	{
+		QMessageBox::warning(0, (u8"错误信息"), (u8"请先新建或打开一个EXCEL对象！"));
+		return res;
+	}
+
+	QXlsx::Workbook* workBook = _mExcel->workbook();
+	QXlsx::Worksheet* workSheet = static_cast<QXlsx::Worksheet*>(workBook->sheet(_mExcel->sheetNames().count() - 1));//打开第一个sheet
+	QXlsx::CellRange usedRange = _mExcel->dimension();//使用范围
+	for (int j = 1; j <= usedRange.columnCount(); j++)
+	{
+		QXlsx::Cell* cell = workSheet->cellAt(4, j);
+		if (cell == NULL) continue;
+		else
+		{
+			res.append(cell->formula().formulaText());
+			//res.append(cell->value().toString());
+		}
+	}
+	
+	//qDebug() << (u8"读取成功");
+	return res;
+}
 
 /***************************************
 *函数功能：写入数据到Excel，若有值，则覆盖原来的值。
@@ -159,7 +184,9 @@ bool ExcelReader::setSheetName(QList<QString> memberTypeList)
 		{
 			if (_mExcel->sheetNames().contains(memberTypeList.at(i)))
 			{
-				_mExcel->insertSheet(i, memberTypeList.at(i) + "-data");
+				//_mExcel->renameSheet(memberTypeList.at(i), memberTypeList.at(i) + "-origin");
+				_mExcel->deleteSheet(memberTypeList.at(i));
+				_mExcel->insertSheet(i, memberTypeList.at(i));
 			}
 			else
 			{
