@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QMessageBox>
+#include <QInputDialog>
 #include <QDebug>
 
 #include <QTreeWidget>
@@ -88,7 +89,8 @@ public:
 private:
     template <typename T>
     void ReleaseQList(QList<T*>*);
-    void initGender();
+    void initLists();
+    bool selectTemplateType();
  
 
     QList<QString> _gender;
@@ -107,6 +109,9 @@ private:
     DlgWait* _waitOperate;
     SetBenchmark* _setAnswer;
 
+    QStringList templateTypeNameList; 
+    QList<int> templateType;
+
     TableItem* _tableEvaluation = nullptr;
     TableItem* _tableEvaluationObject = nullptr;
     TableItem* _tableEvaluationMembers = nullptr;
@@ -120,4 +125,5 @@ private:
     int _formPatternIndex = 0;
     int _templateIndex = 0;
     int _outputType = 1;
+    //int _templateType = 0;
 };

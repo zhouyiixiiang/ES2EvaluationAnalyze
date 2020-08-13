@@ -97,7 +97,7 @@ void LoadDataFile::doDataOperate()
     }
 }
 
-void LoadDataFile::setTemplate(QString filename)
+void LoadDataFile::setTemplate(QString filename, int mode)
 {
 	_templateName = filename;
 }

@@ -7,7 +7,7 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 
     setWindowTitle((u8"数据汇总统计"));
 
-	initGender();
+	initLists();
 	_path = QCoreApplication::applicationDirPath().toUtf8();
 
     McurrentResults = new QList<MResult*>;
@@ -248,7 +248,9 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 
 	loadDataFile->setInfoData(_currentEvaluationInfo);
 	_currentTemplateList.clear();
+	templateType.clear();
 	_currentTemplateList.append("");
+	templateType.append(0);
 	updateAllTableviews();
 
 	ui.pushButton_2->setEnabled(true);
@@ -274,7 +276,7 @@ void ES2EvaluationResultAnalyse::onButtonOutputCurrentExcel()
 	SetWaitExcel(true);
 
 	loadDataFile->setExcelData(McurrentResult, dirName, _outputType, _formPatternIndex);
-	loadDataFile->setTemplate(_currentTemplateList.at(_templateIndex));
+	loadDataFile->setTemplate(_currentTemplateList.at(_templateIndex), templateType.at(_templateIndex));
 	dataOperate();
 }
 
@@ -321,13 +323,43 @@ void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 	SetWaitExcel(true);
 
 	loadDataFile->setExcelData(McurrentResult, dirName, _outputType, -1);
-	loadDataFile->setTemplate(_currentTemplateList.at(_templateIndex));
+	loadDataFile->setTemplate(_currentTemplateList.at(_templateIndex), templateType.at(_templateIndex));
 	dataOperate();
 
 }
 
+bool ES2EvaluationResultAnalyse::selectTemplateType()
+{
+	QString dlgTitle = "模板类型";
+	QString txtLabel = "选择结果模板类型";
+	int     curIndex = 0; //初始选择项
+	bool    editable = false; //ComboBox是否可编辑
+	bool    finish = false;
+	QString text = QInputDialog::getItem(this, dlgTitle, txtLabel, templateTypeNameList, curIndex, editable, &finish);
+	if (finish && !text.isEmpty())
+	{
+		for (int i = 0; i < templateTypeNameList.count(); i++)
+		{
+			if (text.compare(templateTypeNameList.at(i)) == 0)
+			{
+				templateType[_templateIndex] = i;
+				return true;
+			}
+		}
+		return false;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 void ES2EvaluationResultAnalyse::onButtonAddTemplate()
 {
+	if (!selectTemplateType())
+	{
+		return;
+	}
 	QString fileName = QFileDialog::getOpenFileName(this, (u8"添加Excel模板"), QString(), "Data Files(*.xlsx)");
 	if (fileName.isEmpty())
 	{
@@ -343,10 +375,12 @@ void ES2EvaluationResultAnalyse::onButtonAddTemplate()
 		file.close();
 	}
 	_currentTemplateList.append(fileName);
+	templateType.append(templateType.at(_templateIndex));
 
 
 	fillingTheTableView("tableTemplateList");
 }
+
 void ES2EvaluationResultAnalyse::onButtonDeleteTemplate()
 {
 	if (_templateIndex == 0)
@@ -357,6 +391,8 @@ void ES2EvaluationResultAnalyse::onButtonDeleteTemplate()
 		return;
 	}
 	_currentTemplateList.removeAt(_templateIndex);
+	templateType.removeAt(_templateIndex);
+
 	fillingTheTableView("tableTemplateList");
 }
 
@@ -400,6 +436,7 @@ void ES2EvaluationResultAnalyse::selectionTableEvaluationChanged(const QItemSele
 		}
 	}
 }
+
 /*
 void ES2EvaluationResultAnalyse::selectOutputType(int index)
 {
@@ -416,6 +453,7 @@ void ES2EvaluationResultAnalyse::selectOutputType(int index)
 	}
 }
 */
+
 void ES2EvaluationResultAnalyse::finishSetAnswer(QList<QString> benchmark)
 {
 	_benchmark[_formPatternIndex] = benchmark;
@@ -460,13 +498,14 @@ void ES2EvaluationResultAnalyse::outputErrorPrompt(QString hint)
 
 }
 
-
-void ES2EvaluationResultAnalyse::initGender()
+void ES2EvaluationResultAnalyse::initLists()
 {
 	_gender.clear();
 	_gender.append(u8"男");
 	_gender.append(u8"女");
 	_gender.append(u8"未设定");
+
+	templateTypeNameList << u8"默认不复制" << u8"按行复制" << u8"按页复制";
 }
 
 void ES2EvaluationResultAnalyse::disconnectUsingMapFunc(QString s, TableItem* tableItem)
@@ -575,8 +614,11 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 				table->Mmodel->insertRows(i, 1, QModelIndex());//插入每一行
 				MRecognizeFormPattern* tempFormPattern = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(i);
 				QString status = "";
-				//if() 未录入
-				fillTableCell(tempFormPattern->FileName, table, i, 0);
+				if (_outputType == 0 && _benchmark.at(i).isEmpty())
+				{
+					status.append(u8" (未录入答案)");
+				}
+				fillTableCell(tempFormPattern->FileName + status, table, i, 0);
 			}
 		}
 	}
@@ -652,7 +694,12 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 		{
 			QFileInfo fileInfo(_currentTemplateList.at(i));
 			table->Mmodel->insertRows(i, 1, QModelIndex());//插入每一行
-			fillTableCell(fileInfo.fileName(), table, i, 0);
+			QString hint = "";
+			if (templateType.at(i) > 0)
+			{
+				hint.append(" (" + templateTypeNameList.at(templateType.at(i)) + ")");
+			}
+			fillTableCell(fileInfo.fileName() + hint, table, i, 0);
 		}
 
 	}

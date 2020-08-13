@@ -44,7 +44,7 @@ public:
     void setExcelData(MResult*, QString, int, int);
     void setInfoData(MEvaluationInfo*);
     void setAnswer(QList<QList<QString>>);
-    void setTemplate(QString);
+    void setTemplate(QString, int);
 
 signals:
     void countStep(int, int);
