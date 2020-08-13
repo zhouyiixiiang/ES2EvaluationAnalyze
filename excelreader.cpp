@@ -144,6 +144,38 @@ QStringList ExcelReader::readFormula()
 	return res;
 }
 
+int ExcelReader::getRowCount(int sheetIndex)
+{
+	chooseSheet(sheetIndex);
+	return _mExcel->dimension().columnCount();
+}
+
+bool ExcelReader::copySheet(int originSheet, int position)
+{
+	_mExcel->insertSheet(position);
+	_mExcel->copySheet(_mExcel->sheetNames().at(originSheet), _mExcel->sheetNames().at(position));
+	return true;
+}
+
+int ExcelReader::getSheetCount() 
+{
+	return _mExcel->sheetNames().count();
+}
+
+int ExcelReader::getSheetIndex(QString sheetName)
+{
+	return _mExcel->sheetNames().indexOf(sheetName);
+}
+
+bool ExcelReader::isCellEmpty(int row, int column)
+{
+	if (_mExcel->cellAt(row, column) == nullptr || _mExcel->cellAt(row, column)->value().toString() == "")
+	{
+		return true;
+	}
+	return false;
+}
+
 /***************************************
 *函数功能：写入数据到Excel，若有值，则覆盖原来的值。
 *输入：

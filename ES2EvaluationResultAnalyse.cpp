@@ -342,7 +342,7 @@ bool ES2EvaluationResultAnalyse::selectTemplateType()
 		{
 			if (text.compare(templateTypeNameList.at(i)) == 0)
 			{
-				templateType[_templateIndex] = i;
+				templateType.append(i);
 				return true;
 			}
 		}
@@ -363,19 +363,12 @@ void ES2EvaluationResultAnalyse::onButtonAddTemplate()
 	QString fileName = QFileDialog::getOpenFileName(this, (u8"添加Excel模板"), QString(), "Data Files(*.xlsx)");
 	if (fileName.isEmpty())
 	{
+		templateType.removeLast();
 		return;
 	}
-	QFile file(fileName);
 
-	if (file.exists())
-	{
-		file.open(QIODevice::ReadOnly);
-
-
-		file.close();
-	}
 	_currentTemplateList.append(fileName);
-	templateType.append(templateType.at(_templateIndex));
+	//templateType.append(templateType.at(_templateIndex));
 
 
 	fillingTheTableView("tableTemplateList");

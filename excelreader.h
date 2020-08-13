@@ -34,6 +34,11 @@ public:
 	bool chooseSheet(int i);
 	bool setSheetName(QList<QString>);//选定第一个表格，填充明细数据
 	QStringList readFormula();
+	int getRowCount(int);
+	bool copySheet(int, int);
+	int getSheetCount();
+	int getSheetIndex(QString);
+	bool isCellEmpty(int, int);
 
 /***************************************
 *定义：成员变量

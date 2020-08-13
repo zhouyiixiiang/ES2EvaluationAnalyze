@@ -1374,13 +1374,109 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			//模板内容处理
 			if (_patternIndex >= 0 && _templateType > 0)
 			{
+				int excelRowCount = 4;
+				//int excelColumnCount = 0;
+				QString sheetName;
+				for (int i = 0; i < formulaList.count(); i++)
+				{
+					if (formulaList.at(i).contains("!"))
+					{
+						int mark = formulaList.at(i).indexOf("!");
+						sheetName.append(formulaList.at(i).mid(0, mark));
+						break;
+					}
+					if (i == formulaList.count() - 1)
+					{
+						emit outputError(u8"未检测到合法公式");
+						return;
+					}
+				}
+
+				int originSheet = _mExcelReader->getSheetCount();
+				int distSheet = _mExcelReader->getSheetIndex(sheetName);
+				int rowCount = _mExcelReader->getRowCount(distSheet);
+				int memberCount = (rowCount - 5) / (subjectCount + 1);
+				//int memberCount = memberTypeRecord.at(0).at(validSubject).count();
 				if (_templateType == 1)
 				{
+					_mExcelReader->chooseSheet(originSheet - 1);
 
+					for (int memberIndex = 1; memberIndex < memberCount; memberIndex++)
+					{
+						_mExcelReader->chooseSheet(distSheet);
+						if (_mExcelReader->isCellEmpty(5 + memberIndex * (subjectCount + 1), 2))
+						{
+							continue;
+						}
+						_mExcelReader->chooseSheet(originSheet - 1);
+						excelRowCount++;
+						for (int formulaIndex = 0; formulaIndex < formulaList.count(); formulaIndex++)
+						{
+							QString currentRes = formulaList.at(formulaIndex);
+							for (int i = 0; i < currentRes.count(); i++)
+							{
+								i = currentRes.indexOf("$", i);
+								if (i == -1)
+								{
+									break;
+								}
+								int endMark = i;
+								while (endMark + 1 < currentRes.count() && currentRes.at(endMark + 1).isNumber())
+								{
+									endMark++;
+								}
+								if (i != endMark)
+								{
+									QString temp = currentRes.mid(i + 1, endMark - i);
+									QString pre = currentRes.mid(0, i + 1);
+									QString last = currentRes.mid(endMark + 1);
+									int tempint = temp.toInt() + (subjectCount + 1) * memberIndex;
+									temp = QString::number(tempint);
+									currentRes =pre + temp + last;
+									i = endMark;
+								}
+							}
+							
+							_mExcelReader->writeExcel(excelRowCount, formulaIndex + 1, "=" + currentRes, format1);
+						}
+					}
 				}
 				else if (_templateType == 2)
 				{
-					 //_mExcelReader
+					for (int memberIndex = 1; memberIndex < memberCount; memberIndex++)
+					{
+						_mExcelReader->copySheet(originSheet - 1, originSheet + memberIndex);
+						_mExcelReader->chooseSheet(originSheet + memberIndex);
+						for (int formulaIndex = 0; formulaIndex < formulaList.count(); formulaIndex++)
+						{
+							QString currentRes = formulaList.at(formulaIndex);
+							for (int i = 0; i < currentRes.count(); i++)
+							{
+								i = currentRes.indexOf("$", i);
+								if (i == -1)
+								{
+									break;
+								}
+								int endMark = i;
+								while (endMark + 1 < currentRes.count() && currentRes.at(endMark + 1).isNumber())
+								{
+									endMark++;
+								}
+								if (i != endMark)
+								{
+									QString temp = currentRes.mid(i + 1, endMark - i);
+									QString pre = currentRes.mid(0, i);
+									QString last = currentRes.mid(endMark + 1);
+									int tempint = temp.toInt() + (subjectCount + 1) * memberIndex;
+									temp = QString::number(tempint);
+									currentRes = pre + temp + last;
+									i = endMark;
+								}
+							}
+							_mExcelReader->writeExcel(excelRowCount, formulaIndex + 1, "=" + currentRes, format1);
+						}
+						//_mExcelReader
+					}
 				}
 			}
 		}
