@@ -153,6 +153,7 @@ int ExcelReader::getRowCount(int sheetIndex)
 bool ExcelReader::copySheet(int originSheet, int position)
 {
 	_mExcel->insertSheet(position);
+	QStringList a =  _mExcel->sheetNames();
 	_mExcel->copySheet(_mExcel->sheetNames().at(originSheet), _mExcel->sheetNames().at(position));
 	return true;
 }

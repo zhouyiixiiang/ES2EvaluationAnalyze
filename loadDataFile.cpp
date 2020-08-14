@@ -1406,7 +1406,8 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 						_mExcelReader->chooseSheet(distSheet);
 						if (_mExcelReader->isCellEmpty(5 + memberIndex * (subjectCount + 1), 2))
 						{
-							continue;
+							break;
+							//continue; ?
 						}
 						_mExcelReader->chooseSheet(originSheet - 1);
 						excelRowCount++;
@@ -1445,8 +1446,14 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				{
 					for (int memberIndex = 1; memberIndex < memberCount; memberIndex++)
 					{
-						_mExcelReader->copySheet(originSheet - 1, originSheet + memberIndex);
-						_mExcelReader->chooseSheet(originSheet + memberIndex);
+						_mExcelReader->chooseSheet(distSheet);
+						if (_mExcelReader->isCellEmpty(5 + memberIndex * (subjectCount + 1), 2))
+						{
+							break;
+							//continue; ?
+						}
+						_mExcelReader->copySheet(originSheet - 1, originSheet + memberIndex - 1);
+						_mExcelReader->chooseSheet(originSheet + memberIndex - 1);
 						for (int formulaIndex = 0; formulaIndex < formulaList.count(); formulaIndex++)
 						{
 							QString currentRes = formulaList.at(formulaIndex);
