@@ -1420,6 +1420,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 						for (int formulaIndex = 0; formulaIndex < formulaList.count(); formulaIndex++)
 						{
 							QString currentRes = formulaList.at(formulaIndex);
+							bool jump = false;
 							for (int i = 0; i < currentRes.count(); i++)
 							{
 								i = currentRes.indexOf("$", i);
@@ -1428,11 +1429,15 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 									break;
 								}
 								int endMark = i;
+								if (currentRes.at(endMark + 1) == "A" && (endMark + 2 >= currentRes.count() || !currentRes.at(endMark + 2).isLetter()))
+								{
+									jump = true;
+								}
 								while (endMark + 1 < currentRes.count() && currentRes.at(endMark + 1).isNumber())
 								{
 									endMark++;
 								}
-								if (i != endMark)
+								if (i != endMark && !jump)
 								{
 									QString temp = currentRes.mid(i + 1, endMark - i);
 									QString pre = currentRes.mid(0, i + 1);
@@ -1441,6 +1446,10 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 									temp = QString::number(tempint);
 									currentRes =pre + temp + last;
 									i = endMark;
+								}
+								else if (i != endMark && jump)
+								{
+									jump = false;
 								}
 							}
 							
@@ -1490,10 +1499,8 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							}
 						}
 
-
 						for (int formulaIndex = 0; formulaIndex < formulaList.count(); formulaIndex++)
 						{
-							
 							QString currentRes = formulaList.at(formulaIndex);
 							bool jump = false;
 							for (int i = 0; i < currentRes.count(); i++)

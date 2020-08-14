@@ -272,6 +272,10 @@ void ES2EvaluationResultAnalyse::onButtonOutputCurrentExcel()
 		return;
 	}
 	QString dirName = QFileDialog::getExistingDirectory(this, u8"保存数据结果到...").toUtf8();
+	if (dirName.isEmpty())
+	{
+		return;
+	}
 
 	SetWaitExcel(true);
 
