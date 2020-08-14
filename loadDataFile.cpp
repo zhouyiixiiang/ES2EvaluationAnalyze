@@ -1,6 +1,4 @@
 #include "loadDataFile.h"
-#include <windows.h>
-#include <QDebug>
 
 LoadDataFile::LoadDataFile(QObject *parent) : QObject(parent)
 {
