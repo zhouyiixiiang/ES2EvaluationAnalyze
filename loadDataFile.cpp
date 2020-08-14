@@ -526,6 +526,21 @@ void LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 		if (_mExcelReader->newExcel(excelTempName))
 		{
 			//初始化
+			QList<QStringList> titleList;
+			QStringList formulaList;
+			if (!_templateName.isEmpty())
+			{
+				formulaList.append(_mExcelReader->readFormula());
+				for (int i = 1; i < 4; i++)
+				{
+					titleList.append(_mExcelReader->readLine(i));
+				}
+				if (formulaList.isEmpty())
+				{
+					return;
+				}
+			}
+
 			QList<QString> sheetName;
 			sheetName.append(patternName);
 			_mExcelReader->setSheetName(sheetName);
@@ -606,6 +621,173 @@ void LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 				}
 				_mExcelReader->writeExcel(rowCount, 6, QString::number(scoreGet) + "/" + QString::number(scoreSum), format1);
 				rowCount += 4;
+			}
+
+			//
+
+			if (_patternIndex >= 0 && _templateType > 0)
+			{
+				int excelRowCount = 4;
+				//int excelColumnCount = 0;
+				QString sheetName;
+				int maxColumn = formulaList.count();
+				for (int i = 0; i < formulaList.count(); i++)
+				{
+					if (formulaList.at(i).contains("!"))
+					{
+						int mark = formulaList.at(i).indexOf("!");
+						sheetName.append(formulaList.at(i).mid(0, mark));
+						break;
+					}
+					if (i == formulaList.count() - 1)
+					{
+						emit outputError(u8"未检测到合法公式");
+						return;
+					}
+				}
+
+				int originSheet = _mExcelReader->getSheetCount();
+				int distSheet = _mExcelReader->getSheetIndex(sheetName);
+				int rowCount = _mExcelReader->getRowCount(distSheet);
+				int memberCount = (rowCount - 5) / (subjectCount + 1);
+				//int memberCount = memberTypeRecord.at(0).at(validSubject).count();
+				if (_templateType == 1)
+				{
+					_mExcelReader->chooseSheet(originSheet - 1);
+
+					for (int memberIndex = 1; memberIndex < memberCount; memberIndex++)
+					{
+						_mExcelReader->chooseSheet(distSheet);
+						if (_mExcelReader->isCellEmpty(5 + memberIndex * (subjectCount + 1), 2))
+						{
+							break;
+							//continue; ?
+						}
+						_mExcelReader->chooseSheet(originSheet - 1);
+						excelRowCount++;
+						for (int formulaIndex = 0; formulaIndex < formulaList.count(); formulaIndex++)
+						{
+							QString currentRes = formulaList.at(formulaIndex);
+							bool jump = false;
+							for (int i = 0; i < currentRes.count(); i++)
+							{
+								i = currentRes.indexOf("$", i);
+								if (i == -1)
+								{
+									break;
+								}
+								int endMark = i;
+								if (currentRes.at(endMark + 1) == "A" && (endMark + 2 >= currentRes.count() || !currentRes.at(endMark + 2).isLetter()))
+								{
+									jump = true;
+								}
+								while (endMark + 1 < currentRes.count() && currentRes.at(endMark + 1).isNumber())
+								{
+									endMark++;
+								}
+								if (i != endMark && !jump)
+								{
+									QString temp = currentRes.mid(i + 1, endMark - i);
+									QString pre = currentRes.mid(0, i + 1);
+									QString last = currentRes.mid(endMark + 1);
+									int tempint = temp.toInt() + (subjectCount + 1) * memberIndex;
+									temp = QString::number(tempint);
+									currentRes = pre + temp + last;
+									i = endMark;
+								}
+								else if (i != endMark && jump)
+								{
+									jump = false;
+								}
+							}
+
+							_mExcelReader->writeExcel(excelRowCount, formulaIndex + 1, "=" + currentRes, format1);
+						}
+					}
+				}
+				else if (_templateType == 2)
+				{
+					for (int memberIndex = 1; memberIndex < memberCount; memberIndex++)
+					{
+						_mExcelReader->chooseSheet(distSheet);
+						if (_mExcelReader->isCellEmpty(5 + memberIndex * (subjectCount + 1), 2))
+						{
+							break;
+							//continue; ?
+						}
+						_mExcelReader->copySheet(originSheet - 1, originSheet + memberIndex - 1);//没有成功复制
+
+						_mExcelReader->chooseSheet(originSheet + memberIndex - 1);
+						for (int i = 0; i < 3; i++)
+						{
+							int validj = -1;
+							for (int j = 0; j < maxColumn; j++)
+							{
+								if (!titleList.at(i).at(j).isEmpty() || j == maxColumn - 1)
+								{
+									if (j == maxColumn - 1)
+									{
+										_mExcelReader->mergeCells(i + 1, validj + 1, i + 1, j + 1, format1);
+									}
+									else if (validj < j && validj >= 0)
+									{
+										_mExcelReader->mergeCells(i + 1, validj + 1, i + 1, j, format1);
+									}
+									_mExcelReader->writeExcel(i + 1, j + 1, titleList.at(i).at(j), format1);
+									validj = j;
+								}
+								else
+								{
+									if (i > 0 && !titleList.at(i - 1).at(j).isEmpty())
+									{
+										_mExcelReader->mergeCells(i, j + 1, i + 1, j + 1, format1);
+									}
+									continue;
+								}
+							}
+						}
+
+						for (int formulaIndex = 0; formulaIndex < formulaList.count(); formulaIndex++)
+						{
+							QString currentRes = formulaList.at(formulaIndex);
+							bool jump = false;
+							for (int i = 0; i < currentRes.count(); i++)
+							{
+								i = currentRes.indexOf("$", i);
+								if (i == -1)
+								{
+									break;
+								}
+								int endMark = i;
+								if (currentRes.at(endMark + 1) == "A" && (endMark + 2 >= currentRes.count() || !currentRes.at(endMark + 2).isLetter()))
+								{
+									jump = true;
+								}
+
+								while (endMark + 1 < currentRes.count() && currentRes.at(endMark + 1).isNumber())
+								{
+									endMark++;
+								}
+								if (i != endMark && !jump)
+								{
+									QString temp = currentRes.mid(i + 1, endMark - i);
+									QString pre = currentRes.mid(0, i);
+									QString last = currentRes.mid(endMark + 1);
+									int tempint = temp.toInt() + (subjectCount + 1) * memberIndex;
+									temp = QString::number(tempint);
+									currentRes = pre + temp + last;
+									i = endMark;
+								}
+								else if (i != endMark && jump)
+								{
+									jump = false;
+								}
+							}
+							_mExcelReader->writeExcel(excelRowCount, formulaIndex + 1, "=" + currentRes, format1);
+						}
+						//_mExcelReader
+					}
+				}
 			}
 		}
 	}
@@ -770,14 +952,14 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			cellListCount.clear();
 			
 			QList<QStringList> titleList;
-			for (int i = 1; i < 4; i++)
-			{
-				titleList.append(_mExcelReader->readLine(i));
-			}
 			QStringList formulaList;
 			if (!_templateName.isEmpty())
 			{
 				formulaList.append(_mExcelReader->readFormula());
+				for (int i = 1; i < 4; i++)
+				{
+					titleList.append(_mExcelReader->readLine(i));
+				}
 				if (formulaList.isEmpty())
 				{
 					return;
