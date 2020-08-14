@@ -117,6 +117,36 @@ bool ExcelReader::readExcel()
 	return true;
 }
 
+QStringList ExcelReader::readLine(int lineIndex)
+{
+	QStringList res;
+	if (_mExcel == nullptr)
+	{
+		QMessageBox::warning(0, (u8"错误信息"), (u8"请先新建或打开一个EXCEL对象！"));
+		return res;
+	}
+
+	QXlsx::Workbook* workBook = _mExcel->workbook();
+	QXlsx::Worksheet* workSheet = static_cast<QXlsx::Worksheet*>(workBook->sheet(_mExcel->sheetNames().count() - 1));
+	QXlsx::CellRange usedRange = _mExcel->dimension();//使用范围
+	for (int j = 1; j <= usedRange.columnCount(); j++)
+	{
+		QXlsx::Cell* cell = workSheet->cellAt(lineIndex, j);
+		if (cell == NULL) 
+		{
+			res.append("");
+		}
+		else
+		{
+			res.append(cell->value().toString());
+			//res.append(cell->formula().formulaText());
+		}
+	}
+
+	//qDebug() << (u8"读取成功");
+	return res;
+}
+
 QStringList ExcelReader::readFormula()
 {
 	QStringList res;
@@ -127,7 +157,7 @@ QStringList ExcelReader::readFormula()
 	}
 
 	QXlsx::Workbook* workBook = _mExcel->workbook();
-	QXlsx::Worksheet* workSheet = static_cast<QXlsx::Worksheet*>(workBook->sheet(_mExcel->sheetNames().count() - 1));//打开第一个sheet
+	QXlsx::Worksheet* workSheet = static_cast<QXlsx::Worksheet*>(workBook->sheet(_mExcel->sheetNames().count() - 1));
 	QXlsx::CellRange usedRange = _mExcel->dimension();//使用范围
 	for (int j = 1; j <= usedRange.columnCount(); j++)
 	{
@@ -153,8 +183,12 @@ int ExcelReader::getRowCount(int sheetIndex)
 bool ExcelReader::copySheet(int originSheet, int position)
 {
 	_mExcel->insertSheet(position);
+	_mExcel->selectSheet(_mExcel->sheetNames().at(position));
 	QStringList a =  _mExcel->sheetNames();
 	_mExcel->copySheet(_mExcel->sheetNames().at(originSheet), _mExcel->sheetNames().at(position));
+	//QXlsx::Worksheet* workSheet = static_cast<QXlsx::Worksheet*>(->sheet(originSheet));
+	//workSheet->copy(_mExcel->sheetNames().at(position), position);
+	//_mExcel->workbook()->copySheet(position);
 	return true;
 }
 

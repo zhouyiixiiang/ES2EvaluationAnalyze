@@ -771,6 +771,11 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 
 			cellListCount.clear();
 			
+			QList<QStringList> titleList;
+			for (int i = 1; i < 4; i++)
+			{
+				titleList.append(_mExcelReader->readLine(i));
+			}
 			QStringList formulaList;
 			if (!_templateName.isEmpty())
 			{
@@ -1377,6 +1382,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				int excelRowCount = 4;
 				//int excelColumnCount = 0;
 				QString sheetName;
+				int maxColumn = formulaList.count();
 				for (int i = 0; i < formulaList.count(); i++)
 				{
 					if (formulaList.at(i).contains("!"))
@@ -1452,11 +1458,44 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							break;
 							//continue; ?
 						}
-						_mExcelReader->copySheet(originSheet - 1, originSheet + memberIndex - 1);
+						_mExcelReader->copySheet(originSheet - 1, originSheet + memberIndex - 1);//没有成功复制
+
 						_mExcelReader->chooseSheet(originSheet + memberIndex - 1);
+						for (int i = 0; i < 3; i++)
+						{
+							int validj = -1;
+							for (int j = 0; j < maxColumn; j++)
+							{
+								if (!titleList.at(i).at(j).isEmpty() || j == maxColumn - 1)
+								{
+									if (j == maxColumn - 1)
+									{
+										_mExcelReader->mergeCells(i + 1, validj + 1, i + 1, j + 1, format1);
+									}
+									else if (validj < j && validj >= 0)
+									{
+										_mExcelReader->mergeCells(i + 1, validj + 1, i + 1, j, format1);
+									}
+									_mExcelReader->writeExcel(i + 1, j + 1, titleList.at(i).at(j), format1);
+									validj = j;
+								}
+								else
+								{
+									if (i > 0 && !titleList.at(i - 1).at(j).isEmpty())
+									{
+										_mExcelReader->mergeCells(i, j + 1, i + 1, j + 1, format1);
+									}
+									continue;
+								}
+							}
+						}
+
+
 						for (int formulaIndex = 0; formulaIndex < formulaList.count(); formulaIndex++)
 						{
+							
 							QString currentRes = formulaList.at(formulaIndex);
+							bool jump = false;
 							for (int i = 0; i < currentRes.count(); i++)
 							{
 								i = currentRes.indexOf("$", i);
@@ -1465,11 +1504,16 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 									break;
 								}
 								int endMark = i;
+								if (currentRes.at(endMark + 1) == "A" && (endMark + 2 >= currentRes.count() || !currentRes.at(endMark + 2).isLetter()))
+								{
+									jump = true;
+								}
+
 								while (endMark + 1 < currentRes.count() && currentRes.at(endMark + 1).isNumber())
 								{
 									endMark++;
 								}
-								if (i != endMark)
+								if (i != endMark && !jump)
 								{
 									QString temp = currentRes.mid(i + 1, endMark - i);
 									QString pre = currentRes.mid(0, i);
@@ -1478,6 +1522,10 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 									temp = QString::number(tempint);
 									currentRes = pre + temp + last;
 									i = endMark;
+								}
+								else if (i != endMark && jump)
+								{
+									jump = false;
 								}
 							}
 							_mExcelReader->writeExcel(excelRowCount, formulaIndex + 1, "=" + currentRes, format1);
