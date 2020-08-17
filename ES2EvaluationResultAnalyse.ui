@@ -78,7 +78,7 @@
        <item>
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>当前文件名:</string>
+          <string>当前测评名称:</string>
          </property>
         </widget>
        </item>
@@ -271,14 +271,14 @@
              <item>
               <widget class="QPushButton" name="pushButton_8">
                <property name="text">
-                <string>生成单个模式结果</string>
+                <string>按模板生成结果</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QPushButton" name="pushButton_4">
                <property name="text">
-                <string>生成所有结果</string>
+                <string>生成通用结果</string>
                </property>
               </widget>
              </item>
