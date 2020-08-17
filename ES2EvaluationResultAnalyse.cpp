@@ -259,7 +259,6 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 	ui.pushButton_6->setEnabled(false);
 	ui.pushButton_7->setEnabled(false);
 	ui.pushButton_8->setEnabled(false);
-	_benchmark.clear();
 }
 
 void ES2EvaluationResultAnalyse::onButtonOutputCurrentExcel()
@@ -455,6 +454,8 @@ void ES2EvaluationResultAnalyse::finishSetAnswer(QList<QString> benchmark)
 {
 	_benchmark[_formPatternIndex] = benchmark;
 	loadDataFile->setAnswer(_benchmark);
+
+	fillingTheTableView("tableEvaluation");
 }
 
 void ES2EvaluationResultAnalyse::uploadCountProgress(int rec, int sum)

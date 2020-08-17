@@ -10,7 +10,7 @@ SetBenchmark::SetBenchmark(QWidget* parent) : QDialog(parent)
 	table = _tableview;
 	tableview->setModel(table->Mmodel);
 	table->MselectionModel = tableview->selectionModel();
-	setWindowTitle((u8"录入正确结果"));
+	setWindowTitle(u8"录入正确结果");
 
 }
 
