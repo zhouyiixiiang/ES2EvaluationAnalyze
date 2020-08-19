@@ -333,6 +333,10 @@ void LoadDataFile::initSheet(int sheetIndex, int patternCount)
 	for (unsigned i = 0, takenSpace = 5; i < unitCount; i++)
 	{
 		unitName.append(_currentPattern->EvaluationUnits.at(i));
+		if (_currentMemberInfo->EvaluationMembers->at(i)->EvaluationMembers->isEmpty())
+		{
+			continue;
+		}
 		_mExcelReader->writeExcel(i * (subjectCount + 1) + 5, 1, unitName.at(i), format1);
 		//_mExcelReader->mergeCells(i * (subjectCount + 1) + 5, 1, (i + 1) * (subjectCount + 1) + 4, 1, format1);
 
