@@ -1242,7 +1242,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							QList<int> memberTypeRecord_subject;
 							for (int i = 0; i < memberCount; i++)
 							{
-								memberTypeRecord_subject.append(0);
+								memberTypeRecord_subject.append(-2);
 							}
 							//scoreCount_unit.append(scoreCount_subject);
 							for (int formIndex = 0; formIndex < currentFormResults->count(); formIndex++)
@@ -1414,12 +1414,20 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			subjectWeight.append(subjectWeightSum);
 
 			int validSubject = 0;
-			for (; validSubject < subjectCount; validSubject++)
+			for (int i = 0; i < unitCount; i++)
 			{
-				if (!memberTypeRecord.at(0).at(validSubject).isEmpty())
+				if (memberTypeRecord.at(i).at(validSubject).isEmpty())
 				{
-					break;
+					continue;
 				}
+				for (validSubject = 0; validSubject < subjectCount; validSubject++)
+				{
+					if (memberTypeRecord.at(i).at(validSubject).at(0) >= -1)
+					{
+						break;
+					}
+				}
+				break;
 			}
 			//输出
 			for (int memberTypeIndex = 0; memberTypeIndex < _currentPattern->MemberTypes.count(); memberTypeIndex++)
