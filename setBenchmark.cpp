@@ -69,7 +69,8 @@ void SetBenchmark::setPatternSheet(MRecognizeFormPattern* _pattern, QList<QStrin
 				table->Mmodel->setItem(0, _columnCount, item);
 				if (cache)
 				{
-					table->Mmodel->setItem(1, _columnCount, item);
+					QStandardItem* item2 = new QStandardItem(benchmark.at(j));
+					table->Mmodel->setItem(1, _columnCount, item2);
 				}
 				_columnCount++;
 			}
