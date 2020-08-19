@@ -43,6 +43,7 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
     setWindowState(Qt::WindowMaximized);
 
     ui.tableView->setMouseTracking(true);
+	ui.tableView_2->setMouseTracking(true);
 	ui.tableView_4->setMouseTracking(true);
 
 	ui.pushButton_2->setEnabled(false);
@@ -433,6 +434,21 @@ void ES2EvaluationResultAnalyse::selectionTableEvaluationChanged(const QItemSele
 	}
 }
 
+void ES2EvaluationResultAnalyse::selectionTableEvaluationObjectChanged(const QItemSelection& selected, const QItemSelection& deselected)
+{
+	if (_tableEvaluationObject->MselectionModel->selectedIndexes().count() > 0)
+	{
+		int selectedRow = _tableEvaluationObject->MselectionModel->selectedIndexes().front().row();
+		if (_currentrecognizePattern->EvaluationUnits.count() > selectedRow)
+		{
+			_evaluationUnitIndex = selectedRow;
+			// 更新表格
+
+			fillingTheTableView("tableEvaluationMembers");
+		}
+	}
+}
+
 /*
 void ES2EvaluationResultAnalyse::selectOutputType(int index)
 {
@@ -512,6 +528,10 @@ void ES2EvaluationResultAnalyse::disconnectUsingMapFunc(QString s, TableItem* ta
 	{
 		QObject::disconnect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectionTableEvaluationChanged(QItemSelection, QItemSelection)));
 	}
+	else if (s == "tableEvaluationObject")
+	{
+		QObject::disconnect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectionTableEvaluationObjectChanged(QItemSelection, QItemSelection)));
+	}
 	else if (s == "tableTemplateList")
 	{
 		QObject::disconnect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectiontableTemplateListChanged(QItemSelection, QItemSelection)));
@@ -544,6 +564,10 @@ void ES2EvaluationResultAnalyse::getconnectUseMapFunc(QString s, QTableView* tab
 	if (s == "tableEvaluation")
 	{
 		QObject::connect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectionTableEvaluationChanged(QItemSelection, QItemSelection)));\
+	}
+	else if (s == "tableEvaluationObject")
+	{
+		QObject::connect(tableItem->MselectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectionTableEvaluationObjectChanged(QItemSelection, QItemSelection)));
 	}
 	else if (s == "tableTemplateList")
 	{
@@ -602,6 +626,8 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 		tableview->verticalHeader()->hide();//隐藏行号 
 		table->Mmodel->setHeaderData(0, Qt::Horizontal, (u8"已有模式"));
 		tableview->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+		tableview->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
 		//往表格中填充模数据
 		int row = 0;
 		int column = 0;
@@ -619,6 +645,7 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 				fillTableCell(tempFormPattern->FileName + status, table, i, 0);
 			}
 		}
+		_formPatternIndex = 0;
 	}
 	else if (sTable == "tableEvaluationMembers")
 	{
@@ -635,6 +662,8 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 		tableview->setColumnWidth(2, 85);
 		tableview->setColumnWidth(3, 100);
 		tableview->setColumnWidth(4, 100);
+		tableview->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
 		//往表格中填充模数据
 		int row = 0;
 		int column = 0;
@@ -668,6 +697,7 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 		table->Mmodel->setHeaderData(0, Qt::Horizontal, (u8"测评单位"));
 		tableview->verticalHeader()->hide();//隐藏行号 
 		tableview->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+		tableview->setEditTriggers(QAbstractItemView::NoEditTriggers);
 		//往表格中填充模数据
 		int row = 0;
 		int column = 0;
@@ -679,6 +709,7 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 				fillTableCell(_currentrecognizePattern->EvaluationUnits.at(i), table, i, 0);
 			}
 		}
+		_evaluationUnitIndex = 0;
 	}
 	else if (sTable == "tableTemplateList")
 	{
@@ -686,6 +717,8 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 		table->Mmodel->setHeaderData(0, Qt::Horizontal, (u8"可选模板"));
 		tableview->verticalHeader()->hide();//隐藏行号
 		tableview->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+		tableview->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
 		table->Mmodel->insertRows(0, 1, QModelIndex());//插入每一行
 		fillTableCell(u8"默认Excel文件", table, 0, 0);
 		for (int i = 1; i < _currentTemplateList.size(); i++)
@@ -699,7 +732,7 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 			}
 			fillTableCell(fileInfo.fileName() + hint, table, i, 0);
 		}
-
+		_templateIndex = 0;
 	}
 	if (table->Mmodel->rowCount() > 0)
 	{

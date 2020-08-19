@@ -67,6 +67,7 @@ public slots:
     void uploadCountProgress(int, int);
     void selectionTableEvaluationChanged(const QItemSelection& selected, const QItemSelection& deselected);
     void selectionTableTemplateListChanged(const QItemSelection& selected, const QItemSelection& deselected);
+    void selectionTableEvaluationObjectChanged(const QItemSelection& selected, const QItemSelection& deselected);
     //void selectOutputType(int);
 
 public:
@@ -117,10 +118,10 @@ private:
     TableItem* _tableEvaluationMembers = nullptr;
     TableItem* _tableTemplateList = nullptr;
 
-    int _evaluationIndex = 0;
+    //int _evaluationIndex = 0;
     int _evaluationUnitIndex = 0;
-    int _evaluationTableIndex = 0;
-    int _evaluationMemberIndex = 0;
+    //int _evaluationTableIndex = 0;
+    //int _evaluationMemberIndex = 0;
     
     int _formPatternIndex = 0;
     int _templateIndex = 0;
