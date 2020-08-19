@@ -244,7 +244,7 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 		ui.label_2->setText(u8"当前输出类型: 未知");
 	}
 
-	ui.label_3->setText(u8"当前文件名: " + _currentEvaluationInfo->RecognizePatternInfo->Name);
+	ui.label_3->setText(u8"当前测评名称: " + _currentEvaluationInfo->RecognizePatternInfo->Name);
 
 	loadDataFile->setInfoData(_currentEvaluationInfo);
 	_currentTemplateList.clear();
