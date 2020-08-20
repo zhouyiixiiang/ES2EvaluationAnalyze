@@ -89,14 +89,14 @@ void LoadDataFile::doDataOperate()
 		}
 		else
 		{
-			emit outputError("输出类型错误");
+			emit outputError(u8"输出类型错误");
 			return;
 		}
 
 	}
     else
     {
-		emit outputError("数据内容未读入");
+		emit outputError(u8"数据内容未读入");
     }
 }
 
@@ -508,17 +508,17 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 				{
 					if (_info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->FormPatternHash.size() <= currentIR.at(1).toInt())
 					{
-						emit outputError("结果页码数大于模板页码数");
+						emit outputError(u8"结果页码数大于模板页码数");
 						return false;
 					}
 					if (_info->EvaluationSubjectInfo->EvaluationSubjects->at(_info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->EvaluationSubjectIndex)->EvaluationSubjects->count() <= currentIR.at(2).toInt())
 					{
-						emit outputError("结果主体数大于模板主体数");
+						emit outputError(u8"结果主体数大于模板主体数");
 						return false;
 					}
 					if (_info->EvaluationMemberInfo->count() <= currentIR.at(3).toInt())
 					{
-						emit outputError("结果单位数大于模板单位数");
+						emit outputError(u8"结果单位数大于模板单位数");
 						return false;
 					}
 				}
@@ -578,7 +578,7 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 				}
 				if (formulaList.isEmpty())
 				{
-					emit outputError("未读取到模板内公式");
+					emit outputError(u8"未读取到模板内公式");
 					return false;
 				}
 			}
@@ -656,8 +656,12 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 					}
 				}
 			}
-			resultCollect;
-
+			if (resultCollect.isEmpty())
+			{
+				outputError(u8"没有有效数据");
+				QFile::remove(excelTempName);
+				return false;
+			}
 			//结果输出
 			int pageCount = _currentPattern->GetFormPatternCount();
 			int rowCount = 5;
@@ -877,17 +881,17 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				{
 					if (_info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->FormPatternHash.size() <= currentIR.at(1).toInt())
 					{
-						emit outputError("结果页码数大于模板页码数");
+						emit outputError(u8"结果页码数大于模板页码数");
 						return false;
 					}
 					if (_info->EvaluationSubjectInfo->EvaluationSubjects->at(_info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->EvaluationSubjectIndex)->EvaluationSubjects->count() <= currentIR.at(2).toInt())
 					{
-						emit outputError("结果主体数大于模板主体数");
+						emit outputError(u8"结果主体数大于模板主体数");
 						return false;
 					}
 					if (_info->EvaluationMemberInfo->count() <= currentIR.at(3).toInt())
 					{
-						emit outputError("结果单位数大于模板单位数");
+						emit outputError(u8"结果单位数大于模板单位数");
 						return false;
 					}
 				}
@@ -1060,7 +1064,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				}
 				if (formulaList.isEmpty())
 				{
-					emit outputError("未读取到模板内公式");
+					emit outputError(u8"未读取到模板内公式");
 					return false;
 				}
 			}
@@ -1490,6 +1494,12 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				}
 			}
 			
+			if (scoreCount.isEmpty() || memberTypeRecord.isEmpty())
+			{
+				outputError(u8"没有有效数据");
+				QFile::remove(excelTempName);
+				return false;
+			}
 			//QString resultMark = _currentResult->FormReuslts->at(0)->IdentifierResult->Result;
 			//int subjectMark = resultMark.at(4).toLatin1() - 48;//主体
 			//int unitMark = resultMark.at(6).toLatin1() - 48;//单位
