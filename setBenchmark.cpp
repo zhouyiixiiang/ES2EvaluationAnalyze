@@ -26,7 +26,12 @@ void SetBenchmark::finishSetAnswer()
 	for (int i = 0;  i < _columnCount;  i++)
 	{
 		index = table->Mmodel->index(1, i, QModelIndex());
-		benchmark.append(index.data().toString());
+		QString tempAnswer = index.data().toString().toUpper();
+		if (tempAnswer.size() > 1)
+		{
+
+		}
+		benchmark.append(tempAnswer);
 		if (index.data().toString() == "") 
 		{
 

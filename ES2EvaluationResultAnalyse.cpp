@@ -1,4 +1,4 @@
-#include "ES2EvaluationResultAnalyse.h"
+﻿#include "ES2EvaluationResultAnalyse.h"
 
 ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
     : QMainWindow(parent)
@@ -203,10 +203,13 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 	if (_currentEvaluationInfo->EvaluationUID == uid)
 	{
 		//执行窗口
-		QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"当前已有所添加的测评信息！"), QMessageBox::Yes);
-		msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
-		int res = msgBox.exec();
-		return;
+        QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"当前已有所添加的测评信息！是否替换？"), QMessageBox::Yes | QMessageBox::No);
+        msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
+        msgBox.button(QMessageBox::No)->setText((u8"取消"));
+        if(msgBox.exec() == QMessageBox::No)
+        {
+            return;
+        }
 	}
 
 	
