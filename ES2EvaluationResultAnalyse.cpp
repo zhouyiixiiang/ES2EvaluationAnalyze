@@ -1,4 +1,4 @@
-﻿#include "ES2EvaluationResultAnalyse.h"
+#include "ES2EvaluationResultAnalyse.h"
 
 ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
     : QMainWindow(parent)
@@ -211,8 +211,6 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
             return;
         }
 	}
-
-	
 
 	delete _currentEvaluationInfo;
 	_currentEvaluationInfo = new MEvaluationInfo();

@@ -29,14 +29,16 @@ void SetBenchmark::finishSetAnswer()
 		QString tempAnswer = index.data().toString().toUpper();
 		if (tempAnswer.size() > 1)
 		{
-
+			qSort(tempAnswer.begin(), tempAnswer.end());
 		}
 		benchmark.append(tempAnswer);
-		if (index.data().toString() == "") 
+		/*
+		if (tempAnswer == "")
 		{
 
 			//判断空?
 		}
+		*/
 	}
 	emit sendMessage(benchmark);
 	this->accept();
