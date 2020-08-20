@@ -30,13 +30,16 @@
     <ClCompile Include="ES2EvaluationResultAnalyse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <QtMoc Include="waitingwindow.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="loadDataFile.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="excelreader.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="setBenchmark.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="waitingwindow.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
@@ -48,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="excelreader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="setBenchmark.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -69,6 +75,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="waitingwindow.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="setBenchmark.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

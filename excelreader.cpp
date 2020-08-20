@@ -75,7 +75,6 @@ bool ExcelReader::openExcel()
         QMessageBox::critical(0, (u8"错误信息"), (u8"EXCEL对象丢失"));
 		return false;
 	}
-
 	return true;
 }
 
@@ -118,6 +117,99 @@ bool ExcelReader::readExcel()
 	return true;
 }
 
+QStringList ExcelReader::readLine(int lineIndex)
+{
+	QStringList res;
+	if (_mExcel == nullptr)
+	{
+		QMessageBox::warning(0, (u8"错误信息"), (u8"请先新建或打开一个EXCEL对象！"));
+		return res;
+	}
+
+	QXlsx::Workbook* workBook = _mExcel->workbook();
+	QXlsx::Worksheet* workSheet = static_cast<QXlsx::Worksheet*>(workBook->sheet(_mExcel->sheetNames().count() - 1));
+	QXlsx::CellRange usedRange = _mExcel->dimension();//使用范围
+	for (int j = 1; j <= usedRange.columnCount(); j++)
+	{
+		QXlsx::Cell* cell = workSheet->cellAt(lineIndex, j);
+		if (cell == NULL) 
+		{
+			res.append("");
+		}
+		else
+		{
+			res.append(cell->value().toString());
+			//res.append(cell->formula().formulaText());
+		}
+	}
+
+	//qDebug() << (u8"读取成功");
+	return res;
+}
+
+QStringList ExcelReader::readFormula()
+{
+	QStringList res;
+	if (_mExcel == nullptr)
+	{
+		QMessageBox::warning(0, (u8"错误信息"), (u8"请先新建或打开一个EXCEL对象！"));
+		return res;
+	}
+
+	QXlsx::Workbook* workBook = _mExcel->workbook();
+	QXlsx::Worksheet* workSheet = static_cast<QXlsx::Worksheet*>(workBook->sheet(_mExcel->sheetNames().count() - 1));
+	QXlsx::CellRange usedRange = _mExcel->dimension();//使用范围
+	for (int j = 1; j <= usedRange.columnCount(); j++)
+	{
+		QXlsx::Cell* cell = workSheet->cellAt(4, j);
+		if (cell == NULL) continue;
+		else
+		{
+			res.append(cell->formula().formulaText());
+			//res.append(cell->value().toString());
+		}
+	}
+	
+	//qDebug() << (u8"读取成功");
+	return res;
+}
+
+int ExcelReader::getRowCount(int sheetIndex)
+{
+	chooseSheet(sheetIndex);
+	return _mExcel->dimension().columnCount();
+}
+
+bool ExcelReader::copySheet(int originSheet, int position)
+{
+	_mExcel->insertSheet(position);
+	_mExcel->selectSheet(_mExcel->sheetNames().at(position));
+	QStringList a =  _mExcel->sheetNames();
+	_mExcel->copySheet(_mExcel->sheetNames().at(originSheet), _mExcel->sheetNames().at(position));
+	//QXlsx::Worksheet* workSheet = static_cast<QXlsx::Worksheet*>(->sheet(originSheet));
+	//workSheet->copy(_mExcel->sheetNames().at(position), position);
+	//_mExcel->workbook()->copySheet(position);
+	return true;
+}
+
+int ExcelReader::getSheetCount() 
+{
+	return _mExcel->sheetNames().count();
+}
+
+int ExcelReader::getSheetIndex(QString sheetName)
+{
+	return _mExcel->sheetNames().indexOf(sheetName);
+}
+
+bool ExcelReader::isCellEmpty(int row, int column)
+{
+	if (_mExcel->cellAt(row, column) == nullptr || _mExcel->cellAt(row, column)->value().toString() == "")
+	{
+		return true;
+	}
+	return false;
+}
 
 /***************************************
 *函数功能：写入数据到Excel，若有值，则覆盖原来的值。
@@ -151,35 +243,25 @@ bool ExcelReader::writeExcel(const int iRow, const int iColumn, const QString co
 }
 
 
-bool ExcelReader::setSheetName(QString patternName)
+bool ExcelReader::setSheetName(QList<QString> memberTypeList)
 {
-    if (!_mExcel->insertSheet(0, (u8"单位")))
+	for (int i = 0; i < memberTypeList.count(); i++)
 	{
-        _mExcel->insertSheet(0, (u8"abcdefghijklabsdkfj1"));
-        _mExcel->deleteSheet((u8"单位"));
-        _mExcel->renameSheet((u8"abcdefghijklabsdkfj1"), (u8"单位"));
-	}
-    if (!_mExcel->insertSheet(1, (u8"个人")))
-	{
-        _mExcel->insertSheet(1, (u8"abcdefghijklabsdkfj2"));
-        _mExcel->deleteSheet((u8"个人"));
-        _mExcel->renameSheet((u8"abcdefghijklabsdkfj2"), (u8"个人"));
-	}
-	if (!_mExcel->insertSheet(2, patternName))
-	{
-		_mExcel->insertSheet(2, (u8"abcdefghijklabsdkfj3"));
-		_mExcel->deleteSheet(patternName);
-		_mExcel->renameSheet((u8"abcdefghijklabsdkfj3"), patternName);
-	}
-	QStringList sheetsName = _mExcel->sheetNames();
-	if (sheetsName.at(0)== (u8"单位")|| sheetsName.at(1) == (u8"个人") || sheetsName.at(2) == patternName)
-	{ 
-	}
-	else
-	{
-		_mExcel->deleteSheet(sheetsName.at(0));
-		_mExcel->deleteSheet(sheetsName.at(1));
-		_mExcel->deleteSheet(sheetsName.at(2));
+		if (!_mExcel->insertSheet(i, memberTypeList.at(i)))
+		{
+			if (_mExcel->sheetNames().contains(memberTypeList.at(i)))
+			{
+				//_mExcel->renameSheet(memberTypeList.at(i), memberTypeList.at(i) + "-origin");
+				_mExcel->deleteSheet(memberTypeList.at(i));
+				_mExcel->insertSheet(i, memberTypeList.at(i));
+			}
+			else
+			{
+				_mExcel->insertSheet(i, "abcdefghijklabsdkfj1");
+				_mExcel->deleteSheet(memberTypeList.at(i));
+				_mExcel->renameSheet("abcdefghijklabsdkfj1", memberTypeList.at(i));
+			}
+		}
 	}
 	return true;
 }

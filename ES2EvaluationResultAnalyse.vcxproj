@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F37EC31E-4FCD-4638-89B8-080AD077887A}</ProjectGuid>
-    <Keyword>QtVS_v302</Keyword>
+    <Keyword>QtVS_v303</Keyword>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0.18362.0</WindowsTargetPlatformVersion>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
@@ -39,12 +39,13 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>msvc2017_64</QtInstall>
     <QtModules>core;gui;widgets</QtModules>
@@ -65,6 +66,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -78,6 +80,7 @@
       <DebugInformationFormat>None</DebugInformationFormat>
       <Optimization>MaxSpeed</Optimization>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -86,16 +89,30 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\ES2EvaluationSubject;..\Cm3FormResult;..\Cocer200Scan;..\Cm3CommonUtils\GeneratedFiles;..\Cm3CommonUtils;..\ES2EvaluationDocs;..\ES2RecognizePattern;..\Cm3PublicObject;..\Cm3FormProcess;..\Cm3FormPattern;..\ThirdLibrary\Opencv\include;..\ThirdLibrary\libopc\lib-win\include;..\ThirdLibrary\qtxlsx\src\xlsx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;..\ES2EvaluationSubject;..\Cm3FormResult;..\Cocer200Scan;..\Cm3CommonUtils\GeneratedFiles;..\Cm3CommonUtils;..\ES2EvaluationDocs;..\ES2RecognizePattern;..\Cm3PublicObject;..\Cm3FormProcess;..\Cm3FormPattern;..\ThirdLibrary\Opencv\include;..\ThirdLibrary\libopc\lib-win\include;..\ThirdLibrary\qtxlsx\src\xlsx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8</AdditionalOptions>
       <PreprocessorDefinitions>XLSX_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\ThirdLibrary\Opencv\x64\lib\;..\ThirdLibrary\qtxlsx\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Qt5Xlsx.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Link>
+      <AdditionalLibraryDirectories>..\ThirdLibrary\qtxlsx\lib\;..\ThirdLibrary\Opencv\x64\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Qt5Xlsx.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;..\ThirdLibrary\qtxlsx\src\xlsx;..\ThirdLibrary\libopc\lib-win\include;..\ThirdLibrary\Opencv\include;..\ES2EvaluationSubject;..\Cm3FormResult;..\Cocer200Scan;..\Cm3CommonUtils\GeneratedFiles;..\Cm3CommonUtils;..\ES2EvaluationDocs;..\Cm3PublicObject;..\ES2RecognizePattern;..\Cm3FormProcess;..\Cm3FormPattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>XLSX_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="setBenchmark.cpp" />
     <QtRcc Include="ES2EvaluationResultAnalyse.qrc" />
     <QtMoc Include="ES2EvaluationResultAnalyse.h" />
     <ClCompile Include="ES2EvaluationResultAnalyse.cpp" />
@@ -104,16 +121,18 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="waitingwindow.h" />
+    <QtMoc Include="setBenchmark.h" />
     <QtMoc Include="loadDataFile.h" />
     <QtMoc Include="excelreader.h" />
     <ClInclude Include="resource.h" />
-    <QtMoc Include="waitingwindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ES2EvaluationResultAnalyse.rc" />
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="ES2EvaluationResultAnalyse.ui" />
+    <QtUic Include="setBenchmark.ui" />
     <QtUic Include="waitingwindow.ui" />
   </ItemGroup>
   <ItemGroup>

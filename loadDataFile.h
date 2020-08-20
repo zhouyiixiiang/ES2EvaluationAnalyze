@@ -41,14 +41,17 @@ public:
     ~LoadDataFile();
 
     void readDataFile(QList<MResult*>*, QString);
-    void setExcelData(MResult* result, QString excelName);
+    void setExcelData(MResult*, QString, int, int);
     void setInfoData(MEvaluationInfo*);
+    void setAnswer(QList<QList<QString>>);
+    void setTemplate(QString, int);
 
 signals:
     void countStep(int, int);
     void countFile();
     void finish();
     void finishExcel();
+    void outputError(QString);
 
 public slots:
     void doDataOperate();
@@ -56,19 +59,40 @@ public slots:
 
 private:
     void readResultsFromFile();
-    void generateExcelResult(QList<MResult*>*, QString);
+    bool generateExcelResult(QList<MResult*>*, QString);
+    bool generateTestResult(QList<MResult*>*, QString);
+    void formatSet(QXlsx::Format&);
+    void initSheet(int, int);
+    void initSheet_test(int, int);
+
 
     QString _uid;
     QList<MResult*>* _results = nullptr;
     MResult* _result = nullptr;
-    QStringList _fileNames;
+    //QStringList _fileNames;
     QString _filePath;
     QString _dataOperateType;
     QString _path;
     QString _excelName;
     ExcelReader* _mExcelReader = nullptr;//excel操作对象
     MEvaluationInfo* _info = nullptr;
+    QXlsx::Format format1;
+    QXlsx::Format format2;
+    MRecognizeFormPattern* _currentPattern;
+    ES2EvaluationMembers* _currentMemberInfo;
+    ES2EvaluationSubject* _currentSubject;
+    MResult* _currentResult;
+    QString patternName;
 
+    int _outputType;
+    int _patternIndex;
+    int subjectCount;
+    int indexCountGroup;
+    int unitCount;
+    int _templateType;
+    QList<QList<int>> cellListCount;
+    QList<QList<QString>> _answerList;
+    QString _templateName;
 };
 
 

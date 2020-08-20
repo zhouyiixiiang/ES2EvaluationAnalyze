@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QMessageBox>
+#include <QInputDialog>
 #include <QDebug>
 
 #include <QTreeWidget>
@@ -22,6 +23,7 @@
 #include "dlgwait.h"
 #include "loadDataFile.h"
 #include "mevaluationinfo.h"
+#include "setBenchmark.h"
 
 #include "es2evaluationsubject.h"
 #include "es2evaluationsubjects.h"
@@ -48,15 +50,25 @@ private:
 
 signals:
     void dataOperate();
+    void setPattern(MRecognizeFormPattern*, QList<QString>);
 
 public slots:
     void onButtonLoadDataFile();
     void onButtonLoadEvaluationData();
+    void onButtonOutputCurrentExcel();
     void onButtonOutputExcel();
+    void onButtonAddTemplate();
+    void onButtonDeleteTemplate();
+    void onButtonReadBenchmark();
     void finishLoadDataFile();
     void finishSaveExcel();
+    void finishSetAnswer(QList<QString>);
+    void outputErrorPrompt(QString);
     void uploadCountProgress(int, int);
     void selectionTableEvaluationChanged(const QItemSelection& selected, const QItemSelection& deselected);
+    void selectionTableTemplateListChanged(const QItemSelection& selected, const QItemSelection& deselected);
+    void selectionTableEvaluationObjectChanged(const QItemSelection& selected, const QItemSelection& deselected);
+    //void selectOutputType(int);
 
 public:
     void SetWait(bool);
@@ -78,40 +90,41 @@ public:
 private:
     template <typename T>
     void ReleaseQList(QList<T*>*);
-    void initGender();
-    void readEvaluationInfoFromDatafile();
-    QStringList fileNamesEndWith(QString);
+    void initLists();
+    bool selectTemplateType();
  
-    int _formPatternIndex = 0;
+
     QList<QString> _gender;
-    QList<MEvaluationInfo*>* _evaluationInfos = nullptr; // 已有测评
     MEvaluationInfo* _currentEvaluationInfo = nullptr; // 当前测评
     MRecognizeFormPattern* _currentrecognizePattern = nullptr;
     MemberInfo* _currentEvaluationMemberInfo = nullptr;
     ES2EvaluationSubjects* _evaluationSubjectInfo = nullptr;
     ES2EvaluationMember* _currentEvaluationMember = nullptr;
-    QList<int> _selectedMembersIndex;
-
-    QList<MPattern*>* _mCurrentPatterns = nullptr;
-    MPattern* _mCurrentPattern = nullptr;
-    MFormPattern* McurrentFormPattern = nullptr;
-    int McurrentFormPatternIndex = 0;
-    int SelectedFilterdResultGroupLength = 0;
-    //MResult* McurrentRecognizedResult = nullptr;
+    QList<QList<QString>> _benchmark;
+    QList<QString> _currentTemplateList;
 
     QString _path;
-    QList<QMetaObject::Connection> _connections;
 
     QThread* loadThread;
     LoadDataFile* loadDataFile;
     DlgWait* _waitOperate;
+    SetBenchmark* _setAnswer;
+
+    QStringList templateTypeNameList; 
+    QList<int> templateType;
 
     TableItem* _tableEvaluation = nullptr;
     TableItem* _tableEvaluationObject = nullptr;
     TableItem* _tableEvaluationMembers = nullptr;
+    TableItem* _tableTemplateList = nullptr;
 
-    int _evaluationIndex = 0;
+    //int _evaluationIndex = 0;
     int _evaluationUnitIndex = 0;
-    int _evaluationTableIndex = 0;
-    int _evaluationMemberIndex = 0;
+    //int _evaluationTableIndex = 0;
+    //int _evaluationMemberIndex = 0;
+    
+    int _formPatternIndex = 0;
+    int _templateIndex = 0;
+    int _outputType = 1;
+    //int _templateType = 0;
 };

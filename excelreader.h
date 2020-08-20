@@ -4,6 +4,8 @@
 #include "xlsxdocument.h"
 #include "xlsxdocument_p.h"
 #include "xlsxformat.h"
+#include "xlsxcellformula.h"
+
 #include <QString>
 #include <QtCore>
 #include <QDebug>
@@ -30,7 +32,14 @@ public:
 	void mergeCells(const int firstRow, const int firstColumn, const int lastRow, const int lastColumn, QXlsx::Format format);//合并单元格(横向合并或者纵向合并)
 	void unmergeCells(const int firstRow, const int firstColumn, const int lastRow, const int lastColumn);//拆分某个区域单元格
 	bool chooseSheet(int i);
-	bool setSheetName(QString);//选定第一个表格，填充明细数据
+	bool setSheetName(QList<QString>);//选定第一个表格，填充明细数据
+	QStringList readLine(int);
+	QStringList readFormula();
+	int getRowCount(int);
+	bool copySheet(int, int);
+	int getSheetCount();
+	int getSheetIndex(QString);
+	bool isCellEmpty(int, int);
 
 /***************************************
 *定义：成员变量
