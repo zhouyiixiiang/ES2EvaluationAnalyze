@@ -604,13 +604,26 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 			for (int resultIndex = 0; resultIndex < results->count(); resultIndex++)
 			{
 				_currentResult = results->at(resultIndex);
-				if (_currentResult->FormReuslts->at(0)->IdentifierResult->Result.at(0) == tableIndex)
+				if (_currentResult->GetFormResultCount() == 0)
 				{
+					continue;
+				}
+				QStringList currentIR = _currentResult->FormReuslts->at(0)->IdentifierResult->Result.split("-");
+				if (currentIR.at(0) == tableIndex)
+				{
+					bool recSuc = true;
 					for (int formCount = 0; formCount < _currentResult->FormReuslts->count(); formCount++)
 					{
+						if (!_currentResult->FormReuslts->at(formCount)->IsRecognizeSuccess)
+						{
+							recSuc = false;
+							continue;
+						}
 						MFormResult* currentFormResult = _currentResult->FormReuslts->at(formCount);
-						int memberIndex = currentFormResult->IdentifierResult->Result.at(6).toLatin1() - 48;
-						int pageIndex = currentFormResult->IdentifierResult->Result.at(2).toLatin1() - 48;
+						currentIR.clear();
+						currentIR = _currentResult->FormReuslts->at(formCount)->IdentifierResult->Result.split("-");
+						int memberIndex = currentIR.at(3).toInt();
+						int pageIndex = currentIR.at(1).toInt();
 						//QList<QString> resultCollect_member;
 						//int groupIndex = 0; 
 						//resultCollect_member.append("");
@@ -621,6 +634,16 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 							MemberDetailIndex* currentMemberDetail = currentMemberIndex->MemberDetailIndexs->at(i);
 							for (int j = 0; j < currentMemberDetail->SecondLevelIndex.count(); j++)
 							{
+								if (!recSuc)
+								{
+									resultCollect[memberIndex].append("");
+									if (memberIndex == 0)
+									{
+										scoreWeight.append(0);
+										scoreSum += scoreWeight.last();
+									}
+									continue;
+								}
 								resultCollect[memberIndex].append(currentFormResult->MarkGroupResults->at(currentMemberDetail->SecondLevelIndex.at(j).groupIndex)->TextResult);
 								if (memberIndex == 0)
 								{
