@@ -59,8 +59,8 @@ public slots:
 
 private:
     void readResultsFromFile();
-    void generateExcelResult(QList<MResult*>*, QString);
-    void generateTestResult(QList<MResult*>*, QString);
+    bool generateExcelResult(QList<MResult*>*, QString);
+    bool generateTestResult(QList<MResult*>*, QString);
     void formatSet(QXlsx::Format&);
     void initSheet(int, int);
     void initSheet_test(int, int);

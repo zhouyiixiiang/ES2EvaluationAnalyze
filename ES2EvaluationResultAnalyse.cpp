@@ -506,7 +506,7 @@ void ES2EvaluationResultAnalyse::outputErrorPrompt(QString hint)
 {
 	SetWait(false);
 	//执行窗口
-	QMessageBox msgBox(QMessageBox::Information, (u8"提示"), hint, QMessageBox::Yes);
+	QMessageBox msgBox(QMessageBox::Information, (u8"生成结果失败"), hint, QMessageBox::Yes);
 	msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
 	int res = msgBox.exec();
 

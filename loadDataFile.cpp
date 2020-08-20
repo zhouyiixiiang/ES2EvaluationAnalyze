@@ -75,11 +75,17 @@ void LoadDataFile::doDataOperate()
 	{
 		if (_outputType == 1)
 		{
-			generateExcelResult(_results, _excelName);
+			if (generateExcelResult(_results, _excelName))
+			{
+				emit finishExcel();
+			}
 		}
 		else if(_outputType == 0)
 		{
-			generateTestResult(_results, _excelName);
+			if (generateTestResult(_results, _excelName))
+			{
+				emit finishExcel();
+			}
 		}
 		else
 		{
@@ -87,7 +93,6 @@ void LoadDataFile::doDataOperate()
 			return;
 		}
 
-		emit finishExcel();
 	}
     else
     {
@@ -483,11 +488,43 @@ void LoadDataFile::initSheet_test(int sheetIndex, int patternCount)
 	}
 }
 
-void LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelName)
+bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelName)
 {
 	formatSet(format1);
 	formatSet(format2);
 	format2.setFontColor(QColor(Qt::red));
+
+	//数量判断
+	for (int i = 0; i < results->count(); i++)
+	{
+		_currentResult = results->at(i);
+		for (int j = 0; j < _currentResult->GetFormResultCount(); j++)
+		{
+			QStringList currentIR = _currentResult->FormReuslts->at(j)->IdentifierResult->Result.split("-");
+			for (int k = 0; k < _info->RecognizePatternInfo->RecognizeFormPatterns->count(); k++)
+			{
+				QString a = _info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->GetFormPattern(0)->IdentifierCodePattern->CodeValue;
+				if (currentIR.at(0) == _info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->GetFormPattern(0)->IdentifierCodePattern->CodeValue)
+				{
+					if (_info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->FormPatternHash.size() <= currentIR.at(1).toInt())
+					{
+						emit outputError("结果页码数大于模板页码数");
+						return false;
+					}
+					if (_info->EvaluationSubjectInfo->EvaluationSubjects->at(_info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->EvaluationSubjectIndex)->EvaluationSubjects->count() <= currentIR.at(2).toInt())
+					{
+						emit outputError("结果主体数大于模板主体数");
+						return false;
+					}
+					if (_info->EvaluationMemberInfo->count() <= currentIR.at(3).toInt())
+					{
+						emit outputError("结果单位数大于模板单位数");
+						return false;
+					}
+				}
+			}
+		}
+	}
 
 	for (int patternCount = 0; patternCount < _info->RecognizePatternInfo->RecognizeFormPatterns->count(); patternCount++)
 	{
@@ -541,7 +578,8 @@ void LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 				}
 				if (formulaList.isEmpty())
 				{
-					return;
+					emit outputError("未读取到模板内公式");
+					return false;
 				}
 			}
 
@@ -646,7 +684,7 @@ void LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 					if (i == formulaList.count() - 1)
 					{
 						emit outputError(u8"未检测到合法公式");
-						return;
+						return false;
 					}
 				}
 
@@ -795,11 +833,44 @@ void LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 			}
 		}
 	}
+	return true;
 }
 
-void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelName)
+bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelName)
 {
 	formatSet(format1);
+
+	//数量判断
+	for (int i = 0; i < results->count(); i++)
+	{
+		_currentResult = results->at(i);
+		for (int j = 0; j < _currentResult->GetFormResultCount(); j++)
+		{
+			QStringList currentIR = _currentResult->FormReuslts->at(j)->IdentifierResult->Result.split("-");
+			for (int k = 0; k < _info->RecognizePatternInfo->RecognizeFormPatterns->count(); k++)
+			{
+				QString a = _info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->GetFormPattern(0)->IdentifierCodePattern->CodeValue;
+				if (currentIR.at(0) == _info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->GetFormPattern(0)->IdentifierCodePattern->CodeValue)
+				{
+					if (_info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->FormPatternHash.size() <= currentIR.at(1).toInt())
+					{
+						emit outputError("结果页码数大于模板页码数");
+						return false;
+					}
+					if (_info->EvaluationSubjectInfo->EvaluationSubjects->at(_info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->EvaluationSubjectIndex)->EvaluationSubjects->count() <= currentIR.at(2).toInt())
+					{
+						emit outputError("结果主体数大于模板主体数");
+						return false;
+					}
+					if (_info->EvaluationMemberInfo->count() <= currentIR.at(3).toInt())
+					{
+						emit outputError("结果单位数大于模板单位数");
+						return false;
+					}
+				}
+			}
+		}
+	}
 
 	for (int patternCount = 0; patternCount < _info->RecognizePatternInfo->RecognizeFormPatterns->count(); patternCount++)
 	{
@@ -966,7 +1037,8 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				}
 				if (formulaList.isEmpty())
 				{
-					return;
+					emit outputError("未读取到模板内公式");
+					return false;
 				}
 			}
 			if (_currentPattern->MemberTypes.isEmpty())
@@ -1586,7 +1658,7 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 					if (i == formulaList.count() - 1)
 					{
 						emit outputError(u8"未检测到合法公式");
-						return;
+						return false;
 					}
 				}
 
@@ -1735,4 +1807,5 @@ void LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			}
 		}
 	}
+	return true;
 }
