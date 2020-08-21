@@ -608,20 +608,20 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 				{
 					continue;
 				}
-				QStringList currentIR = _currentResult->FormReuslts->at(0)->IdentifierResult->Result.split("-");
-				if (currentIR.at(0) == tableIndex)
+				for (int formIndex = 0; formIndex < _currentResult->FormReuslts->count(); formIndex++)
 				{
-					bool recSuc = true;
-					for (int formCount = 0; formCount < _currentResult->FormReuslts->count(); formCount++)
+					QStringList currentIR = _currentResult->FormReuslts->at(formIndex)->IdentifierResult->Result.split("-");
+					if (currentIR.at(0) == tableIndex)
 					{
-						if (!_currentResult->FormReuslts->at(formCount)->IsRecognizeSuccess)
+						bool recSuc = true;
+						if (!_currentResult->FormReuslts->at(formIndex)->IsRecognizeSuccess)
 						{
 							recSuc = false;
 							continue;
 						}
-						MFormResult* currentFormResult = _currentResult->FormReuslts->at(formCount);
+						MFormResult* currentFormResult = _currentResult->FormReuslts->at(formIndex);
 						currentIR.clear();
-						currentIR = _currentResult->FormReuslts->at(formCount)->IdentifierResult->Result.split("-");
+						currentIR = _currentResult->FormReuslts->at(formIndex)->IdentifierResult->Result.split("-");
 						int memberIndex = currentIR.at(3).toInt();
 						int pageIndex = currentIR.at(1).toInt();
 						//QList<QString> resultCollect_member;
@@ -629,23 +629,14 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 						//resultCollect_member.append("");
 
 						MemberIndex* currentMemberIndex = _currentPattern->MemberIndexs->at(pageIndex);
+						bool scoreRec = false;
 						for (int i = 0; i < currentMemberIndex->MemberDetailIndexs->count(); i++)
 						{
 							MemberDetailIndex* currentMemberDetail = currentMemberIndex->MemberDetailIndexs->at(i);
 							for (int j = 0; j < currentMemberDetail->SecondLevelIndex.count(); j++)
 							{
-								if (!recSuc)
-								{
-									resultCollect[memberIndex].append("");
-									if (memberIndex == 0)
-									{
-										scoreWeight.append(0);
-										scoreSum += scoreWeight.last();
-									}
-									continue;
-								}
 								resultCollect[memberIndex].append(currentFormResult->MarkGroupResults->at(currentMemberDetail->SecondLevelIndex.at(j).groupIndex)->TextResult);
-								if (memberIndex == 0)
+								if (recSuc && !scoreRec)
 								{
 									scoreWeight.append(currentMemberDetail->SecondLevelIndex.at(j).weightNumerator);
 									scoreSum += scoreWeight.last();
@@ -653,8 +644,10 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 							}
 						}
 						//resultCollect[memberIndex].append(resultCollect_member);
+						
 					}
 				}
+
 			}
 			if (resultCollect.isEmpty())
 			{
@@ -1314,7 +1307,15 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				{
 					continue;
 				}
-				QStringList currentIR = _currentResult->FormReuslts->at(0)->IdentifierResult->Result.split("-");
+				QStringList currentIR;
+				for (int i = 0; i < _currentResult->FormReuslts->count(); i++)
+				{
+					currentIR = _currentResult->FormReuslts->at(i)->IdentifierResult->Result.split("-");
+					if (!currentIR.isEmpty())
+					{
+						break;
+					}
+				}
 				if (currentIR.at(0) == tableIndex) //判断模式一致
 				{
 					QList<MFormResult*>* currentFormResults = new QList<MFormResult*>;
