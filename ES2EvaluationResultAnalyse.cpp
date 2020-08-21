@@ -335,8 +335,8 @@ void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 
 bool ES2EvaluationResultAnalyse::selectTemplateType()
 {
-	QString dlgTitle = "模板类型";
-	QString txtLabel = "选择结果模板类型";
+	QString dlgTitle = u8"模板类型";
+	QString txtLabel = u8"选择结果模板类型";
 	int     curIndex = 0; //初始选择项
 	bool    editable = false; //ComboBox是否可编辑
 	bool    finish = false;
