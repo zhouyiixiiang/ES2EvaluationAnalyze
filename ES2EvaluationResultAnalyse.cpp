@@ -265,6 +265,15 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 
 void ES2EvaluationResultAnalyse::onButtonOutputCurrentExcel()
 {
+	if (_currentrecognizePattern->MemberIndexs->isEmpty() || _currentrecognizePattern->MemberIndexs->at(0)->MemberDetailIndexs->isEmpty())
+	{
+		QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"当前模式未录入指标!"), QMessageBox::Yes | QMessageBox::No);
+		msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
+		msgBox.button(QMessageBox::No)->setText((u8"取消"));
+		if (msgBox.exec() == QMessageBox::No) {
+			return;
+		}
+	}
 	if (_outputType == 0 && _benchmark.at(_formPatternIndex).isEmpty())
 	{
 		QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"还没有录入正确结果！"), QMessageBox::Yes);
@@ -297,6 +306,18 @@ void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 		return;
 	}
 	*/
+	for (int i = 0; i < _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->count(); i++)
+	{
+		if (_currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(i)->MemberIndexs->isEmpty() || _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(i)->MemberIndexs->at(0)->MemberDetailIndexs->isEmpty())
+		{
+			QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"第" + QString::number(i + 1) + u8"个模式未录入指标!"), QMessageBox::Yes | QMessageBox::No);
+			msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
+			msgBox.button(QMessageBox::No)->setText((u8"取消"));
+			if (msgBox.exec() == QMessageBox::No) {
+				return;
+			}
+		}
+	}
 	if (_outputType == 0)
 	{
 		for (int i = 0; i < _benchmark.size(); i++)
@@ -402,6 +423,14 @@ void ES2EvaluationResultAnalyse::onButtonReadBenchmark()
 	connect(_setAnswer, &SetBenchmark::sendMessage, this, &ES2EvaluationResultAnalyse::finishSetAnswer);
 
 	setPattern(_currentrecognizePattern, _benchmark.at(_formPatternIndex));
+
+	if (_currentrecognizePattern->MemberIndexs->isEmpty() || _currentrecognizePattern->MemberIndexs->at(0)->MemberDetailIndexs->isEmpty())
+	{
+		QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"当前模式未录入指标!"), QMessageBox::Yes);
+		msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
+		int res = msgBox.exec();
+		return;
+	}
 
 	_setAnswer->show();
 }
