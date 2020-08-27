@@ -655,6 +655,16 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 				QFile::remove(excelTempName);
 				return false;
 			}
+			else
+			{
+				for (int i = 0; i < resultCollect.count(); i++)
+				{
+					if (resultCollect.at(i).isEmpty()) {
+
+					}
+				}
+
+			}
 			//结果输出
 			int pageCount = _currentPattern->GetFormPatternCount();
 			int rowCount = 5;
@@ -663,7 +673,7 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 			{
 				colunmCount = 8;
 				int scoreGet = 0;
-				for (int groupIndex = 0; groupIndex < resultCollect.at(memberIndex).size(); groupIndex++)
+				for (int groupIndex = 0; groupIndex < resultCollect.at(memberIndex).size() && groupIndex < _answerList.at(patternCount).count(); groupIndex++)
 				{
 					_mExcelReader->writeExcel(rowCount, colunmCount, resultCollect.at(memberIndex).at(groupIndex), format1);
 					_mExcelReader->writeExcel(rowCount + 1, colunmCount, _answerList.at(patternCount).at(groupIndex), format1);
