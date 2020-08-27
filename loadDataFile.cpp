@@ -1362,6 +1362,10 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							for (int formIndex = 0; formIndex < currentFormResults->count(); formIndex++)
 							{
 								MFormResult* currentFormResult = currentFormResults->at(formIndex);
+								if (currentFormResult->MarkGroupResults->isEmpty())
+								{
+									continue;
+								}
 								currentIR.clear();
 								currentIR = currentFormResult->IdentifierResult->Result.split("-");
 								if (currentIR.at(2).toInt() == subjectIndex)
