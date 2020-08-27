@@ -517,7 +517,7 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 						emit outputError(u8"结果主体数大于模板主体数");
 						return false;
 					}
-					if (_info->EvaluationMemberInfo->count() <= currentIR.at(3).toInt())
+					if (_info->EvaluationMemberInfo->at(k)->EvaluationMembers->count() <= currentIR.at(3).toInt())
 					{
 						emit outputError(u8"结果单位数大于模板单位数");
 						return false;
@@ -1657,8 +1657,6 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 										memberScore_sub.append(0);
 										excelColumnIndex++;
 									}
-									
-
 								}
 								memberScore.append(memberScore_sub);
 								excelColumnIndex = 9;
