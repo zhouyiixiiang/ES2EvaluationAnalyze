@@ -1437,6 +1437,8 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 										if (scoreCount_subject.size() >= memberCount)
 										{
 											scoreCount_subject[memberIndex + shift] = scoreCount_member;
+											memberTypeRecord_subject[memberIndex + shift] = _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->at(memberIndex + shift)->MemberType;
+
 										}
 										else
 										{
@@ -1521,10 +1523,23 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 
 			int pageCount = _currentPattern->GetFormPatternCount();
 			receiveCount.append(0);
+			bool lackPage = false;
 			for (int i = 0; i < receiveCount.count() - 1; i++)
 			{
+				int lack = 0;
+				if (receiveCount[i] % pageCount != 0)
+				{
+					lackPage = true;
+					lack = 1;
+				}
 				receiveCount[i] /= pageCount;
+				receiveCount[i] += lack;
 				receiveCount[receiveCount.count() - 1] += receiveCount.at(i);
+			}
+
+			if (lackPage)
+			{
+				emit outputError(u8"有仍未矫正的无效页!");
 			}
 
 			QList<int> subjectWeight;
