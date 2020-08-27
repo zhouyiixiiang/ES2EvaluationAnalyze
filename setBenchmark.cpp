@@ -64,23 +64,35 @@ void SetBenchmark::setPatternSheet(MRecognizeFormPattern* _pattern, QList<QStrin
 	for (int formCount = 0; formCount < _pattern->GetFormPatternCount(); formCount++)
 	{
 		MemberIndex* tempMemberIndex = _pattern->MemberIndexs->at(formCount);
+		int indexMark = 0;
 		for (int i = 0; i < tempMemberIndex->MemberDetailIndexs->count(); i++)
 		{
 			//_pattern->MemberIndexs->at(i)->MemberDetailIndexs;
 			MemberDetailIndex* tempMemberDetail = tempMemberIndex->MemberDetailIndexs->at(i);
-			QString typeName = tempMemberDetail->SecondIndexName;
-			for (int j = 0; j < tempMemberDetail->SecondLevelIndex.count(); j++)
+			if (tempMemberDetail->IndexLevel == 1)
 			{
-				QStandardItem* item = new QStandardItem(typeName + tempMemberDetail->SecondLevelIndex.at(j).name);
+				QStandardItem* item = new QStandardItem(tempMemberDetail->FirstLevelIndex.name);
 				table->Mmodel->insertColumn(_columnCount, QModelIndex());
 				table->Mmodel->setItem(0, _columnCount, item);
-				if (cache)
-				{
-					QStandardItem* item2 = new QStandardItem(benchmark.at(j));
-					table->Mmodel->setItem(1, _columnCount, item2);
-				}
-				_columnCount++;
+				indexMark++;
 			}
+			else if(tempMemberDetail->IndexLevel == 2)
+			{
+				QString typeName = tempMemberDetail->SecondIndexName;
+				for (int j = 0; j < tempMemberDetail->SecondLevelIndex.count(); j++)
+				{
+					QStandardItem* item = new QStandardItem(typeName + tempMemberDetail->SecondLevelIndex.at(j).name);
+					table->Mmodel->insertColumn(_columnCount, QModelIndex());
+					table->Mmodel->setItem(0, _columnCount, item);
+					indexMark++;
+				}
+			}
+			if (cache)
+			{
+				QStandardItem* item2 = new QStandardItem(benchmark.at(indexMark));
+				table->Mmodel->setItem(1, _columnCount, item2);
+			}
+			_columnCount++;
 		}
 	}
 }

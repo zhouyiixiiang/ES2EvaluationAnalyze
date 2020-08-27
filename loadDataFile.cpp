@@ -259,7 +259,7 @@ void LoadDataFile::initSheet(int sheetIndex, int patternCount)
 			_mExcelReader->writeExcel(2, indexCountT, indexNameF.at(i), format1);
 			int initMark = indexCountT;
 			//二级指标
-			unsigned j;
+			unsigned j = 0;
 			for (j = 0; j < indexNode->at(i)->SecondLevelIndex.count(); j++)
 			{
 				_mExcelReader->writeExcel(3, indexCountT, indexNode->at(i)->SecondLevelIndex.at(j).name, format1);
@@ -408,11 +408,12 @@ void LoadDataFile::initSheet_test(int sheetIndex, int patternCount)
 	indexNode->clear();
 	for (int pageIndex = 0; pageIndex < _currentPattern->MemberIndexs->count(); pageIndex++)
 	{
-		for (unsigned i = 0; i < _currentPattern->MemberIndexs->at(pageIndex)->MemberDetailIndexs->count(); i++)
+		int indexCountF = _currentPattern->MemberIndexs->at(pageIndex)->MemberDetailIndexs->count();
+		for (unsigned i = 0; i < indexCountF; i++)
 		{
 			indexNode->append(_currentPattern->MemberIndexs->at(pageIndex)->MemberDetailIndexs->at(i));
 			//_currentPattern->MemberIndexs->at(patternCount)->MemberDetailIndexs->at()->FirstLevelIndex.name
-			indexNameF.append(indexNode->last()->SecondIndexName);
+			indexNameF.append(indexNode->last()->FirstLevelIndex.name);
 			_mExcelReader->writeExcel(2, indexCountT, indexNameF.last(), format1);
 			int initMark = indexCountT;
 			//二级指标
@@ -503,7 +504,7 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 			QStringList currentIR = _currentResult->FormReuslts->at(j)->IdentifierResult->Result.split("-");
 			for (int k = 0; k < _info->RecognizePatternInfo->RecognizeFormPatterns->count(); k++)
 			{
-				QString a = _info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->GetFormPattern(0)->IdentifierCodePattern->CodeValue;
+				//QString a = _info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->GetFormPattern(0)->IdentifierCodePattern->CodeValue;
 				if (currentIR.at(0) == _info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->GetFormPattern(0)->IdentifierCodePattern->CodeValue)
 				{
 					if (_info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->FormPatternHash.size() <= currentIR.at(1).toInt())
@@ -633,18 +634,30 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 						for (int i = 0; i < currentMemberIndex->MemberDetailIndexs->count(); i++)
 						{
 							MemberDetailIndex* currentMemberDetail = currentMemberIndex->MemberDetailIndexs->at(i);
-							for (int j = 0; j < currentMemberDetail->SecondLevelIndex.count(); j++)
+							if (currentMemberDetail->IndexLevel == 1)
 							{
-								resultCollect[memberIndex].append(currentFormResult->MarkGroupResults->at(currentMemberDetail->SecondLevelIndex.at(j).groupIndex)->TextResult);
+								resultCollect[memberIndex].append(currentFormResult->MarkGroupResults->at(currentMemberDetail->FirstLevelIndex.groupIndex)->TextResult);
 								if (recSuc && !scoreRec)
 								{
-									scoreWeight.append(currentMemberDetail->SecondLevelIndex.at(j).weightNumerator);
+									scoreWeight.append(currentMemberDetail->FirstLevelIndex.weightNumerator);
 									scoreSum += scoreWeight.last();
+								}
+								
+							}
+							else if (currentMemberDetail->IndexLevel == 2)
+							{
+								for (int j = 0; j < currentMemberDetail->SecondLevelIndex.count(); j++)
+								{
+									resultCollect[memberIndex].append(currentFormResult->MarkGroupResults->at(currentMemberDetail->SecondLevelIndex.at(j).groupIndex)->TextResult);
+									if (recSuc && !scoreRec)
+									{
+										scoreWeight.append(currentMemberDetail->SecondLevelIndex.at(j).weightNumerator);
+										scoreSum += scoreWeight.last();
+									}
 								}
 							}
 						}
 						//resultCollect[memberIndex].append(resultCollect_member);
-						
 					}
 				}
 
@@ -660,10 +673,9 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 				for (int i = 0; i < resultCollect.count(); i++)
 				{
 					if (resultCollect.at(i).isEmpty()) {
-
+						outputError(u8"有效数据不完整");
 					}
 				}
-
 			}
 			//结果输出
 			int pageCount = _currentPattern->GetFormPatternCount();
