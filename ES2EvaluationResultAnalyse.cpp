@@ -67,6 +67,12 @@ ES2EvaluationResultAnalyse::~ES2EvaluationResultAnalyse()
 		delete _evaluationSubjectInfo;
 		_evaluationSubjectInfo = nullptr;
 	}
+	if (_currentEvaluationInfo != nullptr)
+	{
+		delete _currentEvaluationInfo;
+		_currentEvaluationInfo = nullptr;
+	}
+
 	disconnectUsingMapFunc("tableEvaluation", _tableEvaluation);
 	disconnectUsingMapFunc("tableEvaluationObject", _tableEvaluationObject);
 	disconnectUsingMapFunc("tableEvaluationMembers", _tableEvaluationMembers);
