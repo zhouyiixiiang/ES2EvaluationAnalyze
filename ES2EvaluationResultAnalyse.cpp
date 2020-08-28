@@ -229,7 +229,8 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 	*/
 	_currentrecognizePattern = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(_formPatternIndex);
 
-	_outputType = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(0)->TableType;
+	_outputType = _currentEvaluationInfo->EvaluationType;
+	//_outputType = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(0)->TableType;
 	if (_outputType == 0)
 	{
 		//考评
