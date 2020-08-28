@@ -231,7 +231,7 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 
 	_outputType = _currentEvaluationInfo->EvaluationType;
 	//_outputType = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(0)->TableType;
-	if (_outputType == 0)
+	if (_outputType == 1)
 	{
 		//考评
 		ui.label_2->setText(u8"当前输出类型: 考评");
@@ -243,7 +243,7 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 			_benchmark.append(temp);
 		}
 	}
-	else if (_outputType == 1)
+	else if (_outputType == 0)
 	{
 		//测评
 		ui.label_2->setText(u8"当前输出类型: 测评");
@@ -282,7 +282,7 @@ void ES2EvaluationResultAnalyse::onButtonOutputCurrentExcel()
 			return;
 		}
 	}
-	if (_outputType == 0 && _benchmark.at(_formPatternIndex).isEmpty())
+	if (_outputType == 1 && _benchmark.at(_formPatternIndex).isEmpty())
 	{
 		QMessageBox msgBox(QMessageBox::Information, (u8"提示"), (u8"还没有录入正确结果！"), QMessageBox::Yes);
 		msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
@@ -326,7 +326,7 @@ void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 			}
 		}
 	}
-	if (_outputType == 0)
+	if (_outputType == 1)
 	{
 		for (int i = 0; i < _benchmark.size(); i++)
 		{
@@ -676,7 +676,7 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 				table->Mmodel->insertRows(i, 1, QModelIndex());//插入每一行
 				MRecognizeFormPattern* tempFormPattern = _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->at(i);
 				QString status = "";
-				if (_outputType == 0 && _benchmark.at(i).isEmpty())
+				if (_outputType == 1 && _benchmark.at(i).isEmpty())
 				{
 					status.append(u8" (未录入答案)");
 				}

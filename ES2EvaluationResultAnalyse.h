@@ -125,6 +125,6 @@ private:
     
     int _formPatternIndex = 0;
     int _templateIndex = 0;
-    int _outputType = 1;
+    int _outputType = 0;
     //int _templateType = 0;
 };

@@ -73,14 +73,14 @@ void LoadDataFile::doDataOperate()
     }
 	else if (_dataOperateType == "setExcelData")
 	{
-		if (_outputType == 1)
+		if (_outputType == 0)
 		{
 			if (generateExcelResult(_results, _excelName))
 			{
 				emit finishExcel();
 			}
 		}
-		else if(_outputType == 0)
+		else if(_outputType == 1)
 		{
 			if (generateTestResult(_results, _excelName))
 			{
