@@ -512,16 +512,13 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 						emit outputError(u8"结果页码数大于模板页码数");
 						return false;
 					}
-					if (_info->EvaluationSubjectInfo->EvaluationSubjects->at(_info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->EvaluationSubjectIndex)->EvaluationSubjects->count() <= currentIR.at(2).toInt())
-					{
-						emit outputError(u8"结果主体数大于模板主体数");
-						return false;
-					}
-					if (_info->EvaluationMemberInfo->at(k)->EvaluationMembers->count() <= currentIR.at(3).toInt())
+					/*
+					if (_info->EvaluationMemberInfo->at(k)->EvaluationMembers->count() <= currentIR.at(2).toInt())
 					{
 						emit outputError(u8"结果单位数大于模板单位数");
 						return false;
 					}
+					*/
 				}
 			}
 		}
@@ -629,6 +626,10 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 						//int groupIndex = 0; 
 						//resultCollect_member.append("");
 
+						if (memberIndex >= resultCollect.count())
+						{
+							continue;
+						}
 						MemberIndex* currentMemberIndex = _currentPattern->MemberIndexs->at(pageIndex);
 						bool scoreRec = false;
 						for (int i = 0; i < currentMemberIndex->MemberDetailIndexs->count(); i++)
@@ -674,6 +675,7 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 				{
 					if (resultCollect.at(i).isEmpty()) {
 						outputError(u8"有效数据不完整");
+						break;
 					}
 				}
 			}
