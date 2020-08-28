@@ -674,7 +674,7 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 				for (int i = 0; i < resultCollect.count(); i++)
 				{
 					if (resultCollect.at(i).isEmpty()) {
-						outputError(u8"有效数据不完整");
+						outputError(u8"当前表格有成员没有有效结果");
 						break;
 					}
 				}
