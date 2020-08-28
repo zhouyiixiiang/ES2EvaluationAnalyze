@@ -197,6 +197,7 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 		return;
 	}
 	QFile file(fileName);
+	//int temp;
 	QString uid;
 	if (file.exists())
 	{

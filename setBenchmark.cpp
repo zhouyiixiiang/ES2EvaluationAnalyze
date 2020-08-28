@@ -74,6 +74,11 @@ void SetBenchmark::setPatternSheet(MRecognizeFormPattern* _pattern, QList<QStrin
 				QStandardItem* item = new QStandardItem(tempMemberDetail->FirstLevelIndex.name);
 				table->Mmodel->insertColumn(_columnCount, QModelIndex());
 				table->Mmodel->setItem(0, _columnCount, item);
+				if (cache)
+				{
+					QStandardItem* item2 = new QStandardItem(benchmark.at(indexMark));
+					table->Mmodel->setItem(1, _columnCount, item2);
+				}
 				indexMark++;
 				_columnCount++;
 			}
@@ -85,14 +90,14 @@ void SetBenchmark::setPatternSheet(MRecognizeFormPattern* _pattern, QList<QStrin
 					QStandardItem* item = new QStandardItem(typeName + tempMemberDetail->SecondLevelIndex.at(j).name);
 					table->Mmodel->insertColumn(_columnCount, QModelIndex());
 					table->Mmodel->setItem(0, _columnCount, item);
+					if (cache)
+					{
+						QStandardItem* item2 = new QStandardItem(benchmark.at(indexMark));
+						table->Mmodel->setItem(1, _columnCount, item2);
+					}
 					indexMark++;
 					_columnCount++;
 				}
-			}
-			if (cache)
-			{
-				QStandardItem* item2 = new QStandardItem(benchmark.at(indexMark));
-				table->Mmodel->setItem(1, _columnCount, item2);
 			}
 		}
 	}
