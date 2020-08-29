@@ -1322,7 +1322,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			//vector<vector<vector<vector<int>>>> scoreCount;
 			QList<QList<QList<QList<QString>>>> scoreCount;//单位-主体-成员-得分情况
 			QList<QList<QList<int>>> memberTypeRecord; 
-			QList<int> receiveCount;//收回数 计数subjectIndex
+			QList<QList<int>> receiveCount;//收回数 计数subjectIndex
 			for (int resultCount = 0; resultCount < results->count(); resultCount++)
 			{
 				//currentFormPattern = nullptr;
@@ -1347,6 +1347,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 					{
 						QList<QList<QList<QString>>> scoreCount_unit;
 						QList<QList<int>> memberTypeRecord_unit;
+						QList<int> receiveCount_unit;
 						//scoreCount.append(scoreCount_unit);
 						currentFormResults->clear();
 						for (int formIndex = 0; formIndex < _currentResult->FormReuslts->count(); formIndex++)
@@ -1365,7 +1366,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 						{
 							//int memberCount = _currentPattern->MemberIndexs->count();
 							int memberCount = _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->count();
-							receiveCount.append(0);
+							receiveCount_unit.append(0);
 							QList<QList<QString>> scoreCount_subject;
 							QList<int> memberTypeRecord_subject;
 							for (int i = 0; i < memberCount; i++)
@@ -1384,7 +1385,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 								currentIR = currentFormResult->IdentifierResult->Result.split("-");
 								if (currentIR.at(2).toInt() == subjectIndex)
 								{
-									receiveCount[subjectIndex] ++;
+									receiveCount_unit[subjectIndex] ++;
 									int page = currentIR.at(1).toInt();
 									int shift = 0;
 									for (int i = 0; i < page; i++)
@@ -1521,6 +1522,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 						}
 						scoreCount.append(scoreCount_unit);
 						memberTypeRecord.append(memberTypeRecord_unit);
+						receiveCount.append(receiveCount_unit);
 					}
 				}
 			}
@@ -1536,20 +1538,24 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			//int unitMark = resultMark.at(6).toLatin1() - 48;//单位
 
 			int pageCount = _currentPattern->GetFormPatternCount();
-			receiveCount.append(0);
 			bool lackPage = false;
-			for (int i = 0; i < receiveCount.count() - 1; i++)
+			for (int unitIndex = 0; unitIndex < _currentMemberInfo->EvaluationMembers->count(); unitIndex++)
 			{
-				int lack = 0;
-				if (receiveCount[i] % pageCount != 0)
+				receiveCount[unitIndex].append(0);
+				for (int i = 0; i < receiveCount.at(unitIndex).count() - 1; i++)
 				{
-					lackPage = true;
-					lack = 1;
+					int lack = 0;
+					if (receiveCount[unitIndex][i] % pageCount != 0)
+					{
+						lackPage = true;
+						lack = 1;
+					}
+					receiveCount[unitIndex][i] /= pageCount;
+					receiveCount[unitIndex][i] += lack;
+					receiveCount[unitIndex][receiveCount.at(unitIndex).count() - 1] += receiveCount.at(unitIndex).at(i);
 				}
-				receiveCount[i] /= pageCount;
-				receiveCount[i] += lack;
-				receiveCount[receiveCount.count() - 1] += receiveCount.at(i);
 			}
+
 
 			if (lackPage)
 			{
@@ -1632,7 +1638,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 								QList<int> memberScore_sub;
 								memberScore_sub.append(0);
 								_mExcelReader->writeExcel(excelRowCount + subjectIndex, 7, QString::number(subjectWeight.at(subjectIndex)), format1);
-								_mExcelReader->writeExcel(excelRowCount + subjectIndex, 8, QString::number(receiveCount.at(subjectIndex)), format1);
+								_mExcelReader->writeExcel(excelRowCount + subjectIndex, 8, QString::number(receiveCount.at(unitIndex).at(subjectIndex)), format1);
 								for (int i = 0; i < cellListCount.at(memberTypeIndex).count(); i++)
 								{
 									int empty = 0;
@@ -1666,7 +1672,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							else
 							{
 								_mExcelReader->writeExcel(excelRowCount + subjectIndex, 7, QString::number(subjectWeight.at(subjectIndex)), format1);
-								_mExcelReader->writeExcel(excelRowCount + subjectIndex, 8, QString::number(receiveCount.at(subjectIndex)), format1);
+								_mExcelReader->writeExcel(excelRowCount + subjectIndex, 8, QString::number(receiveCount.at(unitIndex).at(subjectIndex)), format1);
 								for (int i = 0; i < cellListCount.at(memberTypeIndex).count(); i++)
 								{
 									//MFormPattern* currentformpattern = _currentPattern->GetFormPattern(0);
@@ -1700,7 +1706,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							if (subjectIndex == subjectCount - 1)
 							{
 								_mExcelReader->writeExcel(excelRowCount + subjectCount, 7, QString::number(subjectWeight.at(subjectCount)), format1);
-								_mExcelReader->writeExcel(excelRowCount + subjectCount, 8, QString::number(receiveCount.at(subjectCount)), format1);
+								_mExcelReader->writeExcel(excelRowCount + subjectCount, 8, QString::number(receiveCount.at(unitIndex).at(subjectCount)), format1);
 								for (int i = 0; i < memberScore[tempMemberIndex].size() - 1; i++) //总计
 								{
 									_mExcelReader->writeExcel(excelRowCount + subjectCount, excelColumnIndex, QString::number(memberScore.at(tempMemberIndex).at(i)), format1);
