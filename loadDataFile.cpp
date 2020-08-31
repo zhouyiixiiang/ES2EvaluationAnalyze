@@ -1321,6 +1321,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			//MRecognizeFormPattern* currentFormPattern;
 			//vector<vector<vector<vector<int>>>> scoreCount;
 			QList<QList<QList<QList<QString>>>> scoreCount;//单位-主体-成员-得分情况
+
 			QList<QList<QList<int>>> memberTypeRecord; 
 			QList<QList<int>> receiveCount;//收回数 计数subjectIndex
 			for (int resultCount = 0; resultCount < results->count(); resultCount++)
@@ -1368,6 +1369,11 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							int memberCount = _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->count();
 							receiveCount_unit.append(0);
 							QList<QList<QString>> scoreCount_subject;
+							for (int k = 0; k < _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->count(); k++)
+							{
+								QList<QString> temp3;
+								scoreCount_subject.append(temp3);
+							}
 							QList<int> memberTypeRecord_subject;
 							for (int i = 0; i < memberCount; i++)
 							{
@@ -1416,7 +1422,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 												scoreCount_member.append("");
 												MGroupResult* currentGroupResult = currentFormResult->MarkGroupResults->at(currentIndex->FirstLevelIndex.groupIndex);
 												int score;
-												if (scoreCount_subject.size() < memberCount)
+												if (scoreCount_subject.at(memberIndex + shift).size() <= groupCount)
 												{
 													score = 0;
 												}
@@ -1435,7 +1441,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 													scoreCount_member.append("");
 													MGroupResult* currentGroupResult = currentFormResult->MarkGroupResults->at(currentIndex->SecondLevelIndex.at(i).groupIndex);
 													int score;
-													if (scoreCount_subject.size() < memberCount)
+													if (scoreCount_subject.at(memberIndex + shift).size() < groupCount)
 													{
 														score = 0;
 													}
@@ -1449,17 +1455,8 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 												}
 											}
 										}
-										if (scoreCount_subject.size() >= memberCount)
-										{
-											scoreCount_subject[memberIndex + shift] = scoreCount_member;
-											memberTypeRecord_subject[memberIndex + shift] = _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->at(memberIndex + shift)->MemberType;
-
-										}
-										else
-										{
-											scoreCount_subject.append(scoreCount_member);
-											memberTypeRecord_subject[memberIndex + shift] = _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->at(memberIndex + shift)->MemberType;
-										}
+										scoreCount_subject[memberIndex + shift] = scoreCount_member;
+										memberTypeRecord_subject[memberIndex + shift] = _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->at(memberIndex + shift)->MemberType;
 										//currentMember->MemberDetailIndexs->at(0);
 									}
 									/*
@@ -1642,7 +1639,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 								for (int i = 0; i < cellListCount.at(memberTypeIndex).count(); i++)
 								{
 									int empty = 0;
-									if (scoreCount.at(unitIndex).at(subjectIndex).isEmpty()) //当前主体数据为空
+									if (scoreCount.at(unitIndex).at(subjectIndex).isEmpty() || scoreCount.at(unitIndex).at(subjectIndex).at(memberIndex).isEmpty()) //当前主体数据为空
 									{
 										empty = cellListCount.at(memberTypeIndex).at(i);
 									}
