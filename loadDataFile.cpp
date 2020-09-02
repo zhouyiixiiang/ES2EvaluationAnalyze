@@ -666,7 +666,7 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 			if (resultCollect.isEmpty())
 			{
 				outputError(u8"没有有效数据");
-				QFile::remove(excelTempName);
+				//QFile::remove(excelTempName);
 				return false;
 			}
 			else
