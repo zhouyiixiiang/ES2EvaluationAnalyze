@@ -1731,6 +1731,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 					{
 						int mark = formulaList.at(i).indexOf("!");
 						sheetName.append(formulaList.at(i).mid(0, mark));
+						sheetName.remove("'");
 						break;
 					}
 					if (i == formulaList.count() - 1)
@@ -1743,7 +1744,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				int originSheet = _mExcelReader->getSheetCount();
 				int distSheet = _mExcelReader->getSheetIndex(sheetName);
 				int rowCount = _mExcelReader->getRowCount(distSheet);
-				int memberCount = (rowCount - 5) / (subjectCount + 1);
+				int memberCount = (rowCount - 4) / (subjectCount + 1);
 				//int memberCount = memberTypeRecord.at(0).at(validSubject).count();
 				if (_templateType == 1)
 				{

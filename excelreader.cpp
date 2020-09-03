@@ -1,5 +1,6 @@
 #include "excelreader.h"
 #include "xlsxdocument.h"
+#include "xlsxcell.h"
 
 ExcelReader::ExcelReader(QWidget *parent) : QDialog(parent)
 {
@@ -177,7 +178,7 @@ QStringList ExcelReader::readFormula()
 int ExcelReader::getRowCount(int sheetIndex)
 {
 	chooseSheet(sheetIndex);
-	return _mExcel->dimension().columnCount();
+	return _mExcel->dimension().rowCount();
 }
 
 bool ExcelReader::copySheet(int originSheet, int position)
@@ -199,6 +200,7 @@ int ExcelReader::getSheetCount()
 
 int ExcelReader::getSheetIndex(QString sheetName)
 {
+	QStringList a = _mExcel->sheetNames();
 	return _mExcel->sheetNames().indexOf(sheetName);
 }
 
