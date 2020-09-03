@@ -364,12 +364,20 @@ void ES2EvaluationResultAnalyse::onButtonOutputExcel()
 
 bool ES2EvaluationResultAnalyse::selectTemplateType()
 {
-	QString dlgTitle = u8"模板类型";
-	QString txtLabel = u8"选择结果模板类型";
-	int     curIndex = 0; //初始选择项
-	bool    editable = false; //ComboBox是否可编辑
-	bool    finish = false;
-	QString text = QInputDialog::getItem(this, dlgTitle, txtLabel, templateTypeNameList, curIndex, editable, &finish);
+	QInputDialog* templateSelect = new QInputDialog(this);
+	templateSelect->setWindowTitle(u8"模板类型");
+	templateSelect->setLabelText(u8"选择结果模板类型");
+	templateSelect->setOkButtonText(u8"确定");
+	templateSelect->setCancelButtonText(u8"取消");
+	templateSelect->setComboBoxEditable(false);
+	templateSelect->setComboBoxItems(templateTypeNameList);
+	bool finish = false;
+	QString text;
+	if (templateSelect->exec() == QDialog::Accepted) {
+		finish = true;
+		text = templateSelect->textValue();
+	}
+
 	if (finish && !text.isEmpty())
 	{
 		for (int i = 0; i < templateTypeNameList.count(); i++)
