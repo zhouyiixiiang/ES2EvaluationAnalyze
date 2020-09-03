@@ -342,7 +342,7 @@ void LoadDataFile::initSheet(int sheetIndex, int patternCount)
 		{
 			continue;
 		}
-		_mExcelReader->writeExcel(i * (subjectCount + 1) + 5, 1, unitName.at(i), format1);
+		//_mExcelReader->writeExcel(i * (subjectCount + 1) + 5, 1, unitName.at(i), format1);
 		//_mExcelReader->mergeCells(i * (subjectCount + 1) + 5, 1, (i + 1) * (subjectCount + 1) + 4, 1, format1);
 
 		int memberCount = 0;
@@ -1745,10 +1745,19 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				int distSheet = _mExcelReader->getSheetIndex(sheetName);
 				int rowCount = _mExcelReader->getRowCount(distSheet);
 				int memberCount = (rowCount - 4) / (subjectCount + 1);
+				int unitIndex_n = 5;
 				//int memberCount = memberTypeRecord.at(0).at(validSubject).count();
+				QList<int> unitSplit;
+				_mExcelReader->chooseSheet(distSheet);
+				for (int i = 5; i < rowCount; i++)
+				{
+					if (!_mExcelReader->isCellEmpty(i, 1))
+					{
+						unitSplit.append(i);
+					}
+				}
 				if (_templateType == 1)
 				{
-					_mExcelReader->chooseSheet(originSheet - 1);
 
 					for (int memberIndex = 1; memberIndex < memberCount; memberIndex++)
 					{
@@ -1780,19 +1789,24 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 								{
 									endMark++;
 								}
-								if (i != endMark && !jump)
+								if (i != endMark)
 								{
 									QString temp = currentRes.mid(i + 1, endMark - i);
 									QString pre = currentRes.mid(0, i + 1);
 									QString last = currentRes.mid(endMark + 1);
 									int tempint = temp.toInt() + (subjectCount + 1) * memberIndex;
 									temp = QString::number(tempint);
+									if (unitSplit.contains(tempint))
+									{
+										unitIndex_n = tempint;
+									}
+									else if (jump && !unitSplit.contains(tempint))
+									{
+										temp = QString::number(unitIndex_n);
+										jump = false;
+									}
 									currentRes =pre + temp + last;
 									i = endMark;
-								}
-								else if (i != endMark && jump)
-								{
-									jump = false;
 								}
 							}
 							
