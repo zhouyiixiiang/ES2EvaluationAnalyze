@@ -1441,7 +1441,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 													scoreCount_member.append("");
 													MGroupResult* currentGroupResult = currentFormResult->MarkGroupResults->at(currentIndex->SecondLevelIndex.at(i).groupIndex);
 													int score;
-													if (scoreCount_subject.at(memberIndex + shift).size() < groupCount)
+													if (scoreCount_subject.at(memberIndex + shift).size() <= groupCount)
 													{
 														score = 0;
 													}
