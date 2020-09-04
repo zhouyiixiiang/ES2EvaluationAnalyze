@@ -1358,6 +1358,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 						QList<QList<QList<QString>>> scoreCount_unit;
 						QList<QList<int>> memberTypeRecord_unit;
 						QList<int> receiveCount_unit;
+						QList<int> memberRecord;
 						//scoreCount.append(scoreCount_unit);
 						currentFormResults->clear();
 						for (int formIndex = 0; formIndex < _currentResult->FormReuslts->count(); formIndex++)
@@ -1372,11 +1373,35 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 									for (int i = 0; i < unitCountRecord.count(); i++)
 									{
 										member -= unitCountRecord.at(i);
-										if (member < 0 && i == unitIndex)
+										if (member < 0)
+										{
+											if (i == unitIndex)
+											{
+												currentFormResults->append(_currentResult->FormReuslts->at(formIndex));
+												if (!memberRecord.contains(currentIR.at(3).toInt()))
+												{
+													memberRecord.append(currentIR.at(3).toInt());
+												}
+											}
+											break;
+										}
+
+									}
+									/*
+									for (int i = 0; i < _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->count(); i++)
+									{
+										
+										if (member == _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->at(i)->number.toInt())
 										{
 											currentFormResults->append(_currentResult->FormReuslts->at(formIndex));
+											if (!memberRecord.contains(member))
+											{
+												memberRecord.append(member);
+											}
 										}
+										//弃用 非连续member
 									}
+									*/
 								}
 								else if (_currentPattern->TableType == 1 && currentIR.at(3).toInt() == unitIndex)
 								{
@@ -1384,6 +1409,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 								}
 							}
 						}
+						qSort(memberRecord.begin(), memberRecord.end());
 						for (int subjectIndex = 0; subjectIndex < subjectCount; subjectIndex++)//主体组
 						{
 							//int memberCount = _currentPattern->MemberIndexs->count();
@@ -1424,12 +1450,28 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 									//bool flag = 0, newflag = 1;
 									for (int memberIndex = 0; memberIndex <  _currentPattern->FormPatternHash.at(page).size(); memberIndex++)
 									{
-										if (shift + memberIndex >= memberCount)
+										if (_currentPattern->TableType == 1 && shift + memberIndex >= memberCount)
 										{
 											break;
 										}
+										MemberIndex* currentMember;
+										if (_currentPattern->TableType == 0)
+										{
+											shift = 0;
+											memberIndex = memberRecord.indexOf(currentIR.at(3).toInt());
+											if (memberIndex == -1)
+											{
+												break;
+											}
+											currentMember = _currentPattern->MemberIndexs->at(page);
+										}
+										else
+										{
+											currentMember = _currentPattern->MemberIndexs->at(memberIndex + shift);
+										}
+
 										scoreCount_member.clear();
-										MemberIndex* currentMember = _currentPattern->MemberIndexs->at(memberIndex + shift);
+
 										int tempType = 0;
 										if (currentMember->MemberType != -1)
 										{
@@ -1479,6 +1521,10 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 										scoreCount_subject[memberIndex + shift] = scoreCount_member;
 										memberTypeRecord_subject[memberIndex + shift] = _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->at(memberIndex + shift)->MemberType;
 										//currentMember->MemberDetailIndexs->at(0);
+										if (_currentPattern->TableType == 0)
+										{
+											break;
+										}
 									}
 									/*
 									for (int i = 0; i < currentFormResult->MarkGroupResults->count(); i++)//
@@ -1570,6 +1616,10 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 					}
 					receiveCount[unitIndex][i] /= pageCount;
 					receiveCount[unitIndex][i] += lack;
+					if (_currentPattern->TableType == 0)
+					{
+						receiveCount[unitIndex][i] /= _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->count();
+					}
 					receiveCount[unitIndex][receiveCount.at(unitIndex).count() - 1] += receiveCount.at(unitIndex).at(i);
 				}
 			}
