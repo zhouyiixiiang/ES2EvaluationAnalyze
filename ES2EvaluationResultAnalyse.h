@@ -64,6 +64,7 @@ public slots:
     void finishSaveExcel();
     void finishSetAnswer(QList<QString>);
     void outputErrorPrompt(QString);
+    void outputUnexpectedPrompt(QString);
     void uploadCountProgress(int, int);
     void selectionTableEvaluationChanged(const QItemSelection& selected, const QItemSelection& deselected);
     void selectionTableTemplateListChanged(const QItemSelection& selected, const QItemSelection& deselected);

@@ -133,6 +133,7 @@ void ES2EvaluationResultAnalyse::startLoadThread()
 	connect(loadDataFile, &LoadDataFile::finish, this, &ES2EvaluationResultAnalyse::finishLoadDataFile);
 	connect(loadDataFile, &LoadDataFile::finishExcel, this, &ES2EvaluationResultAnalyse::finishSaveExcel);
 	connect(loadDataFile, &LoadDataFile::outputError, this, &ES2EvaluationResultAnalyse::outputErrorPrompt);
+	connect(loadDataFile, &LoadDataFile::outputUnexpected , this, &ES2EvaluationResultAnalyse::outputUnexpectedPrompt);
 	
 	//开启线程
 	loadThread->start();
@@ -556,6 +557,13 @@ void ES2EvaluationResultAnalyse::outputErrorPrompt(QString hint)
 	msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
 	int res = msgBox.exec();
 
+}
+
+void ES2EvaluationResultAnalyse::outputUnexpectedPrompt(QString hint)
+{
+	QMessageBox msgBox(QMessageBox::Information, (u8"生成结果问题"), hint, QMessageBox::Yes);
+	msgBox.button(QMessageBox::Yes)->setText((u8"确定"));
+	int res = msgBox.exec();
 }
 
 void ES2EvaluationResultAnalyse::initLists()
