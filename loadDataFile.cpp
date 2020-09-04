@@ -1594,6 +1594,10 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 
 				for (int unitIndex = 0; unitIndex < unitCount; unitIndex++)
 				{
+					if (validSubject.at(unitIndex) >= subjectCount)
+					{
+						continue;
+					}
 					//int memberCount = _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->count();
 
 					int memberCount = 0;
@@ -1608,6 +1612,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 					QList<QList<int>> memberScore;
 					for (int subjectIndex = 0; subjectIndex < subjectCount; subjectIndex++)
 					{
+
 						/*
 						if (scoreCount.at(unitIndex).at(subjectIndex).isEmpty())
 						{
@@ -1675,7 +1680,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 									//MFormPattern* currentformpattern = _currentPattern->GetFormPattern(0);
 									//_currentPattern->MemberIndexs->at(0)->MemberDetailIndexs->at(i)->FirstLevelIndex.groupIndex;
 									int empty = 0;
-									if (scoreCount.at(unitIndex).at(subjectIndex).isEmpty()) //当前主体数据为空
+									if (scoreCount.at(unitIndex).at(subjectIndex).isEmpty() || scoreCount.at(unitIndex).at(subjectIndex).at(memberIndex).isEmpty()) //当前主体数据为空
 									{
 										empty = cellListCount.at(memberTypeIndex).at(i);
 									}
