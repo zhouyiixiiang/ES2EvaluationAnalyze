@@ -893,7 +893,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			QStringList currentIR = _currentResult->FormReuslts->at(j)->IdentifierResult->Result.split("-");
 			for (int k = 0; k < _info->RecognizePatternInfo->RecognizeFormPatterns->count(); k++)
 			{
-				QString a = _info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->GetFormPattern(0)->IdentifierCodePattern->CodeValue;
+				//QString a = _info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->GetFormPattern(0)->IdentifierCodePattern->CodeValue;
 				if (currentIR.at(0) == _info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->GetFormPattern(0)->IdentifierCodePattern->CodeValue)
 				{
 					if (_info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->FormPatternHash.size() <= currentIR.at(1).toInt())
@@ -906,10 +906,13 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 						emit outputError(u8"结果主体数大于模板主体数");
 						return false;
 					}
-					if (_info->EvaluationMemberInfo->at(k)->EvaluationMembers->count() <= currentIR.at(3).toInt())
+					if (_info->RecognizePatternInfo->RecognizeFormPatterns->at(k)->TableType == 1)
 					{
-						emit outputError(u8"结果单位数大于模板单位数");
-						return false;
+						if (_info->EvaluationMemberInfo->at(k)->EvaluationMembers->count() <= currentIR.at(3).toInt())
+						{
+							emit outputError(u8"结果单位数大于模板单位数");
+							return false;
+						}
 					}
 				}
 			}
@@ -1104,8 +1107,8 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				cellListCount.append(temp);
 				initSheet(0, patternCount);
 			}
-			*/
-			/*_mExcelReader->chooseSheet(1);
+
+			_mExcelReader->chooseSheet(1);
 			_mExcelReader->writeExcel(1, 1, u8"成员指标汇总表", format1);
 			_mExcelReader->writeExcel(2, 1, u8"单位", format1);
 			_mExcelReader->writeExcel(2, 2, u8"姓名", format1);
@@ -1115,8 +1118,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			_mExcelReader->writeExcel(2, 6, u8"表类型", format1);
 			_mExcelReader->writeExcel(2, 7, u8"权重", format1);
 			_mExcelReader->writeExcel(2, 8, u8"收回数", format1);
-			*/
-			/*
+
 			int indexCountF = _currentPattern->MemberIndexs->at(patternCount)->MemberDetailIndexs->count();
 			int indexCountGroup = 0;
 			int indexCountT = 9;
@@ -1237,8 +1239,8 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				}
 				_mExcelReader->mergeCells(takenSpace - memberCount * (subjectCount + 1), 1, takenSpace - 1, 1, format1);
 			}
-			*/
-			/*
+
+
 						_mExcelReader->chooseSheet(2);
 						//QString sheetTitle =
 						_mExcelReader->writeExcel(1, 1, u8"得票情况汇总", format1);
@@ -1324,6 +1326,13 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 
 			QList<QList<QList<int>>> memberTypeRecord; 
 			QList<QList<int>> receiveCount;//收回数 计数subjectIndex
+			QList<int> unitCountRecord;
+			for (int i = 0; i < _currentMemberInfo->EvaluationMembers->count(); i++)
+			{
+				unitCountRecord.append(_currentMemberInfo->EvaluationMembers->at(i)->EvaluationMembers->count());
+			}
+
+
 			for (int resultCount = 0; resultCount < results->count(); resultCount++)
 			{
 				//currentFormPattern = nullptr;
@@ -1357,7 +1366,19 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							{
 								currentIR.clear();
 								currentIR = _currentResult->FormReuslts->at(formIndex)->IdentifierResult->Result.split("-");
-								if (currentIR.at(3).toInt() == unitIndex)
+								if (_currentPattern->TableType == 0)
+								{
+									int member = currentIR.at(3).toInt();
+									for (int i = 0; i < unitCountRecord.count(); i++)
+									{
+										member -= unitCountRecord.at(i);
+										if (member < 0 && i == unitIndex)
+										{
+											currentFormResults->append(_currentResult->FormReuslts->at(formIndex));
+										}
+									}
+								}
+								else if (_currentPattern->TableType == 1 && currentIR.at(3).toInt() == unitIndex)
 								{
 									currentFormResults->append(_currentResult->FormReuslts->at(formIndex));
 								}

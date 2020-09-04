@@ -61,6 +61,7 @@ private:
     void readResultsFromFile();
     bool generateExcelResult(QList<MResult*>*, QString);
     bool generateTestResult(QList<MResult*>*, QString);
+    void singleMember(QList<MResult*>*, QString);
     void formatSet(QXlsx::Format&);
     void initSheet(int, int);
     void initSheet_test(int, int);
