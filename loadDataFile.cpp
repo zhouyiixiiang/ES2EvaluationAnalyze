@@ -1667,13 +1667,10 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				_mExcelReader->chooseSheet(memberTypeIndex);
 				int excelRowCount = 5;
 				int excelColumnIndex = 9;
-
+				int unitTaken = 0;
 				for (int unitIndex = 0; unitIndex < unitCount; unitIndex++)
 				{
-					if (validSubject.at(unitIndex) >= subjectCount)
-					{
-						continue;
-					}
+
 					//int memberCount = _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->count();
 
 					int memberCount = 0;
@@ -1685,6 +1682,12 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 						}
 					}
 
+					unitTaken = memberCount * (subjectCount + 1);
+					if (validSubject.at(unitIndex) >= subjectCount)
+					{
+						excelRowCount += unitTaken;
+						continue;
+					}
 					QList<QList<int>> memberScore;
 					//int lastMemberRecord = memberCount;
 					for (int subjectIndex = 0; subjectIndex < subjectCount; subjectIndex++)
@@ -1695,14 +1698,14 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							continue;
 						}
 						*/
-						/*
+						
 						if (subjectIndex != 0)
 						{
-							excelRowCount -= lastMemberRecord * (subjectCount + 1);
+							excelRowCount -= unitTaken;
 						}
-						lastMemberRecord = memberCount;
-						*/
-						excelRowCount = 5;
+						//lastMemberRecord = memberCount;
+						
+						//excelRowCount = 5;
 						//_mExcelReader->writeExcel(excelRowCount + subjectCount, 7, QString::number(ceil(receiveCount[subjectCount] * 1.0 / pageCount * 1.0)), format1);
 						int tempMemberIndex = 0;
 						for (int memberIndex = 0; memberIndex < _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->count(); memberIndex++)
@@ -1711,8 +1714,12 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							{
 								if (memberTypeRecord.at(unitIndex).at(validSubject.at(unitIndex)).at(memberIndex) != memberTypeIndex)
 								{
+									if (memberTypeRecord.at(unitIndex).at(validSubject.at(unitIndex)).at(memberIndex) == -2)
+									{
+										excelRowCount += subjectCount + 1;
+									}
 									//lastMemberRecord--;
-									excelRowCount += subjectCount + 1;
+									//excelRowCount += subjectCount + 1;
 									continue;
 								}
 							}
