@@ -1686,7 +1686,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 					}
 
 					QList<QList<int>> memberScore;
-					int lastMemberRecord = memberCount;
+					//int lastMemberRecord = memberCount;
 					for (int subjectIndex = 0; subjectIndex < subjectCount; subjectIndex++)
 					{
 						/*
@@ -1695,11 +1695,14 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							continue;
 						}
 						*/
+						/*
 						if (subjectIndex != 0)
 						{
 							excelRowCount -= lastMemberRecord * (subjectCount + 1);
 						}
 						lastMemberRecord = memberCount;
+						*/
+						excelRowCount = 5;
 						//_mExcelReader->writeExcel(excelRowCount + subjectCount, 7, QString::number(ceil(receiveCount[subjectCount] * 1.0 / pageCount * 1.0)), format1);
 						int tempMemberIndex = 0;
 						for (int memberIndex = 0; memberIndex < _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->count(); memberIndex++)
@@ -1708,7 +1711,8 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							{
 								if (memberTypeRecord.at(unitIndex).at(validSubject.at(unitIndex)).at(memberIndex) != memberTypeIndex)
 								{
-									lastMemberRecord--;
+									//lastMemberRecord--;
+									excelRowCount += subjectCount + 1;
 									continue;
 								}
 							}
