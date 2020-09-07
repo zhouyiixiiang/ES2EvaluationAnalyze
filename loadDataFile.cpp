@@ -1750,9 +1750,9 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 									}
 									for (int n = 0; n < cellListCount.at(memberTypeIndex).at(i) - empty; n++)
 									{
-										QString result = QString::number((scoreCount[unitIndex][subjectIndex][memberIndex][i][n].toLatin1() - 48) * subjectWeight.at(subjectIndex));
+										QString result = QString::number((scoreCount[unitIndex][subjectIndex][memberIndex][i][n].toLatin1() - 48));
 										_mExcelReader->writeExcel(excelRowCount + subjectIndex, excelColumnIndex, result, format1);
-										memberScore_sub[excelColumnIndex - 9] += result.toInt();
+										memberScore_sub[excelColumnIndex - 9] += result.toInt() * subjectWeight.at(subjectIndex);
 										memberScore_sub.append(0);
 										excelColumnIndex++;
 									}
@@ -1786,9 +1786,9 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 									}
 									for (int n = 0; n < cellListCount.at(memberTypeIndex).at(i) - empty; n++)
 									{
-										QString result = QString::number((scoreCount[unitIndex][subjectIndex][memberIndex][i][n].toLatin1() - 48) * subjectWeight.at(subjectIndex));
+										QString result = QString::number((scoreCount[unitIndex][subjectIndex][memberIndex][i][n].toLatin1() - 48));
 										_mExcelReader->writeExcel(excelRowCount + subjectIndex, excelColumnIndex, result, format1);
-										memberScore[tempMemberIndex][excelColumnIndex - 9] += result.toInt();
+										memberScore[tempMemberIndex][excelColumnIndex - 9] += result.toInt() * subjectWeight.at(subjectIndex);
 										excelColumnIndex++;
 									}
 								}
