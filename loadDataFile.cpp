@@ -1594,9 +1594,9 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			
 			if (scoreCount.isEmpty() || memberTypeRecord.isEmpty())
 			{
-				outputError(u8"没有有效数据");
-				QFile::remove(excelTempName);
-				return false;
+				outputUnexpected(u8"没有有效数据");
+				//QFile::remove(excelTempName);
+				continue;
 			}
 			//QString resultMark = _currentResult->FormReuslts->at(0)->IdentifierResult->Result;
 			//int subjectMark = resultMark.at(4).toLatin1() - 48;//主体
