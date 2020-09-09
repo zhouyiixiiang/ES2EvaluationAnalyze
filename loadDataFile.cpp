@@ -1345,7 +1345,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 				for (int i = 0; i < _currentResult->FormReuslts->count(); i++)
 				{
 					currentIR = _currentResult->FormReuslts->at(i)->IdentifierResult->Result.split("-");
-					if (!currentIR.isEmpty())
+					if (currentIR.count() == 4)
 					{
 						break;
 					}
