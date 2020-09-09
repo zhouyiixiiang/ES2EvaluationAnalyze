@@ -1469,7 +1469,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 											currentMember = _currentPattern->MemberIndexs->at(memberIndex + shift);
 										}
 
-										receiveCount_subject[memberIndex] ++;
+										receiveCount_subject[memberIndex + shift] ++;
 										scoreCount_member.clear();
 
 										int tempType = 0;
@@ -1617,13 +1617,16 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 					for (int i = 0; i < receiveCount.at(unitIndex).at(subjectIndex).count(); i++)
 					{
 						int lack = 0;
-						if (receiveCount[unitIndex][subjectIndex][i] % pageCount != 0)
+						if (_currentPattern->TableType == 0)
 						{
-							lackPage = true;
-							lack = 1;
+							if (receiveCount[unitIndex][subjectIndex][i] % pageCount != 0)
+							{
+								lackPage = true;
+								lack = 1;
+							}
+							receiveCount[unitIndex][subjectIndex][i] /= pageCount;
+							receiveCount[unitIndex][subjectIndex][i] += lack;
 						}
-						receiveCount[unitIndex][subjectIndex][i] /= pageCount;
-						receiveCount[unitIndex][subjectIndex][i] += lack;
 						receiveCount[unitIndex][subjectCount][i] += receiveCount.at(unitIndex).at(subjectIndex).at(i);
 					}
 				}
