@@ -715,10 +715,10 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 		table->Mmodel->setHeaderData(2, Qt::Horizontal, (u8"职务"));
 		table->Mmodel->setHeaderData(3, Qt::Horizontal, (u8"职务类别"));
 		table->Mmodel->setHeaderData(4, Qt::Horizontal, (u8"编码"));
-		tableview->setColumnWidth(0, 90);
-		tableview->setColumnWidth(1, 40);
-		tableview->setColumnWidth(2, 85);
-		tableview->setColumnWidth(3, 100);
+		tableview->setColumnWidth(0, 120);
+		tableview->setColumnWidth(1, 70);
+		tableview->setColumnWidth(2, 135);
+		tableview->setColumnWidth(3, 140);
 		tableview->setColumnWidth(4, 100);
 		tableview->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
