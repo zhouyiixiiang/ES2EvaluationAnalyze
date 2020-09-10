@@ -40,6 +40,7 @@ public:
 	int getSheetCount();
 	int getSheetIndex(QString);
 	bool isCellEmpty(int, int);
+	void setColumnWidth(int, int);
 
 /***************************************
 *定义：成员变量

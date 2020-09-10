@@ -232,6 +232,12 @@ void LoadDataFile::initSheet(int sheetIndex, int patternCount)
 	_mExcelReader->writeExcel(2, 7, u8"权重", format1);
 	_mExcelReader->writeExcel(2, 8, u8"收回数", format1);
 
+	_mExcelReader->setColumnWidth(2, 13);
+	_mExcelReader->setColumnWidth(3, 7);
+	_mExcelReader->setColumnWidth(4, 13.5);
+	_mExcelReader->setColumnWidth(5, 14);
+	_mExcelReader->setColumnWidth(6, 10);
+
 	indexCountGroup = 0;
 	int indexCountT = 9;
 	QList<QString> indexNameF;

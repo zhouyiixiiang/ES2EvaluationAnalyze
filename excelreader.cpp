@@ -359,3 +359,10 @@ void ExcelReader::unmergeCells(const int firstRow, const int firstColumn, const 
         qDebug() << (u8"取消合并不成功");
 	}
 }
+
+void ExcelReader::setColumnWidth(int column, int w)
+{
+	_mExcel->setColumnWidth(column, w);
+	return;
+}
+
