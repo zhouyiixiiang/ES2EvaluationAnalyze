@@ -46,6 +46,10 @@ ES2EvaluationResultAnalyse::ES2EvaluationResultAnalyse(QWidget *parent)
 	ui.tableView_2->setMouseTracking(true);
 	ui.tableView_4->setMouseTracking(true);
 
+	ui.tableView_2->horizontalHeader()->setFont(QFont("宋体", 13, QFont::Bold));
+	ui.tableView_3->horizontalHeader()->setFont(QFont("宋体", 13, QFont::Bold));
+	ui.tableView_4->horizontalHeader()->setFont(QFont("宋体", 13, QFont::Bold));
+
 	ui.pushButton_2->setEnabled(false);
 	ui.pushButton_4->setEnabled(false);
 	ui.pushButton_5->setEnabled(false);
