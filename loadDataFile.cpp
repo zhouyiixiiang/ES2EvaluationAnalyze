@@ -1422,7 +1422,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 
 			//MRecognizeFormPattern* currentFormPattern;
 			//vector<vector<vector<vector<int>>>> scoreCount;
-			QList<QList<QList<QList<QString>>>> scoreCount;//单位-主体-成员-得分情况
+			QList<QList<QList<QList<QList<QString>>>>> scoreCount;//单位-主体-成员-大标-小标-得分
 
 			QList<QList<QList<int>>> memberTypeRecord; 
 			QList<QList<QList<int>>> receiveCount;//收回数 计数subjectIndex
@@ -1455,7 +1455,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 					QList<MFormResult*>* currentFormResults = new QList<MFormResult*>;
 					for (int unitIndex = 0; unitIndex < _currentPattern->EvaluationUnits.count(); unitIndex++)
 					{
-						QList<QList<QList<QString>>> scoreCount_unit;
+						QList<QList<QList<QList<QString>>>> scoreCount_unit;
 						QList<QList<int>> memberTypeRecord_unit;
 						QList<QList<int>> receiveCount_unit;
 						QList<int> memberRecord;
@@ -1515,12 +1515,12 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 							//int memberCount = _currentPattern->MemberIndexs->count();
 							int memberCount = _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->count();
 							//receiveCount_unit.append(0);
-							QList<QList<QString>> scoreCount_subject;
+							QList<QList<QList<QString>>> scoreCount_subject;
 							QList<int> memberTypeRecord_subject;
 							QList<int> receiveCount_subject;
 							for (int k = 0; k < _currentMemberInfo->EvaluationMembers->at(unitIndex)->EvaluationMembers->count(); k++)
 							{
-								QList<QString> temp3;
+								QList<QList<QString>> temp3;
 								scoreCount_subject.append(temp3);
 								memberTypeRecord_subject.append(-2);
 								receiveCount_subject.append(0);
@@ -1561,7 +1561,6 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 													{
 														groupShift += tempIndex->SecondLevelIndex.count();
 													}
-
 												}
 											}
 										}
@@ -1575,7 +1574,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 									}
 
 									//int memberCount = _currentPattern->FormPatternHash.at(page).size(); //当前页面人数
-									QList<QString> scoreCount_member;
+									QList<QList<QString>> scoreCount_member;
 									//bool flag = 0, newflag = 1;
 									for (int memberIndex = 0; memberIndex <  _currentPattern->FormPatternHash.at(page).size(); memberIndex++)
 									{
@@ -1608,17 +1607,16 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 
 										if (_currentPattern->TableType == 0)
 										{
-											int groupCount = groupShift;
-											if (scoreCount_subject.at(memberIndex + shift).count() >= groupShift)
+											int groupIndex = groupShift;
+											if (scoreCount_subject.at(memberIndex + shift).count() > 0)
 											{
 												scoreCount_member = scoreCount_subject.at(memberIndex + shift);
 											}
-											else
+
+											for (int i = 0; i < groupShift - scoreCount_member.count(); i++)
 											{
-												for (int i = 0; i < groupShift; i++)
-												{
-													scoreCount_member.append("");
-												}
+												QList<QString> temp;
+												scoreCount_member.append(temp);
 											}
 
 											//_currentPattern->FormPatternHash.at(page);
@@ -1630,39 +1628,73 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 													MemberDetailIndex* currentIndex = currentMember->MemberDetailIndexs->at(index);
 													if (currentIndex->IndexLevel == 1)
 													{
-														scoreCount_member.append("");
 														MGroupResult* currentGroupResult = currentFormResult->MarkGroupResults->at(currentIndex->FirstLevelIndex.groupIndex);
-														int score;
-														if (scoreCount_subject.at(memberIndex + shift).size() <= groupCount)
+														QList<QString> scoreCount_group;
+														if (scoreCount_member.count() > groupIndex)
 														{
-															score = 0;
+															scoreCount_group = scoreCount_member.at(groupIndex);
 														}
-														else
+														for (int cellIndex = 0; cellIndex < cellListCount.at(tempType).at(groupIndex); cellIndex++)
 														{
-															score = scoreCount_subject[memberIndex + shift][groupCount].toInt();
+															int score;
+															if (scoreCount_group.count() <= cellIndex)
+															{
+																score = 0;
+																scoreCount_group.append(0);
+															}
+															else
+															{
+																score = scoreCount_group[cellIndex].toInt();
+															}
+															score += currentGroupResult->NumberResult.at(cellIndex).toLatin1() - 48;
+															scoreCount_group[cellIndex] = QString::number(score);
 														}
-														score += currentGroupResult->NumberResult.toInt();
-														scoreCount_member[groupCount] = QString::number(score);
-														groupCount++;
+														if (scoreCount_member.count() <= groupIndex)
+														{
+															for (int i = 0; i <= groupIndex; i++)
+															{
+																QList<QString> temp;
+																scoreCount_member.append(temp);
+															}
+														}
+														scoreCount_member[groupIndex] = scoreCount_group;
+														groupIndex++;
 													}
 													else if (currentIndex->IndexLevel == 2)
 													{
 														for (int i = 0; i < currentIndex->SecondLevelIndex.count(); i++)
 														{
-															scoreCount_member.append("");
 															MGroupResult* currentGroupResult = currentFormResult->MarkGroupResults->at(currentIndex->SecondLevelIndex.at(i).groupIndex);
-															int score;
-															if (scoreCount_subject.at(memberIndex + shift).size() <= groupCount)
+															QList<QString> scoreCount_group; 
+															if (scoreCount_member.count() > groupIndex)
 															{
-																score = 0;
+																scoreCount_group = scoreCount_member.at(groupIndex);
 															}
-															else
+															for (int cellIndex = 0; cellIndex < cellListCount.at(tempType).at(groupIndex); cellIndex++)
 															{
-																score = scoreCount_subject[memberIndex + shift][groupCount].toInt();
+																int score;
+																if (scoreCount_group.count() <= cellIndex)
+																{
+																	score = 0;
+																	scoreCount_group.append(0);
+																}
+																else
+																{
+																	score = scoreCount_group[cellIndex].toInt();
+																}
+																score += currentGroupResult->NumberResult.at(cellIndex).toLatin1() - 48;
+																scoreCount_group[cellIndex] = QString::number(score);
 															}
-															score += currentGroupResult->NumberResult.toInt();
-															scoreCount_member[groupCount] = QString::number(score);
-															groupCount++;
+															if (scoreCount_member.count() <= groupIndex)
+															{
+																for (int i = 0; i <= groupIndex; i++)
+																{
+																	QList<QString> temp;
+																	scoreCount_member.append(temp);
+																}
+															}
+															scoreCount_member[groupIndex] = scoreCount_group;
+															groupIndex++;
 														}
 													}
 												}
@@ -1670,44 +1702,78 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 										}
 										else
 										{
-											for (int groupCount = 0; groupCount < cellListCount.at(tempType).count();)
+											for (int groupIndex = 0; groupIndex < cellListCount.at(tempType).count();)
 											{
-												MemberDetailIndex* currentIndex = currentMember->MemberDetailIndexs->at(groupCount);
+												MemberDetailIndex* currentIndex = currentMember->MemberDetailIndexs->at(groupIndex);
 												if (currentIndex->IndexLevel == 1)
 												{
-													scoreCount_member.append("");
 													MGroupResult* currentGroupResult = currentFormResult->MarkGroupResults->at(currentIndex->FirstLevelIndex.groupIndex);
-													int score;
-													if (scoreCount_subject.at(memberIndex + shift).size() <= groupCount)
+													QList<QString> scoreCount_group;
+													if (scoreCount_member.count() > groupIndex)
 													{
-														score = 0;
+														scoreCount_group = scoreCount_member.at(groupIndex);
 													}
-													else
+													for (int cellIndex = 0; cellIndex < cellListCount.at(tempType).at(groupIndex); cellIndex++)
 													{
-														score = scoreCount_subject[memberIndex + shift][groupCount].toInt();
+														int score;
+														if (scoreCount_group.count() <= cellIndex)
+														{
+															score = 0;
+															scoreCount_group.append(0);
+														}
+														else
+														{
+															score = scoreCount_group[cellIndex].toInt();
+														}
+														score += currentGroupResult->NumberResult.at(cellIndex).toLatin1() - 48;
+														scoreCount_group[cellIndex] = QString::number(score);
 													}
-													score += currentGroupResult->NumberResult.toInt();
-													scoreCount_member[groupCount] = QString::number(score);
-													groupCount++;
+													if (scoreCount_member.count() <= groupIndex)
+													{
+														for (int i = 0; i <= groupIndex; i++)
+														{
+															QList<QString> temp;
+															scoreCount_member.append(temp);
+														}
+													}
+													scoreCount_member[groupIndex] = scoreCount_group;
+													groupIndex++;
 												}
 												else if (currentIndex->IndexLevel == 2)
 												{
 													for (int i = 0; i < currentIndex->SecondLevelIndex.count(); i++)
 													{
-														scoreCount_member.append("");
 														MGroupResult* currentGroupResult = currentFormResult->MarkGroupResults->at(currentIndex->SecondLevelIndex.at(i).groupIndex);
-														int score;
-														if (scoreCount_subject.at(memberIndex + shift).size() <= groupCount)
+														QList<QString> scoreCount_group;
+														if (scoreCount_member.count() > groupIndex)
 														{
-															score = 0;
+															scoreCount_group = scoreCount_member.at(groupIndex);
 														}
-														else
+														for (int cellIndex = 0; cellIndex < cellListCount.at(tempType).at(groupIndex); cellIndex++)
 														{
-															score = scoreCount_subject[memberIndex + shift][groupCount].toInt();
+															int score;
+															if (scoreCount_group.count() <= cellIndex)
+															{
+																score = 0;
+																scoreCount_group.append(0);
+															}
+															else
+															{
+																score = scoreCount_group[cellIndex].toInt();
+															}
+															score += currentGroupResult->NumberResult.at(cellIndex).toLatin1() - 48;
+															scoreCount_group[cellIndex] = QString::number(score);
 														}
-														score += currentGroupResult->NumberResult.toInt();
-														scoreCount_member[groupCount] = QString::number(score);
-														groupCount++;
+														if (scoreCount_member.count() <= groupIndex)
+														{
+															for (int i = 0; i <= groupIndex; i++)
+															{
+																QList<QString> temp;
+																scoreCount_member.append(temp);
+															}
+														}
+														scoreCount_member[groupIndex] = scoreCount_group;
+														groupIndex++;
 													}
 												}
 											}
@@ -1934,10 +2000,12 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 									{
 										empty = cellListCount.at(memberTypeIndex).at(i);
 									}
+									/*
 									else
 									{
 										empty = cellListCount.at(memberTypeIndex).at(i) - scoreCount[unitIndex][subjectIndex][memberIndex][i].count();
 									}
+									*/
 									for (int j = 0; j < empty; j++)
 									{
 										_mExcelReader->writeExcel(excelRowCount + subjectIndex, excelColumnIndex, "0", format1);
@@ -1947,7 +2015,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 									}
 									for (int n = 0; n < cellListCount.at(memberTypeIndex).at(i) - empty; n++)
 									{
-										QString result = QString::number((scoreCount[unitIndex][subjectIndex][memberIndex][i][n].toLatin1() - 48));
+										QString result = QString::number(scoreCount[unitIndex][subjectIndex][memberIndex][i][n].toInt());
 										_mExcelReader->writeExcel(excelRowCount + subjectIndex, excelColumnIndex, result, format1);
 										memberScore_sub[excelColumnIndex - 9] += result.toInt() * subjectWeight.at(subjectIndex);
 										memberScore_sub.append(0);
@@ -1970,10 +2038,12 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 									{
 										empty = cellListCount.at(memberTypeIndex).at(i);
 									}
+									/*
 									else
 									{
 										empty = cellListCount.at(memberTypeIndex).at(i) - scoreCount[unitIndex][subjectIndex][memberIndex][i].count();
 									}
+									*/
 									//int empty = cellListCount.at(memberTypeIndex).at(i) - scoreCount[unitIndex][subjectIndex][memberIndex][i].count();
 									for (int j = 0; j < empty; j++)
 									{
@@ -1983,7 +2053,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 									}
 									for (int n = 0; n < cellListCount.at(memberTypeIndex).at(i) - empty; n++)
 									{
-										QString result = QString::number((scoreCount[unitIndex][subjectIndex][memberIndex][i][n].toLatin1() - 48));
+										QString result = QString::number(scoreCount[unitIndex][subjectIndex][memberIndex][i][n].toInt());
 										_mExcelReader->writeExcel(excelRowCount + subjectIndex, excelColumnIndex, result, format1);
 										memberScore[tempMemberIndex][excelColumnIndex - 9] += result.toInt() * subjectWeight.at(subjectIndex);
 										excelColumnIndex++;

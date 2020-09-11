@@ -149,7 +149,7 @@ void ES2EvaluationResultAnalyse::ReleaseQList(QList<T*>* qlist)
 	if (qlist != nullptr)
 	{
 		// 清空_recognizePatterns
-		QList<T*>::iterator item = qlist->begin();
+        typename QList<T*>::iterator item = qlist->begin();
 		while (item != qlist->end())
 		{
 			qlist->removeOne(*item);
@@ -239,7 +239,8 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 	if (_outputType == 1)
 	{
 		//考评
-		ui.label_2->setText(u8"当前输出类型: 考评");
+        //ui.label_2->setText(u8"当前输出类型: 考评");
+        ui.label->setText(u8"考评");
 		ui.pushButton_7->setVisible(true);
 		_benchmark.clear();
 		for (int i = 0; i < _currentEvaluationInfo->RecognizePatternInfo->RecognizeFormPatterns->count(); i++)
@@ -251,16 +252,18 @@ void ES2EvaluationResultAnalyse::onButtonLoadEvaluationData()
 	else if (_outputType == 0)
 	{
 		//测评
-		ui.label_2->setText(u8"当前输出类型: 测评");
+        //ui.label_2->setText(u8"当前输出类型: 测评");
+        ui.label->setText(u8"测评");
 		ui.pushButton_7->setVisible(false);
 	}
 	else
 	{
-		ui.label_2->setText(u8"当前输出类型: 未知");
+        //ui.label_2->setText(u8"当前输出类型: 未知");
+        ui.label->setText(u8"未知");
 	}
 
-	ui.label_3->setText(u8"当前测评名称: " + _currentEvaluationInfo->RecognizePatternInfo->Name);
-
+    //ui.label_3->setText(u8"当前测评名称: " + _currentEvaluationInfo->RecognizePatternInfo->Name);
+      ui.label_4->setText(_currentEvaluationInfo->RecognizePatternInfo->Name);
 	loadDataFile->setInfoData(_currentEvaluationInfo);
 	_currentTemplateList.clear();
 	templateType.clear();
@@ -715,11 +718,11 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 		table->Mmodel->setHeaderData(2, Qt::Horizontal, (u8"职务"));
 		table->Mmodel->setHeaderData(3, Qt::Horizontal, (u8"职务类别"));
 		table->Mmodel->setHeaderData(4, Qt::Horizontal, (u8"编码"));
-		tableview->setColumnWidth(0, 120);
-		tableview->setColumnWidth(1, 70);
-		tableview->setColumnWidth(2, 135);
-		tableview->setColumnWidth(3, 140);
-		tableview->setColumnWidth(4, 100);
+        tableview->setColumnWidth(0, 140);
+        tableview->setColumnWidth(1, 70);
+        tableview->setColumnWidth(2, 135);
+        tableview->setColumnWidth(3, 140);
+        tableview->setColumnWidth(4, 90);
 		tableview->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 		//往表格中填充模数据
@@ -752,7 +755,8 @@ void ES2EvaluationResultAnalyse::fillingTheTableView(QString sTable)
 	else if (sTable == "tableEvaluationObject")
 	{
 		table->Mmodel->setColumnCount(1);
-		table->Mmodel->setHeaderData(0, Qt::Horizontal, (u8"测评单位"));
+        //table->Mmodel->setHeaderData(0, Qt::Horizontal, (u8"测评单位"));
+        tableview->horizontalHeader()->hide();
 		tableview->verticalHeader()->hide();//隐藏行号 
 		tableview->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 		tableview->setEditTriggers(QAbstractItemView::NoEditTriggers);
