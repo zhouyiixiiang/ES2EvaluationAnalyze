@@ -1651,7 +1651,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 														}
 														if (scoreCount_member.count() <= groupIndex)
 														{
-															for (int i = 0; i <= groupIndex; i++)
+															for (int i = 0; i <= groupIndex - scoreCount_member.count(); i++)
 															{
 																QList<QString> temp;
 																scoreCount_member.append(temp);
@@ -1687,7 +1687,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 															}
 															if (scoreCount_member.count() <= groupIndex)
 															{
-																for (int i = 0; i <= groupIndex; i++)
+																for (int i = 0; i <= groupIndex - scoreCount_member.count(); i++)
 																{
 																	QList<QString> temp;
 																	scoreCount_member.append(temp);
@@ -1730,7 +1730,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 													}
 													if (scoreCount_member.count() <= groupIndex)
 													{
-														for (int i = 0; i <= groupIndex; i++)
+														for (int i = 0; i <= groupIndex - scoreCount_member.count(); i++)
 														{
 															QList<QString> temp;
 															scoreCount_member.append(temp);
@@ -1766,7 +1766,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 														}
 														if (scoreCount_member.count() <= groupIndex)
 														{
-															for (int i = 0; i <= groupIndex; i++)
+															for (int i = 0; i <= groupIndex - scoreCount_member.count(); i++)
 															{
 																QList<QString> temp;
 																scoreCount_member.append(temp);
