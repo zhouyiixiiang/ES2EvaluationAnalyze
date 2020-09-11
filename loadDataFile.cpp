@@ -1602,8 +1602,12 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 											}
 										}
 
-										receiveCount_subject[memberIndex + shift] ++;
 										scoreCount_member.clear();
+										if (scoreCount_subject.count() >= memberIndex + shift)
+										{
+											scoreCount_member = scoreCount_subject.at(memberIndex + shift);
+										}
+										receiveCount_subject[memberIndex + shift] ++;
 
 										if (_currentPattern->TableType == 0)
 										{
