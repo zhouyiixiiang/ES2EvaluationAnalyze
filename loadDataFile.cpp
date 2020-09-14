@@ -675,6 +675,7 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 			}
 			QList<int> scoreWeight; //分值
 			int scoreSum = 0; //add?
+			bool scoreRec = true;
 			for (int resultIndex = 0; resultIndex < results->count(); resultIndex++)
 			{
 				_currentResult = results->at(resultIndex);
@@ -714,7 +715,6 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 							}
 						}
 						MemberIndex* currentMemberIndex = _currentPattern->MemberIndexs->at(pageIndex);
-						bool scoreRec = false;
 						int indexGroup = 0;
 						for (int i = 0; i < pageIndex; i++)
 						{
@@ -739,7 +739,7 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 							{
 								resultCollect[memberIndex][indexGroup] = (currentFormResult->MarkGroupResults->at(currentMemberDetail->FirstLevelIndex.groupIndex)->TextResult);
 								indexGroup++;
-								if (recSuc && !scoreRec)
+								if (recSuc && scoreRec)
 								{
 									scoreWeight.append(currentMemberDetail->FirstLevelIndex.weightNumerator);
 									scoreSum += scoreWeight.last();
@@ -752,7 +752,7 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 								{
 									resultCollect[memberIndex][indexGroup] = (currentFormResult->MarkGroupResults->at(currentMemberDetail->SecondLevelIndex.at(j).groupIndex)->TextResult);
 									indexGroup++;
-									if (recSuc && !scoreRec)
+									if (recSuc && scoreRec)
 									{
 										scoreWeight.append(currentMemberDetail->SecondLevelIndex.at(j).weightNumerator);
 										scoreSum += scoreWeight.last();
@@ -760,6 +760,7 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 								}
 							}
 						}
+						scoreRec = false;
 						//resultCollect[memberIndex].append(resultCollect_member);
 					}
 				}
