@@ -738,6 +738,7 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 							if (currentMemberDetail->IndexLevel == 1)
 							{
 								resultCollect[memberIndex][indexGroup] = (currentFormResult->MarkGroupResults->at(currentMemberDetail->FirstLevelIndex.groupIndex)->TextResult);
+								indexGroup++;
 								if (recSuc && !scoreRec)
 								{
 									scoreWeight.append(currentMemberDetail->FirstLevelIndex.weightNumerator);
@@ -750,6 +751,7 @@ bool LoadDataFile::generateTestResult(QList<MResult*>* results, QString excelNam
 								for (int j = 0; j < currentMemberDetail->SecondLevelIndex.count(); j++)
 								{
 									resultCollect[memberIndex][indexGroup] = (currentFormResult->MarkGroupResults->at(currentMemberDetail->SecondLevelIndex.at(j).groupIndex)->TextResult);
+									indexGroup++;
 									if (recSuc && !scoreRec)
 									{
 										scoreWeight.append(currentMemberDetail->SecondLevelIndex.at(j).weightNumerator);
