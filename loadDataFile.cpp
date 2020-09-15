@@ -264,7 +264,14 @@ void LoadDataFile::initSheet(int sheetIndex, int patternCount)
 				indexNode->append(_currentPattern->MemberIndexs->at(memberIndexCount)->MemberDetailIndexs->at(i));
 				//_currentPattern->MemberIndexs->at(patternCount)->MemberDetailIndexs->at()->FirstLevelIndex.name
 				indexNameF.append(indexNode->at(i)->FirstLevelIndex.name);
-				_mExcelReader->writeExcel(2, indexCountT, indexNameF.at(i), format1);
+				if (indexNode->last()->IndexLevel == 1)
+				{
+					_mExcelReader->writeExcel(2, indexCountT, indexNameF.last(), format1);
+				}
+				else if (indexNode->last()->IndexLevel == 2)
+				{
+					_mExcelReader->writeExcel(2, indexCountT, indexNode->last()->SecondIndexName, format1);
+				}
 				int initMark = indexCountT;
 				//二级指标
 				unsigned j = 0;
@@ -328,13 +335,20 @@ void LoadDataFile::initSheet(int sheetIndex, int patternCount)
 				indexNode->append(_currentPattern->MemberIndexs->at(memberIndexCount)->MemberDetailIndexs->at(i));
 				//_currentPattern->MemberIndexs->at(patternCount)->MemberDetailIndexs->at()->FirstLevelIndex.name
 				indexNameF.append(indexNode->last()->FirstLevelIndex.name);
-				_mExcelReader->writeExcel(2, indexCountT, indexNameF.last(), format1);
+				if (indexNode->last()->IndexLevel == 1)
+				{
+					_mExcelReader->writeExcel(2, indexCountT, indexNameF.last(), format1);
+				}
+				else if (indexNode->last()->IndexLevel == 2)
+				{
+					_mExcelReader->writeExcel(2, indexCountT, indexNode->last()->SecondIndexName, format1);
+				}
 				int initMark = indexCountT;
 				//二级指标
 				unsigned j;
 				for (j = 0; j < indexNode->last()->SecondLevelIndex.count(); j++)
 				{
-					_mExcelReader->writeExcel(4, indexCountT, indexNode->last()->SecondLevelIndex.at(j).name, format1);
+					_mExcelReader->writeExcel(3, indexCountT, indexNode->last()->SecondLevelIndex.at(j).name, format1);
 					MGroupPattern* tempGroupPattern = _currentPattern->GetFormPattern(0)->MarkGroupPattern->at(indexNode->at(i)->SecondLevelIndex.at(j).groupIndex);
 					cellListCount[sheetIndex].append(0);
 					cellListCount[sheetIndex][indexCountGroup] = tempGroupPattern->CellList->count();
@@ -382,7 +396,7 @@ void LoadDataFile::initSheet(int sheetIndex, int patternCount)
 				}
 				else
 				{
-					_mExcelReader->mergeCells(2, initMark, 3, indexCountT - 1, format1);
+					_mExcelReader->mergeCells(2, initMark, 2, indexCountT - 1, format1);
 				}
 			}
 		}
