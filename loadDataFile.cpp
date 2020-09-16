@@ -1451,6 +1451,7 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			QList<QList<QList<int>>> memberTypeRecord; 
 			QList<QList<QList<int>>> receiveCount;//收回数 计数subjectIndex
 			QList<int> unitCountRecord;
+			bool indexComplete = true;
 			for (int i = 0; i < _currentMemberInfo->EvaluationMembers->count(); i++)
 			{
 				unitCountRecord.append(_currentMemberInfo->EvaluationMembers->at(i)->EvaluationMembers->count());
@@ -1732,6 +1733,11 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 										{
 											for (int groupIndex = 0; groupIndex < cellListCount.at(tempType).count();)
 											{
+												if (currentMember->MemberDetailIndexs->isEmpty())
+												{
+													indexComplete = false;
+													break;
+												}
 												MemberDetailIndex* currentIndex = currentMember->MemberDetailIndexs->at(groupIndex);
 												if (currentIndex->IndexLevel == 1)
 												{
@@ -1924,6 +1930,10 @@ bool LoadDataFile::generateExcelResult(QList<MResult*>* results, QString excelNa
 			if (lackPage)
 			{
 				emit outputUnexpected(u8"有仍未矫正的无效页!");
+			}
+			if (!indexComplete)
+			{
+				emit outputUnexpected(u8"成员指标配布不完整");
 			}
 
 			QList<int> subjectWeight;
