@@ -502,7 +502,14 @@ void LoadDataFile::initSheet_test(int sheetIndex, int patternCount)
 			indexNode->append(_currentPattern->MemberIndexs->at(pageIndex)->MemberDetailIndexs->at(i));
 			//_currentPattern->MemberIndexs->at(patternCount)->MemberDetailIndexs->at()->FirstLevelIndex.name
 			indexNameF.append(indexNode->last()->FirstLevelIndex.name);
-			_mExcelReader->writeExcel(2, indexCountT, indexNameF.last(), format1);
+			if (indexNode->last()->IndexLevel == 1)
+			{
+				_mExcelReader->writeExcel(2, indexCountT, indexNameF.last(), format1);
+			}
+			else if (indexNode->last()->IndexLevel == 2)
+			{
+				_mExcelReader->writeExcel(2, indexCountT, indexNode->last()->SecondIndexName, format1);
+			}
 			int initMark = indexCountT;
 			//二级指标
 			unsigned j;
